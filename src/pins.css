@@ -1,0 +1,57 @@
+.pin {
+ display: inline-block;
+ width: 12rem;
+}
+
+.searchFields {
+  width: 100%;
+  align-items: center;
+}
+
+.searchFields label {
+  display: inline-flexbox;
+  text-align: left;
+  font-weight: bolder;
+}
+
+.searchFields input[type="text"], .searchFields textarea, .searchFields select {
+  display: inline;
+  width: 300px;
+}
+
+img.pinImage {
+  max-height: 120px;
+  max-width: 120px;
+}
+
+div.filterQrCode { 
+  display: inline-block;
+  margin: 16pt;
+}
+
+div.searchFields {
+  display: inline-block
+}
+
+div.listButtons button {
+  margin: 4px;
+  width: 64px;
+  height: 64px;
+  border-radius: 100%;
+  border: 3px solid #000;
+  color: #000;
+}
+
+div.listButtons button.addButton {
+  font-size: 36pt;
+  background-color: rgb(90, 180, 90);
+}
+
+div.listButtons button.removeButton {
+  font-size: 36pt;
+  background-color: rgb(150, 82, 82);
+}
+
+.drawerButton {
+  min-width: 100;
+}

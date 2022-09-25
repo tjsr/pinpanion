@@ -1,0 +1,42 @@
+[
+  {
+    "id": 0,
+    "description": "PAX"
+  },
+  {
+    "id": 1,
+    "description": "Prime"
+  },
+  {
+    "id": 2,
+    "description": "East"
+  },
+  {
+    "id": 3,
+    "description": "Aus"
+  },
+  {
+    "id": 4,
+    "description": "PAX"
+  },
+  {
+    "id": 5,
+    "description": "Online"
+  },
+  {
+    "id": 6,
+    "description": "Limited"
+  },
+  {
+    "id": 7,
+    "description": "Gaming"
+  },
+  {
+    "id": 8,
+    "description": "South"
+  },
+  {
+    "id": 9,
+    "description": "Unplugged"
+  }
+]
