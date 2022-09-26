@@ -55,3 +55,8 @@ div.listButtons button.removeButton {
 .drawerButton {
   min-width: 100;
 }
+
+div.qrQuietZone {
+  background: 'white';
+  padding: '16px';
+}

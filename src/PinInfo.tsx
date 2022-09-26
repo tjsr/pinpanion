@@ -29,10 +29,7 @@ export const PinInfo = ({
 
   return (
     <>
-      <div
-        className="pin"
-        id={`pin_${pin.id}`}
-      >
+      <div className="pin" id={`pin_${pin.id}`}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
           {pinPax?.name ? <div className="pax">{pinPax?.name}</div> : <></>}

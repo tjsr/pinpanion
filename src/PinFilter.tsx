@@ -17,7 +17,7 @@ import { filterStringToIds } from './listutils';
 import fuzzy from 'fuzzy';
 import { isEmpty } from './utils';
 
-type PinListFilterProps = {
+export type PinListFilterDisplayProps = {
   filter?: PinListFilter;
   paxs?: PAX[];
   pinSets?: PinSet[];
@@ -122,7 +122,7 @@ export const PinListFilterDisplay = ({
   paxs,
   pinSets,
   onChange,
-}: PinListFilterProps): JSX.Element => {
+}: PinListFilterDisplayProps): JSX.Element => {
   return (
     <>
       {filter && (

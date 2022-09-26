@@ -5,7 +5,7 @@ import { SEARCH_CONTROL_WIDTH } from './globals';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 
-type PinSelectionFilterProps = {
+export type PinSelectionFilterProps = {
   filter: PinListFilter;
   onChange: (updatedFilter: PinListFilter) => void;
 };

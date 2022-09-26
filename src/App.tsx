@@ -4,24 +4,29 @@ import './pins.css';
 import { PAX, Pin, PinListFilter, PinSet } from './types';
 import React, { useEffect, useState } from 'react';
 
-import Button from '@mui/material/Button';
-import Drawer from '@mui/material/Drawer';
 import { EMPTY_FILTER } from './fixture';
 import { FilterQRCode } from './filterqrcode';
+import { PinAppDrawerSet } from './PinAppDrawerSet';
 import { PinList } from './PinList';
 import { PinListFilterDisplay } from './PinFilter';
 import { PinSelectionFilter } from './PinSelectionFilter';
 import { filterStringToIds } from './listutils';
-import { isEmpty } from './utils';
+import useHashParam from 'use-hash-param';
 
 function App() {
   // const allPins: Pin[];
+  // const [hash, setHash] = useHash();
+  const [filterHash, setFilterHash] = useHashParam('filter', '');
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
   const [paxs, setPaxs] = useState<PAX[]>([]);
-  const [filter, setFilter] = useState<PinListFilter>(EMPTY_FILTER);
+  const [filter, setFilter] = useState<PinListFilter>({
+    ...EMPTY_FILTER,
+    selectedPinsList: filterHash
+  });
 
   useEffect(() => {
+    // setHash('#');
     const fetchPins = async () => {
       const response = await fetch('sample.json', {
         mode: 'cors',
@@ -37,70 +42,14 @@ function App() {
     fetchPins();
   }, []);
 
-  const [filterSelectionState, setSelectionDrawerState] =
-    React.useState<boolean>(false);
-  const [filterDrawerState, setFilterDrawerState] =
-    React.useState<boolean>(false);
-  const [filterQrState, setQrDrawerState] = React.useState<boolean>(false);
-
-  const toggleDrawer =
-    (drawer: string, display: boolean) =>
-      (event: React.KeyboardEvent | React.MouseEvent) => {
-        {
-          if (
-            event.type === 'keydown' &&
-          ((event as React.KeyboardEvent).key === 'Tab' ||
-            (event as React.KeyboardEvent).key === 'Shift')
-          ) {
-            return;
-          }
-
-          switch (drawer) {
-          case 'selection':
-            setSelectionDrawerState(display);
-            break;
-          case 'filter':
-            setFilterDrawerState(display);
-            break;
-          case 'qr':
-            setQrDrawerState(display);
-            break;
-          }
-        }
-      };
-
-  const getFilterButtonLabel = (): string => {
-    let filters = 0;
-    if (filter.endYear) {
-      filters++;
-    }
-    if (filter.startYear) {
-      filters++;
-    }
-    if (!isEmpty(filter.filterText)) {
-      filters++;
-    }
-    if (filter?.paxId !== undefined && filter?.paxId > 0) {
-      filters++;
-    }
-    if (filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
-      filters++;
-    }
-    if (filters > 0) {
-      return `Filters (${filters})`;
-    } else {
-      return 'Filters';
-    }
+  const buildFilterHashString = (filter: PinListFilter): string => {
+    return filterStringToIds(filter.selectedPinsList || '').join(',');
   };
 
-  const getSelectionButtonLabel = (): string => {
-    if (isEmpty(filter.selectedPinsList)) {
-      return 'Selection';
-    }
-    const selectedPins: number = filterStringToIds(
-      filter.selectedPinsList || ''
-    ).length;
-    return `Selection (${selectedPins})`;
+  const filterUpdated = (updatedFilter: PinListFilter): void => {
+    const filterString: string = buildFilterHashString(updatedFilter);
+    setFilterHash(filterString);
+    setFilter(updatedFilter);
   };
 
   return (
@@ -108,77 +57,27 @@ function App() {
       <>
         {pins && (
           <>
-            <React.Fragment key={'selection'}>
-              {filter.selectedPinsOnly ? (
-                <Button
-                  className="drawerButton"
-                  variant="contained"
-                  onClick={toggleDrawer('selection', true)}
-                >
-                  {getSelectionButtonLabel()}
-                </Button>
-              ) : (
-                <Button
-                  className="drawerButton"
-                  onClick={toggleDrawer('selection', true)}
-                >
-                  {getSelectionButtonLabel()}
-                </Button>
-              )}
-              <Drawer
-                anchor={'top'}
-                open={filterSelectionState}
-                onClose={toggleDrawer('selection', false)}
-              >
-                <PinSelectionFilter filter={filter} onChange={setFilter} />
-              </Drawer>
-            </React.Fragment>
-
-            <React.Fragment key={'filter'}>
-              <Button
-                className="drawerButton"
-                onClick={toggleDrawer('filter', true)}
-              >
-                {getFilterButtonLabel()}
-              </Button>
-              <Drawer
-                anchor={'top'}
-                open={filterDrawerState}
-                onClose={toggleDrawer('filter', false)}
-                ModalProps={{
-                  keepMounted: true,
-                }}
-              >
+            <PinAppDrawerSet
+              filter={filter}
+              pinListFilterDisplay={
                 <PinListFilterDisplay
                   filter={filter}
                   paxs={paxs}
                   pinSets={pinSets}
-                  onChange={setFilter}
+                  onChange={filterUpdated}
                 />
-              </Drawer>
-            </React.Fragment>
-
-            <React.Fragment key={'qr'}>
-              <Button
-                className="drawerButton"
-                onClick={toggleDrawer('qr', true)}
-              >
-                QR
-              </Button>
-              <Drawer
-                anchor={'top'}
-                open={filterQrState}
-                onClose={toggleDrawer('qr', false)}
-              >
-                <FilterQRCode filter={filter} />
-              </Drawer>
-            </React.Fragment>
+              }
+              qrCode={<FilterQRCode filter={filter} />}
+              pinSelectionFilter={
+                <PinSelectionFilter filter={filter} onChange={filterUpdated} />
+              }
+            />
             <PinList
               pins={pins}
               paxs={paxs}
               pinSets={pinSets}
               filter={filter}
-              setFilter={setFilter}
+              setFilter={filterUpdated}
             />
           </>
         )}
