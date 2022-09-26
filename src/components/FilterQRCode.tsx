@@ -1,7 +1,7 @@
-import { PinListFilter } from './types';
+import { PinListFilter } from '../types';
 import QRCode from 'react-qr-code';
-import { QR_CODE_SIZE } from './globals';
-import { filterStringToIds } from './listutils';
+import { QR_CODE_SIZE } from '../globals';
+import { filterStringToIds } from '../listutils';
 
 export type FilterQRCodeProps = {
   filter: PinListFilter;

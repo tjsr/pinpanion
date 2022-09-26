@@ -1,4 +1,4 @@
-import { PAX, Pin, PinSet } from './types';
+import { PAX, Pin, PinSet } from '../types';
 
 import React from 'react';
 

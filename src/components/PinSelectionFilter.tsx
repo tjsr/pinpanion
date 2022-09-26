@@ -1,7 +1,7 @@
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { PinListFilter } from './types';
-import { SEARCH_CONTROL_WIDTH } from './globals';
+import { PinListFilter } from '../types';
+import { SEARCH_CONTROL_WIDTH } from '../globals';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 

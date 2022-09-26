@@ -1,21 +1,19 @@
-import './App.css';
-import './pins.css';
+import './css/App.css';
+import './css/pins.css';
 
 import { PAX, Pin, PinListFilter, PinSet } from './types';
 import React, { useEffect, useState } from 'react';
 
 import { EMPTY_FILTER } from './fixture';
-import { FilterQRCode } from './filterqrcode';
-import { PinAppDrawerSet } from './PinAppDrawerSet';
-import { PinList } from './PinList';
-import { PinListFilterDisplay } from './PinFilter';
-import { PinSelectionFilter } from './PinSelectionFilter';
+import { FilterQRCode } from './components/FilterQRCode';
+import { PinAppDrawerSet } from './components/PinAppDrawerSet';
+import { PinList } from './components/PinList';
+import { PinListFilterDisplay } from './components/PinFilter';
+import { PinSelectionFilter } from './components/PinSelectionFilter';
 import { filterStringToIds } from './listutils';
 import useHashParam from 'use-hash-param';
 
 function App() {
-  // const allPins: Pin[];
-  // const [hash, setHash] = useHash();
   const [filterHash, setFilterHash] = useHashParam('filter', '');
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
@@ -26,7 +24,6 @@ function App() {
   });
 
   useEffect(() => {
-    // setHash('#');
     const fetchPins = async () => {
       const response = await fetch('sample.json', {
         mode: 'cors',

@@ -1,7 +1,7 @@
-import './pins.css';
+import '../css/pins.css';
 
-import { PAX, Pin, PinListFilter, PinSet } from './types';
-import { addIdToList, removeIdFromList } from './listutils';
+import { PAX, Pin, PinListFilter, PinSet } from '../types';
+import { addIdToList, removeIdFromList } from '../listutils';
 import { isPinFiltered, isPinSelected } from './PinFilter';
 
 import { PinInfo } from './PinInfo';

@@ -2,12 +2,12 @@ import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import { FilterQRCodeProps } from './filterqrcode';
-import { PinListFilter } from './types';
+import { FilterQRCodeProps } from './FilterQRCode';
+import { PinListFilter } from '../types';
 import { PinListFilterDisplayProps } from './PinFilter';
 import { PinSelectionFilterProps } from './PinSelectionFilter';
-import { filterStringToIds } from './listutils';
-import { isEmpty } from './utils';
+import { filterStringToIds } from '../listutils';
+import { isEmpty } from '../utils';
 
 type PinAppDrawerSetProps = {
   filter: PinListFilter;

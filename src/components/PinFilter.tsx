@@ -1,21 +1,21 @@
-import './pins.css';
+import '../css/pins.css';
 
-import { PAX, Pin, PinListFilter, PinSet } from './types';
+import { PAX, Pin, PinListFilter, PinSet } from '../types';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
-import { EMPTY_FILTER } from './fixture';
+import { EMPTY_FILTER } from '../fixture';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { SEARCH_CONTROL_WIDTH } from './globals';
+import { SEARCH_CONTROL_WIDTH } from '../globals';
 import TextField from '@mui/material/TextField';
 import { YearSelector } from './YearSelector';
-import eventnames from './eventnames.json';
-import { filterStringToIds } from './listutils';
+import eventnames from '../eventnames.json';
+import { filterStringToIds } from '../listutils';
 import fuzzy from 'fuzzy';
-import { isEmpty } from './utils';
+import { isEmpty } from '../utils';
 
 export type PinListFilterDisplayProps = {
   filter?: PinListFilter;
