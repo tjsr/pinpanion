@@ -24,6 +24,14 @@ export type PinnypalsPinsRequest = {
   pins: Pin[];
 };
 
+export type PinSelectionList = {
+  name: string
+  id: string
+  availableIds: number[]
+  wantedIds: number[],
+  revision: number,
+}
+
 export type PinListFilter = {
   startYear?: number;
   endYear?: number;
