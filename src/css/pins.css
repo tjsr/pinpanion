@@ -47,6 +47,12 @@ div.listButtons button.addButton {
   background-color: rgb(90, 180, 90);
 }
 
+div.listButtons button:disabled {
+  color: #927a56;
+  border: 1px solid #888;
+  opacity: 0.50;
+}
+
 div.listButtons button.removeButton {
   font-size: 36pt;
   background-color: rgb(150, 82, 82);
