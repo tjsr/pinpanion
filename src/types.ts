@@ -53,3 +53,5 @@ export type PinSet = {
   name: string;
   year: number;
 };
+
+export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
