@@ -11,28 +11,44 @@ import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { countFilters } from './utils';
-import { filterStringToIds } from './listutils';
 import useHashParam from 'use-hash-param';
 
 const isPinOnLanyard = (pin:Pin, lanyard: PinSelectionList):boolean => {
-  return lanyard.availableIds.includes(pin.id) || lanyard.wantedIds.includes(pin.id);
+  return lanyard.availableIds.includes(+pin.id) || lanyard.wantedIds.includes(+pin.id);
 };
 
 function App() {
-  const [filterHash, setFilterHash] = useHashParam('filter', '');
+  const [availIdHash, setAvailIdHash] = useHashParam('availableIds', '');
+  const [wantedIdHash, setWantedIdHash] = useHashParam('wantedIds', '');
+  const [idHash, setIdHash] = useHashParam('id', '');
+  const [listNameHash, setlistNameHash] = useHashParam('name', '');
+  const [revisionHash, setRevisionHash] = useHashParam('revision', '');
+
+
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
   const [paxs, setPaxs] = useState<PAX[]>([]);
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
-    selectedPinsList: filterHash,
   });
   // const [selectionListIndex, updateSelectionListIndex] = useState<number>(0);
   const [selectionFilterEnabled, setSelectionFilterEnabled] =
     useState<boolean>(false);
 
   const buildSetsFromFilterHash = (): PinSelectionList[] => {
-    return [newSelectionList()];
+    let revision:number = parseInt(revisionHash);
+    if (isNaN(revision)) {
+      revision = 0;
+    }
+    const selection: PinSelectionList = {
+      ...newSelectionList(),
+      availableIds: availIdHash.split(',').map((n) => parseInt(n)),
+      id: idHash,
+      name: listNameHash,
+      revision,
+      wantedIds: wantedIdHash.split(',').map((n) => parseInt(n)),
+    };
+    return [selection];
   };
 
   const [pinSelectionLists, updateLists] = useState<PinSelectionList[]>(
@@ -55,14 +71,13 @@ function App() {
     fetchPins();
   }, []);
 
-  const buildFilterHashString = (filter: PinListFilter): string => {
-    return filterStringToIds(filter.selectedPinsList || '').join(',');
-  };
-
-  const filterUpdated = (updatedFilter: PinListFilter): void => {
-    const filterString: string = buildFilterHashString(updatedFilter);
-    setFilterHash(filterString);
-    setFilter(updatedFilter);
+  const updateListHash = (selection: PinSelectionList): void => {
+    setAvailIdHash(selection.availableIds.join(','));
+    setWantedIdHash(selection.wantedIds.join(','));
+    setIdHash(selection.id);
+    setlistNameHash(selection.name);
+    setRevisionHash(selection.revision.toString());
+    window.location.href = window.location.href.replaceAll('%2C', ',');
   };
 
   const selectionListUpdated = (updatedList: PinSelectionList): void => {
@@ -75,7 +90,11 @@ function App() {
         recreatedList[i] = pinSelectionLists[i];
       }
     }
+    if (isNaN(updatedList.revision)) {
+      updatedList.revision = 0;
+    }
     updateLists(recreatedList);
+    updateListHash(updatedList);
   };
 
   const getPinListHeading = (): string => {
@@ -102,10 +121,10 @@ function App() {
                   filter={filter}
                   paxs={paxs}
                   pinSets={pinSets}
-                  onChange={filterUpdated}
+                  onChange={setFilter}
                 />
               }
-              qrCode={<FilterQRCode filter={filter} />}
+              qrCode={<FilterQRCode selection={pinSelectionLists[0]} />}
               pinSelectionFilter={
                 <PinSelectionListEditor
                   enableFilter={selectionFilterEnabled}
@@ -121,11 +140,9 @@ function App() {
               activePinSet={pinSelectionLists[0]}
               filter={filter}
               heading={getPinListHeading()}
-
               isPinFiltered={(pin:Pin) => {
-                return isPinFiltered(pin, filter) || (
-                  selectionFilterEnabled && !isPinOnLanyard(pin, pinSelectionLists[0])
-                );
+                return (selectionFilterEnabled && !isPinOnLanyard(pin, pinSelectionLists[0])) ||
+                  isPinFiltered(pin, filter);
               }}
               paxs={paxs}
               pins={pins}

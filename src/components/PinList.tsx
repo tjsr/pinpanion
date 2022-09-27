@@ -33,7 +33,6 @@ export const PinList = ({
   const displayedPins: Pin[] = pins.filter(
     (pin: Pin) => !isPinFiltered(pin, filter)
   );
-
   // const addToSelection = (id: number): void => {
   //   const selectedPinsList: string = addIdToList(
   //     filter?.selectedPinsList || '',
@@ -75,10 +74,10 @@ export const PinList = ({
     );
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList();
-      console.log(`New wanted list: ${availableIds}`);
       setPinSet({
         ...base,
         availableIds,
+        revision: ++base.revision,
       });
     }
   };
@@ -87,9 +86,9 @@ export const PinList = ({
     const wantedIds: number[] = removeOrAddId(activePinSet?.wantedIds, pinId);
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList();
-      console.log(`New wanted list: ${wantedIds}`);
       setPinSet({
         ...base,
+        revision: ++base.revision,
         wantedIds,
       });
     }

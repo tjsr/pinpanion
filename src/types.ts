@@ -40,7 +40,6 @@ export type PinListFilter = {
   selectedPinsOnly?: boolean;
   paxId?: number;
   pinSetId?: number;
-  selectedPinsList?: string;
   filterText?: string;
 };
 

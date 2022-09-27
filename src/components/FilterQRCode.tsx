@@ -1,24 +1,24 @@
-import { PinListFilter } from '../types';
+import { PinSelectionList } from '../types';
 import QRCode from 'react-qr-code';
 import { QR_CODE_SIZE } from '../globals';
-import { filterStringToIds } from '../listutils';
 
 export type FilterQRCodeProps = {
-  filter: PinListFilter;
+  selection: PinSelectionList;
 };
-export const FilterQRCode = ({ filter }: FilterQRCodeProps): JSX.Element => {
+export const FilterQRCode = ({ selection }: FilterQRCodeProps): JSX.Element => {
   const generateQrCode = (): string => {
-    return filter?.selectedPinsList ?
-      filterStringToIds(filter?.selectedPinsList).join(',') :
-      '';
+    return window.location.href;
+    // return selection?.selectedPinsList ?
+    //   filterStringToIds(filter?.selectedPinsList).join(',') :
+    //   '';
   };
 
   return (
-    <div className="filterQrCode">
+    <div className="selectionQrCode">
       <div className="qrQuietZone">
         <QRCode
           size={QR_CODE_SIZE}
-          className="filterQrCode"
+          className="selectionQrCode"
           value={generateQrCode()}
           viewBox={`0 0 ${QR_CODE_SIZE} ${QR_CODE_SIZE}`}
         />
