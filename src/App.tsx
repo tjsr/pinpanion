@@ -37,8 +37,18 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
-  const [selectionFilterEnabled, setSelectionFilterEnabled] =
-    useState<boolean>(false);
+
+  const shouldDefaultShowSelection = (): boolean => {
+    const rh: number = parseInt(revisionHash);
+    if (!isNaN(rh) && rh > 0) {
+      return true;
+    }
+    return false;
+  };
+
+  const [selectionFilterEnabled, setSelectionFilterEnabled] = useState<boolean>(
+    shouldDefaultShowSelection()
+  );
 
   const buildSetsFromFilterHash = (): PinSelectionList[] => {
     let revision: number = parseInt(revisionHash);
@@ -160,7 +170,7 @@ const App = (): JSX.Element => {
                   onChange={setFilter}
                 />
               }
-              qrCode={<FilterQRCode lanyard={activePinList}/>}
+              qrCode={<FilterQRCode lanyard={activePinList} />}
               pinSelectionFilter={
                 <PinSelectionListEditor
                   enableFilter={selectionFilterEnabled}
