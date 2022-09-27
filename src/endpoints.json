@@ -1,5 +1,0 @@
-{
-  "pinnypals": "https://pinnypals.com/scripts/queryPins.php",
-  "proxy": "http://localhost:8080/pins",
-  "imagePrefix": "https://pinnypals.com/imgs"
-}

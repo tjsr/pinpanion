@@ -4,6 +4,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
+import config from '../config.json';
 
 type YearSelectorProps = {
   minYear: number;
@@ -19,12 +20,15 @@ export const getCurrentYear = (): number => {
 };
 
 export const YearSelector = (props: YearSelectorProps): JSX.Element => {
-  const years = [];
+  let years = [];
 
   const maxYear = !props.maxYear ? getCurrentYear() : props.maxYear;
 
   for (let cy = props.minYear; cy <= maxYear; cy++) {
     years.push(cy);
+  }
+  if (config.reverseYears) {
+    years = years.reverse();
   }
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>

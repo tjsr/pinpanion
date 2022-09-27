@@ -11,6 +11,7 @@ import { PinSetSelector } from './PinSetSelector';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import TextField from '@mui/material/TextField';
 import { YearSelector } from './YearSelector';
+import config from '../config.json';
 import fuzzy from 'fuzzy';
 import { isEmpty } from '../utils';
 
@@ -66,8 +67,8 @@ export const PinSearchFilterDisplay = ({
           <YearSelector
             id="startYear"
             selectedYear={filter?.startYear}
-            minYear={2013}
-            maxYear={2022}
+            minYear={config.minYear}
+            maxYear={config.maxYear}
             label="Year from"
             yearChanged={(startYear: number) => {
               const updatedFilter = {
@@ -86,8 +87,8 @@ export const PinSearchFilterDisplay = ({
           <YearSelector
             id="endYear"
             selectedYear={filter?.endYear}
-            minYear={2013}
-            maxYear={2022}
+            minYear={config.minYear}
+            maxYear={config.maxYear}
             label="Year until"
             yearChanged={(endYear: number) => {
               const updatedFilter = {
