@@ -32,7 +32,7 @@ export const PinListButtons = ({
           setPinAvailable(pinId);
         }}
       >
-        +
+        A
       </button>
       <button
         className={wantedClasses}
@@ -42,7 +42,7 @@ export const PinListButtons = ({
           setPinWanted(pinId);
         }}
       >
-        -
+        W
       </button>
     </div>
   );
