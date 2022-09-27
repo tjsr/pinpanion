@@ -1,7 +1,7 @@
 import './css/App.css';
 import './css/pins.css';
 
-import { EMPTY_FILTER, newSelectionList } from './fixture';
+import { EMPTY_FILTER, generateListId, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import {
   PinSearchFilterDisplay,
@@ -14,6 +14,7 @@ import { FilterQRCode } from './components/FilterQRCode';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
+import { generateRandomName } from './namegenerator';
 import useHashParam from 'use-hash-param';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
@@ -23,7 +24,7 @@ const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
   );
 };
 
-function App() {
+const App = (): JSX.Element => {
   const [availIdHash, setAvailIdHash] = useHashParam('availableIds', '');
   const [wantedIdHash, setWantedIdHash] = useHashParam('wantedIds', '');
   const [idHash, setIdHash] = useHashParam('id', '');
@@ -37,7 +38,7 @@ function App() {
     ...EMPTY_FILTER,
   });
   const [selectionFilterEnabled, setSelectionFilterEnabled] =
-  useState<boolean>(false);
+    useState<boolean>(false);
 
   const buildSetsFromFilterHash = (): PinSelectionList[] => {
     let revision: number = parseInt(revisionHash);
@@ -51,16 +52,19 @@ function App() {
       [] :
       wantedIdHash.split(',').map((n) => parseInt(n));
 
-    console.log(availIdHash);
-    console.log(wantedIdHash);
-    console.log(availableIds);
-    console.log(wantedIds);
+    const id: string = isEmpty(idHash) ? generateListId() : idHash;
+    const name: string = isEmpty(listNameHash) ? '' : listNameHash;
+
+    // console.log(availIdHash);
+    // console.log(wantedIdHash);
+    // console.log(availableIds);
+    // console.log(wantedIds);
 
     const selection: PinSelectionList = {
       ...newSelectionList(),
       availableIds,
-      id: idHash,
-      name: listNameHash,
+      id,
+      name,
       revision,
       wantedIds,
     };
@@ -70,19 +74,36 @@ function App() {
   const [pinSelectionLists, updateLists] = useState<PinSelectionList[]>(
     buildSetsFromFilterHash()
   );
-  const [activePinList, setActivePinList] = useState<PinSelectionList>(pinSelectionLists[0]);
+  const [activePinList, setActivePinList] = useState<PinSelectionList>(
+    pinSelectionLists[0]
+  );
 
   useEffect(() => {
     const fetchPins = async () => {
-      const response = await fetch('sample.json', {
+      const response = await fetch('pins.json', {
         mode: 'cors',
       });
       const data: any = await response.json();
+
       setPins(data.pins);
       setPinSets(data.sets);
       setPaxs(data.paxs);
     };
+    const assignRandomName = async () => {
+      const randomAnimal: string = await generateRandomName();
+      if (isEmpty(listNameHash) && isEmpty(pinSelectionLists[0].name)) {
+        console.log(
+          'A random animal name has been assigned to this list: ' + randomAnimal
+        );
+        selectionListUpdated({
+          ...pinSelectionLists[0],
+          name: randomAnimal,
+        });
+      }
+    };
+
     fetchPins();
+    assignRandomName();
   }, []);
 
   const updateListHash = (selection: PinSelectionList): void => {
@@ -157,11 +178,10 @@ function App() {
               heading={getPinListHeading()}
               isPinFiltered={(pin: Pin) => {
                 if (selectionFilterEnabled) {
-                  const isOnLanyard: boolean = isPinOnLanyard(pin, activePinList);
-                  if (pin.id < 20) {
-                    console.log(activePinList);
-                    console.log(`Pin ${pin.id} isOnLanyard=${isOnLanyard}`);
-                  }
+                  const isOnLanyard: boolean = isPinOnLanyard(
+                    pin,
+                    activePinList
+                  );
                   return !isOnLanyard;
                 }
                 return isPinFiltered(pin, filter);
@@ -176,6 +196,6 @@ function App() {
       </>
     </div>
   );
-}
+};
 
 export default App;
