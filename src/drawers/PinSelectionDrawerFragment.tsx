@@ -1,3 +1,5 @@
+import '../css/pins.css';
+
 import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
@@ -52,7 +54,9 @@ export const PinSelectionDrawerFragment = ({
         open={filterSelectionState}
         onClose={toggleDrawer('selection', false)}
       >
-        {pinSelectionFilter}
+        <div className="drawer">
+          <div className="drawerContent">{pinSelectionFilter}</div>
+        </div>
       </Drawer>
     </React.Fragment>
   );

@@ -28,82 +28,86 @@ export const PinSelectionEditor = ({
 }: PinSelectionProps): JSX.Element => {
   return (
     <>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-          <TextField
-            id="listName"
-            label="List Name"
-            variant="outlined"
-            value={pinList?.name}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const updatedList: PinSelectionList = {
-                ...pinList,
-                name: event.target.value,
-              };
-              onChange(updatedList);
-              return true;
-            }}
-          />
-        </FormControl>
-      </div>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-          <TextField
-            id="selectedPins"
-            label="Wanted"
-            variant="outlined"
-            value={pinList?.wantedIds}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const wantedIds: number[] = filterStringToIds(event.target.value);
+      <div className="pinSelectionFilter">
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <TextField
+              id="listName"
+              label="List Name"
+              variant="outlined"
+              value={pinList?.name}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const updatedList: PinSelectionList = {
+                  ...pinList,
+                  name: event.target.value,
+                };
+                onChange(updatedList);
+                return true;
+              }}
+            />
+          </FormControl>
+        </div>
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <TextField
+              id="selectedPins"
+              label="Wanted"
+              variant="outlined"
+              value={pinList?.wantedIds}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const wantedIds: number[] = filterStringToIds(
+                  event.target.value
+                );
 
-              const updatedList: PinSelectionList = {
-                ...pinList,
-                revision: pinList.revision + 1,
-                wantedIds,
-              };
-              onChange(updatedList);
-              return true;
-            }}
-          />
-        </FormControl>
-      </div>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-          <TextField
-            id="selectedPins"
-            label="Available"
-            variant="outlined"
-            value={pinList?.availableIds}
-            onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-              const availableIds: number[] = filterStringToIds(
-                event.target.value
-              );
-              const updatedList: PinSelectionList = {
-                ...pinList,
-                availableIds,
-                revision: pinList.revision + 1,
-              };
-              onChange(updatedList);
-              return true;
-            }}
-          />
-        </FormControl>
-      </div>
-      <div>
-        <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-          <FormControlLabel
-            control={
-              <Switch
-                id="selectedPinsOnly"
-                checked={displayList}
-                onChange={(event: React.FormEvent<HTMLInputElement>) => {
-                  changeListDisplayed(event.currentTarget.checked);
-                }}
-              />
-            }
-            label="Show selected pins only"
-          />
-        </FormControl>
+                const updatedList: PinSelectionList = {
+                  ...pinList,
+                  revision: pinList.revision + 1,
+                  wantedIds,
+                };
+                onChange(updatedList);
+                return true;
+              }}
+            />
+          </FormControl>
+        </div>
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <TextField
+              id="selectedPins"
+              label="Available"
+              variant="outlined"
+              value={pinList?.availableIds}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const availableIds: number[] = filterStringToIds(
+                  event.target.value
+                );
+                const updatedList: PinSelectionList = {
+                  ...pinList,
+                  availableIds,
+                  revision: pinList.revision + 1,
+                };
+                onChange(updatedList);
+                return true;
+              }}
+            />
+          </FormControl>
+        </div>
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <FormControlLabel
+              control={
+                <Switch
+                  id="selectedPinsOnly"
+                  checked={displayList}
+                  onChange={(event: React.FormEvent<HTMLInputElement>) => {
+                    changeListDisplayed(event.currentTarget.checked);
+                  }}
+                />
+              }
+              label="Show selected pins only"
+            />
+          </FormControl>
+        </div>
       </div>
     </>
   );

@@ -1,3 +1,5 @@
+import '../css/pins.css';
+
 import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
@@ -55,7 +57,9 @@ export const PinFilterDrawerFragment = ({
           keepMounted: true,
         }}
       >
-        {pinListFilterDisplay}
+        <div className="drawer">
+          <div className="drawerContent">{pinListFilterDisplay}</div>
+        </div>
       </Drawer>
     </React.Fragment>
   );

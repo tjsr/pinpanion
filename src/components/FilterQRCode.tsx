@@ -17,7 +17,7 @@ export const FilterQRCode = ({}: FilterQRCodeProps): JSX.Element => {
           viewBox={`0 0 ${QR_CODE_SIZE} ${QR_CODE_SIZE}`}
         />
       </div>
-      <div>
+      <div className="qrDescription">
         Use this QR code to allow others to scan, which will let them browse
         this list of selected pins.
       </div>

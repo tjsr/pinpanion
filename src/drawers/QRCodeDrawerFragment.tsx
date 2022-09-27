@@ -1,3 +1,5 @@
+import '../css/pins.css';
+
 import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
@@ -28,7 +30,9 @@ export const QRCodeDrawerFragment = ({
         open={filterQrState}
         onClose={toggleDrawer('qr', false)}
       >
-        {qrCode}
+        <div className="drawer">
+          <div className="drawerContent">{qrCode}</div>
+        </div>
       </Drawer>
     </React.Fragment>
   );
