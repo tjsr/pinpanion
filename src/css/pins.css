@@ -3,11 +3,6 @@
  width: 12rem;
 }
 
-.searchFields {
-  width: 100%;
-  align-items: center;
-}
-
 .searchFields label {
   display: inline-flexbox;
   text-align: left;
@@ -30,6 +25,7 @@ div.filterQrCode {
 }
 
 div.searchFields {
+  align-items: center;
   display: inline-block
 }
 

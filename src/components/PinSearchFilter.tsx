@@ -40,10 +40,10 @@ export const PinSearchFilterDisplay = ({
 }: PinListFilterDisplayProps): JSX.Element => {
   return (
     <>
-      {filter && (
-        <div className="filterInfo">Filtered for {filterString(filter)}</div>
-      )}
       <div className="searchFields">
+        {filter && (
+          <div className="filterInfo">Filtered for {filterString(filter)}</div>
+        )}
         <div>
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
