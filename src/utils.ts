@@ -4,7 +4,7 @@ export const isEmpty = (value: string | undefined): boolean => {
   return value === undefined || value.trim() == '';
 };
 
-export const countFilters = (filter: PinListFilter):number => {
+export const countFilters = (filter: PinListFilter): number => {
   let filters = 0;
   if (filter.endYear) {
     filters++;

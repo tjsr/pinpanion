@@ -3,7 +3,10 @@ import './css/pins.css';
 
 import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
-import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
+import {
+  PinSearchFilterDisplay,
+  isPinFiltered,
+} from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmpty } from './utils';
 
@@ -13,8 +16,11 @@ import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import useHashParam from 'use-hash-param';
 
-const isPinOnLanyard = (pin:Pin, lanyard: PinSelectionList):boolean => {
-  return lanyard.availableIds.includes(+pin.id) || lanyard.wantedIds.includes(+pin.id);
+const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
+  return (
+    lanyard.availableIds.includes(+pin.id) ||
+    lanyard.wantedIds.includes(+pin.id)
+  );
 };
 
 function App() {
@@ -23,7 +29,6 @@ function App() {
   const [idHash, setIdHash] = useHashParam('id', '');
   const [listNameHash, setlistNameHash] = useHashParam('name', '');
   const [revisionHash, setRevisionHash] = useHashParam('revision', '');
-
 
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
@@ -36,12 +41,16 @@ function App() {
     useState<boolean>(false);
 
   const buildSetsFromFilterHash = (): PinSelectionList[] => {
-    let revision:number = parseInt(revisionHash);
+    let revision: number = parseInt(revisionHash);
     if (isNaN(revision)) {
       revision = 0;
     }
-    const availableIds: number[] = isEmpty(availIdHash) ? [] : availIdHash.split(',').map((n) => parseInt(n));
-    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : wantedIdHash.split(',').map((n) => parseInt(n));
+    const availableIds: number[] = isEmpty(availIdHash) ?
+      [] :
+      availIdHash.split(',').map((n) => parseInt(n));
+    const wantedIds: number[] = isEmpty(wantedIdHash) ?
+      [] :
+      wantedIdHash.split(',').map((n) => parseInt(n));
 
     console.log(availIdHash);
     console.log(wantedIdHash);
@@ -148,9 +157,12 @@ function App() {
               activePinSet={pinSelectionLists[0]}
               filter={filter}
               heading={getPinListHeading()}
-              isPinFiltered={(pin:Pin) => {
-                return (selectionFilterEnabled && !isPinOnLanyard(pin, pinSelectionLists[0])) ||
-                  isPinFiltered(pin, filter);
+              isPinFiltered={(pin: Pin) => {
+                return (
+                  (selectionFilterEnabled &&
+                    !isPinOnLanyard(pin, pinSelectionLists[0])) ||
+                  isPinFiltered(pin, filter)
+                );
               }}
               paxs={paxs}
               pins={pins}

@@ -9,18 +9,20 @@ type PinSelectionDrawerFragmentProps = {
   filterSelectionState: boolean;
   isSelectionActive: boolean;
   pinSelection: PinSelectionList;
-  toggleDrawer: (id: string, visible: boolean)=> (event: React.KeyboardEvent | React.MouseEvent) => void;
+  toggleDrawer: (
+    id: string,
+    visible: boolean
+  ) => (event: React.KeyboardEvent | React.MouseEvent) => void;
   pinSelectionFilter: ReactElement<PinSelectionFilterProps>;
-}
+};
 
-export const PinSelectionDrawerFragment = (
-  {
-    filterSelectionState,
-    isSelectionActive,
-    pinSelection,
-    toggleDrawer,
-    pinSelectionFilter
-  } : PinSelectionDrawerFragmentProps ): JSX.Element => {
+export const PinSelectionDrawerFragment = ({
+  filterSelectionState,
+  isSelectionActive,
+  pinSelection,
+  toggleDrawer,
+  pinSelectionFilter,
+}: PinSelectionDrawerFragmentProps): JSX.Element => {
   const getSelectionButtonLabel = (): string => {
     const selectedPins: number =
       pinSelection?.availableIds.length + pinSelection?.wantedIds.length;
@@ -31,29 +33,31 @@ export const PinSelectionDrawerFragment = (
     return selectedPins > 0 ? `Selection (${selectedPins})` : 'Selection';
   };
 
-  return (<React.Fragment key={'selection'}>
-    {isSelectionActive ? (
-      <Button
-        className="drawerButton"
-        variant="contained"
-        onClick={toggleDrawer('selection', true)}
+  return (
+    <React.Fragment key={'selection'}>
+      {isSelectionActive ? (
+        <Button
+          className="drawerButton"
+          variant="contained"
+          onClick={toggleDrawer('selection', true)}
+        >
+          {getSelectionButtonLabel()}
+        </Button>
+      ) : (
+        <Button
+          className="drawerButton"
+          onClick={toggleDrawer('selection', true)}
+        >
+          {getSelectionButtonLabel()}
+        </Button>
+      )}
+      <Drawer
+        anchor={'top'}
+        open={filterSelectionState}
+        onClose={toggleDrawer('selection', false)}
       >
-        {getSelectionButtonLabel()}
-      </Button>
-    ) : (
-      <Button
-        className="drawerButton"
-        onClick={toggleDrawer('selection', true)}
-      >
-        {getSelectionButtonLabel()}
-      </Button>
-    )}
-    <Drawer
-      anchor={'top'}
-      open={filterSelectionState}
-      onClose={toggleDrawer('selection', false)}
-    >
-      {pinSelectionFilter}
-    </Drawer>
-  </React.Fragment>);
+        {pinSelectionFilter}
+      </Drawer>
+    </React.Fragment>
+  );
 };

@@ -10,15 +10,18 @@ type PinFilterDrawerFragmentProps = {
   filter: PinListFilter;
   filterDrawerState: boolean;
   pinListFilterDisplay: ReactElement<PinListFilterDisplayProps>;
-  toggleDrawer: (id: string, visible: boolean)=> (event: React.KeyboardEvent | React.MouseEvent) => void;
+  toggleDrawer: (
+    id: string,
+    visible: boolean
+  ) => (event: React.KeyboardEvent | React.MouseEvent) => void;
 };
 
-export const PinFilterDrawerFragment = (
-  {
-    filter,
-    filterDrawerState,
-    pinListFilterDisplay,
-    toggleDrawer } : PinFilterDrawerFragmentProps ): JSX.Element => {
+export const PinFilterDrawerFragment = ({
+  filter,
+  filterDrawerState,
+  pinListFilterDisplay,
+  toggleDrawer,
+}: PinFilterDrawerFragmentProps): JSX.Element => {
   const getFilterButtonLabel = (): string => {
     const filters: number = countFilters(filter);
 
@@ -31,14 +34,19 @@ export const PinFilterDrawerFragment = (
 
   return (
     <React.Fragment key={'filter'}>
-      {countFilters(filter) > 0 ?
-        <Button className="drawerButton" variant="contained" onClick={toggleDrawer('filter', true)}>
+      {countFilters(filter) > 0 ? (
+        <Button
+          className="drawerButton"
+          variant="contained"
+          onClick={toggleDrawer('filter', true)}
+        >
           {getFilterButtonLabel()}
-        </Button> :
+        </Button>
+      ) : (
         <Button className="drawerButton" onClick={toggleDrawer('filter', true)}>
           {getFilterButtonLabel()}
         </Button>
-      }
+      )}
       <Drawer
         anchor={'top'}
         open={filterDrawerState}

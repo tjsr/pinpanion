@@ -5,17 +5,19 @@ import Drawer from '@mui/material/Drawer';
 import { FilterQRCodeProps } from '../components/FilterQRCode';
 
 type QRCodeDrawerFragmentProps = {
-  toggleDrawer: (id: string, visible: boolean)=> (event: React.KeyboardEvent | React.MouseEvent) => void;
+  toggleDrawer: (
+    id: string,
+    visible: boolean
+  ) => (event: React.KeyboardEvent | React.MouseEvent) => void;
   qrCode: ReactElement<FilterQRCodeProps>;
-  filterQrState: boolean
+  filterQrState: boolean;
 };
 
-export const QRCodeDrawerFragment = (
-  {
-    filterQrState,
-    toggleDrawer,
-    qrCode,
-  } : QRCodeDrawerFragmentProps ) : JSX.Element => {
+export const QRCodeDrawerFragment = ({
+  filterQrState,
+  toggleDrawer,
+  qrCode,
+}: QRCodeDrawerFragmentProps): JSX.Element => {
   return (
     <React.Fragment key={'qr'}>
       <Button className="drawerButton" onClick={toggleDrawer('qr', true)}>

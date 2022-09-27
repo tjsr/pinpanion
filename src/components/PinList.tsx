@@ -117,15 +117,15 @@ export const PinList = ({
           {displayedPins.map((pin: Pin) => {
             return (
               <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-                { activePinSet?.editable &&
-                <PinListButtons
-                  availableCount={countPinAvailable(pin.id)}
-                  wantedCount={countPinWanted(pin.id)}
-                  pinId={pin.id}
-                  setPinAvailable={togglePinAvailable}
-                  setPinWanted={togglePinWanted}
-                />
-                }
+                {activePinSet?.editable && (
+                  <PinListButtons
+                    availableCount={countPinAvailable(pin.id)}
+                    wantedCount={countPinWanted(pin.id)}
+                    pinId={pin.id}
+                    setPinAvailable={togglePinAvailable}
+                    setPinWanted={togglePinWanted}
+                  />
+                )}
               </PinInfo>
             );
           })}

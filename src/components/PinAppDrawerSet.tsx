@@ -64,7 +64,8 @@ export const PinAppDrawerSet = ({
         isSelectionActive={isSelectionActive}
         pinSelection={pinSelection}
         toggleDrawer={toggleDrawer}
-        pinSelectionFilter={pinSelectionFilter} />
+        pinSelectionFilter={pinSelectionFilter}
+      />
 
       <PinFilterDrawerFragment
         filter={filter}

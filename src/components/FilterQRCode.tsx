@@ -1,8 +1,7 @@
 import QRCode from 'react-qr-code';
 import { QR_CODE_SIZE } from '../globals';
 
-export type FilterQRCodeProps = {
-};
+export type FilterQRCodeProps = {};
 export const FilterQRCode = ({}: FilterQRCodeProps): JSX.Element => {
   const generateQrCode = (): string => {
     return window.location.href;
