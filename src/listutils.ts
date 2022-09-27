@@ -33,13 +33,13 @@ export const removeOrAddId = (
   id: number
 ): number[] => {
   if (idList === undefined) {
-    return [id];
+    return <number[]>[+id];
   }
   const updatedIds: number[] | undefined = idList.filter(
     (setId) => +id !== +setId
   );
   if (updatedIds.length === idList.length) {
-    updatedIds.push(id);
+    updatedIds.push(+id);
   }
   return updatedIds;
 };

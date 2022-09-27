@@ -37,7 +37,7 @@ function App() {
     ...EMPTY_FILTER,
   });
   const [selectionFilterEnabled, setSelectionFilterEnabled] =
-    useState<boolean>(false);
+  useState<boolean>(false);
 
   const buildSetsFromFilterHash = (): PinSelectionList[] => {
     let revision: number = parseInt(revisionHash);
@@ -70,6 +70,7 @@ function App() {
   const [pinSelectionLists, updateLists] = useState<PinSelectionList[]>(
     buildSetsFromFilterHash()
   );
+  const [activePinList, setActivePinList] = useState<PinSelectionList>(pinSelectionLists[0]);
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -108,6 +109,7 @@ function App() {
     }
     updateLists(recreatedList);
     updateListHash(updatedList);
+    setActivePinList(updatedList);
   };
 
   const getPinListHeading = (): string => {
@@ -128,7 +130,7 @@ function App() {
             <PinAppDrawerSet
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
-              pinSelection={pinSelectionLists[0]}
+              pinSelection={activePinList}
               pinListFilterDisplay={
                 <PinSearchFilterDisplay
                   filter={filter}
@@ -150,15 +152,19 @@ function App() {
               }
             />
             <PinList
-              activePinSet={pinSelectionLists[0]}
+              activePinSet={activePinList}
               filter={filter}
               heading={getPinListHeading()}
               isPinFiltered={(pin: Pin) => {
-                return (
-                  (selectionFilterEnabled &&
-                    !isPinOnLanyard(pin, pinSelectionLists[0])) ||
-                  isPinFiltered(pin, filter)
-                );
+                if (selectionFilterEnabled) {
+                  const isOnLanyard: boolean = isPinOnLanyard(pin, activePinList);
+                  if (pin.id < 20) {
+                    console.log(activePinList);
+                    console.log(`Pin ${pin.id} isOnLanyard=${isOnLanyard}`);
+                  }
+                  return !isOnLanyard;
+                }
+                return isPinFiltered(pin, filter);
               }}
               paxs={paxs}
               pins={pins}
