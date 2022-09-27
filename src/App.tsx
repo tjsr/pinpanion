@@ -160,7 +160,7 @@ const App = (): JSX.Element => {
                   onChange={setFilter}
                 />
               }
-              qrCode={<FilterQRCode />}
+              qrCode={<FilterQRCode lanyard={activePinList}/>}
               pinSelectionFilter={
                 <PinSelectionListEditor
                   enableFilter={selectionFilterEnabled}
