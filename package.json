@@ -38,7 +38,7 @@
     "test:react": "react-scripts test",
     "test": "jest",
     "lint": "eslint --fix \"./src/**/*.{ts,tsx}\"",
-    "prettier": "prettier --write \"./src/**/*.{ts,tsx}\"",
+    "prettier": "prettier --single-quote --write \"./src/**/*.{ts,tsx}\"",
     "format": "npm run prettier && npm run lint"
   },
   "eslintConfig": {
