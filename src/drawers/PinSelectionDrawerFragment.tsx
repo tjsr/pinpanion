@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import { PinSelectionFilterProps } from './PinSelectionFilter';
+import { PinSelectionFilterProps } from '../components/PinSelectionFilter';
 import { PinSelectionList } from '../types';
 
 type PinSelectionDrawerFragmentProps = {

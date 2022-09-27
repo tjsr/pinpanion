@@ -2,11 +2,11 @@ import { PinListFilter, PinSelectionList } from '../types';
 import React, { ReactElement } from 'react';
 
 import { FilterQRCodeProps } from './FilterQRCode';
-import { PinFilterDrawerFragment } from './PinFilterDrawerFragment';
+import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment';
 import { PinListFilterDisplayProps } from './PinFilter';
-import { PinSelectionDrawerFragment } from './PinSelectionDrawerFragment';
+import { PinSelectionDrawerFragment } from '../drawers/PinSelectionDrawerFragment';
 import { PinSelectionFilterProps } from './PinSelectionFilter';
-import { QRCodeDrawerFragment } from './QRCodeDrawerFragment';
+import { QRCodeDrawerFragment } from '../drawers/QRCodeDrawerFragment';
 
 type PinAppDrawerSetProps = {
   filter: PinListFilter;

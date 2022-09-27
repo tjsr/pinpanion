@@ -2,7 +2,7 @@ import React, { ReactElement } from 'react';
 
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
-import { FilterQRCodeProps } from './FilterQRCode';
+import { FilterQRCodeProps } from '../components/FilterQRCode';
 
 type QRCodeDrawerFragmentProps = {
   toggleDrawer: (id: string, visible: boolean)=> (event: React.KeyboardEvent | React.MouseEvent) => void;
