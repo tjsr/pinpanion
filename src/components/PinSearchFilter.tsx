@@ -1,19 +1,16 @@
 import '../css/pins.css';
 
 import { PAX, Pin, PinListFilter, PinSet } from '../types';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import { EMPTY_FILTER } from '../fixture';
 import FormControl from '@mui/material/FormControl';
-import InputLabel from '@mui/material/InputLabel';
-import MenuItem from '@mui/material/MenuItem';
+import { PAXSelector } from './PAXFilter';
+import { PinSetSelector } from './PinSetSelector';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import TextField from '@mui/material/TextField';
 import { YearSelector } from './YearSelector';
-import eventnames from '../eventnames.json';
-import { filterStringToIds } from '../listutils';
 import fuzzy from 'fuzzy';
 import { isEmpty } from '../utils';
 
@@ -22,88 +19,6 @@ export type PinListFilterDisplayProps = {
   paxs?: PAX[];
   pinSets?: PinSet[];
   onChange: (updatedFilter: PinListFilter) => void;
-};
-
-type PinSetSelectorProps = {
-  id: string;
-  pinSets: PinSet[];
-  selectedSet: number | undefined;
-  setSelected: (setId: number | undefined) => void;
-};
-
-const PinSetSelector = ({
-  pinSets,
-  id,
-  selectedSet,
-  setSelected,
-}: PinSetSelectorProps): JSX.Element => {
-  return (
-    <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={id}>Filter by Set</InputLabel>
-      <Select
-        id={id}
-        label="Filter by Set"
-        value={selectedSet !== undefined ? selectedSet.toString() : ''}
-        onChange={(event: SelectChangeEvent) => {
-          if (event.target?.value === '') {
-            setSelected(undefined);
-          } else {
-            setSelected(parseInt(event.target.value));
-          }
-        }}
-      >
-        <MenuItem key="set_0" value="">
-          <em>None</em>
-        </MenuItem>
-        {pinSets.map((s: PinSet) => (
-          <MenuItem key={`set_${s.id}`} value={s.id}>
-            {s.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-};
-
-type PAXSelectorProps = {
-  id: string;
-  paxs: PAX[];
-  selectedPax: number | undefined;
-  paxSelected: (setId: number | undefined) => void;
-};
-
-const PAXSelector = ({
-  paxs,
-  id,
-  selectedPax,
-  paxSelected,
-}: PAXSelectorProps): JSX.Element => {
-  return (
-    <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={id}>Filter by PAX</InputLabel>
-      <Select
-        id={id}
-        label="Filter by PAX"
-        value={selectedPax?.toString() || ''}
-        onChange={(event: SelectChangeEvent) => {
-          if (event.target.value === '') {
-            paxSelected(undefined);
-          } else {
-            paxSelected(parseInt(event.target.value));
-          }
-        }}
-      >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-        {paxs.map((p: PAX) => (
-          <MenuItem key={`pax_${p.id}`} value={p.id}>
-            {eventnames[p.id].description}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
 };
 
 const filterString = (filter: PinListFilter): string => {
@@ -117,7 +32,7 @@ const filterString = (filter: PinListFilter): string => {
   return output;
 };
 
-export const PinListFilterDisplay = ({
+export const PinSearchFilterDisplay = ({
   filter,
   paxs,
   pinSets,

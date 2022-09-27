@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 
 import { FilterQRCodeProps } from './FilterQRCode';
 import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment';
-import { PinListFilterDisplayProps } from './PinFilter';
+import { PinListFilterDisplayProps } from './PinSearchFilter';
 import { PinSelectionDrawerFragment } from '../drawers/PinSelectionDrawerFragment';
 import { PinSelectionFilterProps } from './PinSelectionFilter';
 import { QRCodeDrawerFragment } from '../drawers/QRCodeDrawerFragment';

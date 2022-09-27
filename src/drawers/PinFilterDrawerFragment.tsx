@@ -3,7 +3,7 @@ import React, { ReactElement } from 'react';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import { PinListFilter } from '../types';
-import { PinListFilterDisplayProps } from '../components/PinFilter';
+import { PinListFilterDisplayProps } from '../components/PinSearchFilter';
 import { countFilters } from '../utils';
 
 type PinFilterDrawerFragmentProps = {

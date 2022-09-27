@@ -1,16 +1,11 @@
-import { PinSelectionList } from '../types';
 import QRCode from 'react-qr-code';
 import { QR_CODE_SIZE } from '../globals';
 
 export type FilterQRCodeProps = {
-  selection: PinSelectionList;
 };
-export const FilterQRCode = ({ selection }: FilterQRCodeProps): JSX.Element => {
+export const FilterQRCode = ({}: FilterQRCodeProps): JSX.Element => {
   const generateQrCode = (): string => {
     return window.location.href;
-    // return selection?.selectedPinsList ?
-    //   filterStringToIds(filter?.selectedPinsList).join(',') :
-    //   '';
   };
 
   return (

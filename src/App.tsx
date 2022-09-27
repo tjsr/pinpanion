@@ -3,14 +3,14 @@ import './css/pins.css';
 
 import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
-import { PinListFilterDisplay, isPinFiltered } from './components/PinFilter';
+import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
+import { countFilters, isEmpty } from './utils';
 
 import { FilterQRCode } from './components/FilterQRCode';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
-import { countFilters } from './utils';
 import useHashParam from 'use-hash-param';
 
 const isPinOnLanyard = (pin:Pin, lanyard: PinSelectionList):boolean => {
@@ -40,13 +40,21 @@ function App() {
     if (isNaN(revision)) {
       revision = 0;
     }
+    const availableIds: number[] = isEmpty(availIdHash) ? [] : availIdHash.split(',').map((n) => parseInt(n));
+    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : wantedIdHash.split(',').map((n) => parseInt(n));
+
+    console.log(availIdHash);
+    console.log(wantedIdHash);
+    console.log(availableIds);
+    console.log(wantedIds);
+
     const selection: PinSelectionList = {
       ...newSelectionList(),
-      availableIds: availIdHash.split(',').map((n) => parseInt(n)),
+      availableIds,
       id: idHash,
       name: listNameHash,
       revision,
-      wantedIds: wantedIdHash.split(',').map((n) => parseInt(n)),
+      wantedIds,
     };
     return [selection];
   };
@@ -117,14 +125,14 @@ function App() {
               isSelectionActive={selectionFilterEnabled}
               pinSelection={pinSelectionLists[0]}
               pinListFilterDisplay={
-                <PinListFilterDisplay
+                <PinSearchFilterDisplay
                   filter={filter}
                   paxs={paxs}
                   pinSets={pinSets}
                   onChange={setFilter}
                 />
               }
-              qrCode={<FilterQRCode selection={pinSelectionLists[0]} />}
+              qrCode={<FilterQRCode />}
               pinSelectionFilter={
                 <PinSelectionListEditor
                   enableFilter={selectionFilterEnabled}
