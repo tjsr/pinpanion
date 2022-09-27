@@ -17,7 +17,6 @@ interface PinListPropTypes {
   pins: Pin[];
   pinSets?: PinSet[];
   setPinSet?: (list: PinSelectionList) => void;
-  // setFilter: (filter: PinListFilter) => void;
 }
 
 export const PinList = ({
@@ -33,39 +32,6 @@ export const PinList = ({
   const displayedPins: Pin[] = pins.filter(
     (pin: Pin) => !isPinFiltered(pin, filter)
   );
-  // const addToSelection = (id: number): void => {
-  //   const selectedPinsList: string = addIdToList(
-  //     filter?.selectedPinsList || '',
-  //     id
-  //   );
-  //   const updatedFilter: PinListFilter = {
-  //     ...filter,
-  //     selectedPinsList,
-  //   };
-  //   setFilter(updatedFilter);
-  // };
-
-  // const removeFromSelection = (id: number): void => {
-  //   const selectedPinsList: string = removeIdFromList(
-  //     filter?.selectedPinsList || '',
-  //     id
-  //   );
-  //   const updatedFilter: PinListFilter = {
-  //     ...filter,
-  //     selectedPinsList,
-  //   };
-  //   setFilter(updatedFilter);
-  // };
-
-  // const togglePinInSet = (pinId: number): boolean => {
-  //   if (isPinSelected(filter, pinId)) {
-  //     removeFromSelection(pinId);
-  //     return false;
-  //   } else {
-  //     addToSelection(pinId);
-  //     return true;
-  //   }
-  // };
 
   const togglePinAvailable = (pinId: number): void => {
     const availableIds: number[] = removeOrAddId(

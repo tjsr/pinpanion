@@ -172,23 +172,6 @@ export const PinSearchFilterDisplay = ({
   );
 };
 
-// export const isPinSelected = (
-//   filter: PinListFilter | undefined,
-//   pinId: number
-// ): boolean => {
-//   if (!filter) {
-//     return false;
-//   }
-//   if (isEmpty(filter.selectedPinsList)) {
-//     return false;
-//   }
-//   const ids: number[] = filterStringToIds(filter.selectedPinsList || '');
-//   if (ids.includes(+pinId)) {
-//     return true;
-//   }
-//   return false;
-// };
-
 export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
   if (!filter) {
     return false;

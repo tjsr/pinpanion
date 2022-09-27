@@ -36,7 +36,6 @@ function App() {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
-  // const [selectionListIndex, updateSelectionListIndex] = useState<number>(0);
   const [selectionFilterEnabled, setSelectionFilterEnabled] =
     useState<boolean>(false);
 
@@ -77,9 +76,6 @@ function App() {
       const response = await fetch('sample.json', {
         mode: 'cors',
       });
-      // const response = await fetch(ALL_PINS_URL, {
-      //   mode: 'cors',
-      // });
       const data: any = await response.json();
       setPins(data.pins);
       setPinSets(data.sets);
