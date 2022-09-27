@@ -1,6 +1,7 @@
 import { PAX, Pin, PinSet } from '../types';
 
 import React from 'react';
+import eventnames from '../eventnames.json';
 
 const PIN_IMG_PREFIX = 'https://pinnypals.com/imgs';
 
@@ -8,8 +9,6 @@ type PinInfoPropTypes = {
   pin: Pin;
   paxs?: PAX[];
   pinSets?: PinSet[];
-  togglePinInSet: (id: number) => boolean;
-  isSelected: boolean;
   children: React.ReactNode;
 };
 
@@ -32,7 +31,11 @@ export const PinInfo = ({
       <div className="pin" id={`pin_${pin.id}`}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
-          {pinPax?.name ? <div className="pax">{pinPax?.name}</div> : <></>}
+          {pinPax?.name ? (
+            <div className="pax">{eventnames[pinPax.id!].description}</div>
+          ) : (
+            <></>
+          )}
           {pinSet?.name ? <div className="set">{pinSet?.name}</div> : <></>}
           <img className="pinImage" alt={pin.name} src={url} />
         </div>

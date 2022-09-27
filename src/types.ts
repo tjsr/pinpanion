@@ -25,12 +25,13 @@ export type PinnypalsPinsRequest = {
 };
 
 export type PinSelectionList = {
-  name: string
-  id: string
-  availableIds: number[]
-  wantedIds: number[],
-  revision: number,
-}
+  name: string;
+  id: string;
+  availableIds: number[];
+  wantedIds: number[];
+  revision: number;
+  editable: boolean;
+};
 
 export type PinListFilter = {
   startYear?: number;

@@ -27,3 +27,19 @@ export const filterStringToIds = (data: string): number[] => {
     .filter((n) => !isNaN(n))
     .sort();
 };
+
+export const removeOrAddId = (
+  idList: number[] | undefined,
+  id: number
+): number[] => {
+  if (idList === undefined) {
+    return [id];
+  }
+  const updatedIds: number[] | undefined = idList.filter(
+    (setId) => +id !== +setId
+  );
+  if (updatedIds.length === idList.length) {
+    updatedIds.push(id);
+  }
+  return updatedIds;
+};

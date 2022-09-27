@@ -1,37 +1,45 @@
 type PinListButtonsProps = {
-  isSelected: boolean;
+  availableCount: number;
+  wantedCount: number;
   pinId: number;
-  addPin: (pinId: number) => void;
-  removePin: (pinId: number) => void;
-  togglePinInSet: (pinId: number) => boolean;
+  setPinWanted: (pinId: number) => void;
+  setPinAvailable: (pinId: number) => void;
 };
 
 export const PinListButtons = ({
-  isSelected,
+  availableCount,
+  wantedCount,
   pinId,
-  addPin,
-  removePin,
+  setPinWanted,
+  setPinAvailable,
 }: PinListButtonsProps): JSX.Element => {
+  const isAvailable: boolean = availableCount > 0;
+  const availableClasses: string = isAvailable ?
+    'availableButton' :
+    'availableButton pinNotAvailable';
+
+  const isWanted: boolean = wantedCount > 0;
+  const wantedClasses: string = isWanted ?
+    'wantedButton' :
+    'wantedButton pinNotWanted';
   return (
     <div className="listButtons">
       <button
-        className="addButton"
-        disabled={isSelected}
-        id={`add_${pinId}`}
+        className={availableClasses}
+        id={`available_${pinId}`}
         value={pinId}
         onClick={() => {
-          addPin(pinId);
+          setPinAvailable(pinId);
         }}
       >
         +
       </button>
       <button
-        className="removeButton"
-        disabled={!isSelected}
-        id={`remove_${pinId}`}
+        className={wantedClasses}
+        id={`wanted_${pinId}`}
         value={pinId}
         onClick={() => {
-          removePin(pinId);
+          setPinWanted(pinId);
         }}
       >
         -

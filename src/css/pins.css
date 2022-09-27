@@ -42,18 +42,18 @@ div.listButtons button {
   color: #000;
 }
 
-div.listButtons button.addButton {
+div.listButtons button.addButton, div.listButtons button.availableButton {
   font-size: 36pt;
   background-color: rgb(90, 180, 90);
 }
 
-div.listButtons button:disabled {
+div.listButtons button:disabled, button.pinNotAvailable, button.pinNotWanted {
   color: #927a56;
   border: 1px solid #888;
   opacity: 0.50;
 }
 
-div.listButtons button.removeButton {
+div.listButtons button.removeButton, div.listButtons button.wantedButton {
   font-size: 36pt;
   background-color: rgb(150, 82, 82);
 }

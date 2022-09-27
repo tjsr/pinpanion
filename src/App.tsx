@@ -1,17 +1,22 @@
 import './css/App.css';
 import './css/pins.css';
 
-import { PAX, Pin, PinListFilter, PinSet } from './types';
+import { EMPTY_FILTER, newSelectionList } from './fixture';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
+import { PinListFilterDisplay, isPinFiltered } from './components/PinFilter';
 import React, { useEffect, useState } from 'react';
 
-import { EMPTY_FILTER } from './fixture';
 import { FilterQRCode } from './components/FilterQRCode';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
-import { PinListFilterDisplay } from './components/PinFilter';
-import { PinSelectionFilter } from './components/PinSelectionFilter';
+import { PinSelectionListEditor } from './components/PinSelectionFilter';
+import { countFilters } from './utils';
 import { filterStringToIds } from './listutils';
 import useHashParam from 'use-hash-param';
+
+const isPinOnLanyard = (pin:Pin, lanyard: PinSelectionList):boolean => {
+  return lanyard.availableIds.includes(pin.id) || lanyard.wantedIds.includes(pin.id);
+};
 
 function App() {
   const [filterHash, setFilterHash] = useHashParam('filter', '');
@@ -20,8 +25,19 @@ function App() {
   const [paxs, setPaxs] = useState<PAX[]>([]);
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
-    selectedPinsList: filterHash
+    selectedPinsList: filterHash,
   });
+  // const [selectionListIndex, updateSelectionListIndex] = useState<number>(0);
+  const [selectionFilterEnabled, setSelectionFilterEnabled] =
+    useState<boolean>(false);
+
+  const buildSetsFromFilterHash = (): PinSelectionList[] => {
+    return [newSelectionList()];
+  };
+
+  const [pinSelectionLists, updateLists] = useState<PinSelectionList[]>(
+    buildSetsFromFilterHash()
+  );
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -49,6 +65,29 @@ function App() {
     setFilter(updatedFilter);
   };
 
+  const selectionListUpdated = (updatedList: PinSelectionList): void => {
+    const recreatedList: PinSelectionList[] = [];
+
+    for (let i = 0; i < pinSelectionLists.length; i++) {
+      if (pinSelectionLists[i].id == updatedList.id) {
+        recreatedList[i] = updatedList;
+      } else {
+        recreatedList[i] = pinSelectionLists[i];
+      }
+    }
+    updateLists(recreatedList);
+  };
+
+  const getPinListHeading = (): string => {
+    if (selectionFilterEnabled) {
+      return 'Selected pins';
+    } else if (countFilters(filter)) {
+      return 'Filtered pins';
+    } else {
+      return 'Pin list';
+    }
+  };
+
   return (
     <div className="App">
       <>
@@ -56,6 +95,8 @@ function App() {
           <>
             <PinAppDrawerSet
               filter={filter}
+              isSelectionActive={selectionFilterEnabled}
+              pinSelection={pinSelectionLists[0]}
               pinListFilterDisplay={
                 <PinListFilterDisplay
                   filter={filter}
@@ -66,15 +107,30 @@ function App() {
               }
               qrCode={<FilterQRCode filter={filter} />}
               pinSelectionFilter={
-                <PinSelectionFilter filter={filter} onChange={filterUpdated} />
+                <PinSelectionListEditor
+                  enableFilter={selectionFilterEnabled}
+                  pinLists={pinSelectionLists}
+                  onChange={selectionListUpdated}
+                  changeListDisplayed={(id: string, display: boolean) => {
+                    setSelectionFilterEnabled(display);
+                  }}
+                />
               }
             />
             <PinList
-              pins={pins}
-              paxs={paxs}
-              pinSets={pinSets}
+              activePinSet={pinSelectionLists[0]}
               filter={filter}
-              setFilter={filterUpdated}
+              heading={getPinListHeading()}
+
+              isPinFiltered={(pin:Pin) => {
+                return isPinFiltered(pin, filter) || (
+                  selectionFilterEnabled && !isPinOnLanyard(pin, pinSelectionLists[0])
+                );
+              }}
+              paxs={paxs}
+              pins={pins}
+              pinSets={pinSets}
+              setPinSet={selectionListUpdated}
             />
           </>
         )}

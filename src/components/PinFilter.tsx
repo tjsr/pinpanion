@@ -294,12 +294,6 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
     return true;
   }
 
-  if (filter?.selectedPinsOnly && filter?.selectedPinsList) {
-    if (!isPinSelected(filter, pin.id)) {
-      return true;
-    }
-  }
-
   if (!isEmpty(filter?.filterText)) {
     return fuzzy.filter(filter.filterText!, [pin.name, pin.year]).length === 0;
   }

@@ -36,8 +36,8 @@
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
-    "jest": "jest",
+    "test:react": "react-scripts test",
+    "test": "jest",
     "lint": "eslint --fix \"./src/**/*.{ts,tsx}\"",
     "prettier": "prettier --write \"./src/**/*.{ts,tsx}\"",
     "format": "npm run prettier && npm run lint"

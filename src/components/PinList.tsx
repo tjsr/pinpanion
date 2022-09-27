@@ -1,92 +1,132 @@
 import '../css/pins.css';
 
-import { PAX, Pin, PinListFilter, PinSet } from '../types';
-import { addIdToList, removeIdFromList } from '../listutils';
-import { isPinFiltered, isPinSelected } from './PinFilter';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from '../types';
 
 import { PinInfo } from './PinInfo';
 import { PinListButtons } from './PinButtons';
 import React from 'react';
+import { newSelectionList } from '../fixture';
+import { removeOrAddId } from '../listutils';
 
 interface PinListPropTypes {
-  pins: Pin[];
-  paxs?: PAX[];
-  pinSets?: PinSet[];
+  activePinSet?: PinSelectionList;
   filter?: PinListFilter;
-  setFilter: (filter: PinListFilter) => void;
+  heading: string;
+  isPinFiltered: (pin: Pin, filter?: PinListFilter) => boolean;
+  paxs?: PAX[];
+  pins: Pin[];
+  pinSets?: PinSet[];
+  setPinSet?: (list: PinSelectionList) => void;
+  // setFilter: (filter: PinListFilter) => void;
 }
 
 export const PinList = ({
+  heading,
   pins,
   paxs,
   pinSets,
   filter,
-  setFilter,
+  activePinSet,
+  isPinFiltered,
+  setPinSet,
 }: PinListPropTypes): JSX.Element => {
   const displayedPins: Pin[] = pins.filter(
     (pin: Pin) => !isPinFiltered(pin, filter)
   );
 
-  const addToFilter = (id: number): void => {
-    const selectedPinsList: string = addIdToList(
-      filter?.selectedPinsList || '',
-      id
-    );
-    console.log('Updated list: ' + selectedPinsList);
-    const updatedFilter: PinListFilter = {
-      ...filter,
-      selectedPinsList,
-    };
-    setFilter(updatedFilter);
-  };
+  // const addToSelection = (id: number): void => {
+  //   const selectedPinsList: string = addIdToList(
+  //     filter?.selectedPinsList || '',
+  //     id
+  //   );
+  //   const updatedFilter: PinListFilter = {
+  //     ...filter,
+  //     selectedPinsList,
+  //   };
+  //   setFilter(updatedFilter);
+  // };
 
-  const removeFromFilter = (id: number): void => {
-    const selectedPinsList: string = removeIdFromList(
-      filter?.selectedPinsList || '',
-      id
-    );
-    console.log('Updated list: ' + selectedPinsList);
-    const updatedFilter: PinListFilter = {
-      ...filter,
-      selectedPinsList,
-    };
-    setFilter(updatedFilter);
-  };
+  // const removeFromSelection = (id: number): void => {
+  //   const selectedPinsList: string = removeIdFromList(
+  //     filter?.selectedPinsList || '',
+  //     id
+  //   );
+  //   const updatedFilter: PinListFilter = {
+  //     ...filter,
+  //     selectedPinsList,
+  //   };
+  //   setFilter(updatedFilter);
+  // };
 
-  const togglePinInSet = (pinId: number): boolean => {
-    if (isPinSelected(filter, pinId)) {
-      removeFromFilter(pinId);
-      return false;
-    } else {
-      addToFilter(pinId);
-      return true;
+  // const togglePinInSet = (pinId: number): boolean => {
+  //   if (isPinSelected(filter, pinId)) {
+  //     removeFromSelection(pinId);
+  //     return false;
+  //   } else {
+  //     addToSelection(pinId);
+  //     return true;
+  //   }
+  // };
+
+  const togglePinAvailable = (pinId: number): void => {
+    const availableIds: number[] = removeOrAddId(
+      activePinSet?.availableIds,
+      pinId
+    );
+    if (setPinSet) {
+      const base: PinSelectionList = activePinSet || newSelectionList();
+      console.log(`New wanted list: ${availableIds}`);
+      setPinSet({
+        ...base,
+        availableIds,
+      });
     }
+  };
+
+  const togglePinWanted = (pinId: number): void => {
+    const wantedIds: number[] = removeOrAddId(activePinSet?.wantedIds, pinId);
+    if (setPinSet) {
+      const base: PinSelectionList = activePinSet || newSelectionList();
+      console.log(`New wanted list: ${wantedIds}`);
+      setPinSet({
+        ...base,
+        wantedIds,
+      });
+    }
+  };
+
+  const countPinAvailable = (pinId: number): number => {
+    if (activePinSet) {
+      return activePinSet?.availableIds.filter((n) => +n === +pinId).length;
+    }
+    return 0;
+  };
+
+  const countPinWanted = (pinId: number): number => {
+    if (activePinSet) {
+      return activePinSet?.wantedIds.filter((n) => +n === +pinId).length;
+    }
+    return 0;
   };
 
   return (
     <>
-      <h2>Pin list</h2>
+      <h2>{heading}</h2>
       {pins && displayedPins && (
         <>
           <div>Total pins: {displayedPins.length}</div>
           {displayedPins.map((pin: Pin) => {
-            const isSelected: boolean = isPinSelected(filter, pin.id);
             return (
-              <PinInfo
-                key={pin.id}
-                paxs={paxs}
-                pinSets={pinSets}
-                pin={pin}
-                togglePinInSet={togglePinInSet}
-                isSelected={isSelected}
-              >
+              <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+                { activePinSet?.editable &&
                 <PinListButtons
-                  isSelected={isSelected}
+                  availableCount={countPinAvailable(pin.id)}
+                  wantedCount={countPinWanted(pin.id)}
                   pinId={pin.id}
-                  addPin={addToFilter}
-                  removePin={removeFromFilter}
-                  togglePinInSet={togglePinInSet}
+                  setPinAvailable={togglePinAvailable}
+                  setPinWanted={togglePinWanted}
                 />
+                }
               </PinInfo>
             );
           })}
