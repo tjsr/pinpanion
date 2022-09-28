@@ -2,7 +2,14 @@ import './css/App.css';
 import './css/pins.css';
 
 import { EMPTY_FILTER, generateListId, newSelectionList } from './fixture';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from './types';
+import {
+  PAX,
+  Pin,
+  PinListFilter,
+  PinSelectionList,
+  PinSet,
+  SizesType,
+} from './types';
 import {
   PinSearchFilterDisplay,
   isPinFiltered,
@@ -88,7 +95,8 @@ const App = (): JSX.Element => {
     pinSelectionLists[0]
   );
 
-  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(true);
+  const [splitActiveAndWanted, setSplitActiveAndWanted] =
+    useState<boolean>(true);
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -169,7 +177,12 @@ const App = (): JSX.Element => {
         {pins && (
           <>
             <PinAppDrawerSet
-              appSettingsPanel={<AppSettingsPanel size={displaySize} setObjectSize={displaySizeChanged} />}
+              appSettingsPanel={
+                <AppSettingsPanel
+                  size={displaySize}
+                  setObjectSize={displaySizeChanged}
+                />
+              }
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
               pinSelection={activePinList}
@@ -193,12 +206,20 @@ const App = (): JSX.Element => {
                 />
               }
             />
-            { splitActiveAndWanted && selectionFilterEnabled ?
-              <LanyardPinList displaySize={displaySize} heading={`Lanyard for ${activePinList.name}`}
-                availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
-                wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
+            {splitActiveAndWanted && selectionFilterEnabled ? (
+              <LanyardPinList
+                displaySize={displaySize}
+                heading={`Lanyard for ${activePinList.name}`}
+                availablePins={pins.filter((p) =>
+                  activePinList.availableIds.includes(+p.id)
+                )}
+                wantedPins={pins.filter((p) =>
+                  activePinList.wantedIds.includes(+p.id)
+                )}
                 paxs={paxs}
-                pinSets={pinSets} /> :
+                pinSets={pinSets}
+              />
+            ) : (
               <PinList
                 activePinSet={activePinList}
                 displaySize={displaySize}
@@ -219,7 +240,7 @@ const App = (): JSX.Element => {
                 pinSets={pinSets}
                 setPinSet={selectionListUpdated}
               />
-            }
+            )}
           </>
         )}
       </>

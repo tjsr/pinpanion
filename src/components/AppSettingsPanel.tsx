@@ -15,10 +15,13 @@ export type AppSettingsPanelProps = {
   setObjectSize: (size: SizesType) => void;
 };
 
-const ObjectSizeSetting = ({ size, setObjectSize } : ObjectSizeSettingProps ): JSX.Element => {
+const ObjectSizeSetting = ({
+  size,
+  setObjectSize,
+}: ObjectSizeSettingProps): JSX.Element => {
   const handleSizeChange = (
     event: React.MouseEvent<HTMLElement>,
-    newSize: SizesType | null,
+    newSize: SizesType | null
   ) => {
     if (newSize !== null) {
       setObjectSize(newSize);
@@ -60,9 +63,15 @@ const ObjectSizeSetting = ({ size, setObjectSize } : ObjectSizeSettingProps ): J
   );
 };
 
-export const AppSettingsPanel = ({ size, setObjectSize } : AppSettingsPanelProps):JSX.Element => {
-  return (<>
-    <div>
-      <ObjectSizeSetting size={size} setObjectSize={setObjectSize} />
-    </div></>);
+export const AppSettingsPanel = ({
+  size,
+  setObjectSize,
+}: AppSettingsPanelProps): JSX.Element => {
+  return (
+    <>
+      <div>
+        <ObjectSizeSetting size={size} setObjectSize={setObjectSize} />
+      </div>
+    </>
+  );
 };

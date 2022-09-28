@@ -36,7 +36,9 @@ export const YearSelector = (props: YearSelectorProps): JSX.Element => {
       <Select
         id={props.id}
         value={
-          props.selectedYear !== undefined && !isNaN(props.selectedYear) ? props.selectedYear.toString() : ''
+          props.selectedYear !== undefined && !isNaN(props.selectedYear) ?
+            props.selectedYear.toString() :
+            ''
         }
         label={props.label}
         onChange={(event: SelectChangeEvent) => {

@@ -58,7 +58,11 @@ export const DrawerFragment = ({
         <div className="drawer">
           <div className="drawerContent">{children}</div>
         </div>
-        <div className="closeButton"><Button variant="outlined" onClick={toggleDrawer(false)}>Close</Button></div>
+        <div className="closeButton">
+          <Button variant="outlined" onClick={toggleDrawer(false)}>
+            Close
+          </Button>
+        </div>
       </Drawer>
     </React.Fragment>
   );
