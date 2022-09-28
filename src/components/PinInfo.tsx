@@ -9,7 +9,7 @@ type PinInfoPropTypes = {
   pin: Pin;
   paxs?: PAX[];
   pinSets?: PinSet[];
-  children: React.ReactNode;
+  children?: React.ReactNode;
 };
 
 export const PinInfo = ({

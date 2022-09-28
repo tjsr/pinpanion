@@ -12,6 +12,7 @@ import { countFilters, isEmpty } from './utils';
 import { getStoredLanyardList, getStoredLanyards, saveListToLocal } from './lanyardStorage';
 
 import { FilterQRCode } from './components/FilterQRCode';
+import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
@@ -83,6 +84,8 @@ const App = (): JSX.Element => {
   const [activePinList, setActivePinList] = useState<PinSelectionList>(
     pinSelectionLists[0]
   );
+
+  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(true);
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -181,25 +184,32 @@ const App = (): JSX.Element => {
                 />
               }
             />
-            <PinList
-              activePinSet={activePinList}
-              filter={filter}
-              heading={getPinListHeading()}
-              isPinFiltered={(pin: Pin) => {
-                if (selectionFilterEnabled) {
-                  const isOnLanyard: boolean = isPinOnLanyard(
-                    pin,
-                    activePinList
-                  );
-                  return !isOnLanyard;
-                }
-                return isPinFiltered(pin, filter);
-              }}
-              paxs={paxs}
-              pins={pins}
-              pinSets={pinSets}
-              setPinSet={selectionListUpdated}
-            />
+            { splitActiveAndWanted && selectionFilterEnabled ?
+              <LanyardPinList heading={`Lanyard for ${activePinList.name}`}
+                availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
+                wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
+                paxs={paxs}
+                pinSets={pinSets} /> :
+              <PinList
+                activePinSet={activePinList}
+                filter={filter}
+                heading={getPinListHeading()}
+                isPinFiltered={(pin: Pin) => {
+                  if (selectionFilterEnabled) {
+                    const isOnLanyard: boolean = isPinOnLanyard(
+                      pin,
+                      activePinList
+                    );
+                    return !isOnLanyard;
+                  }
+                  return isPinFiltered(pin, filter);
+                }}
+                paxs={paxs}
+                pins={pins}
+                pinSets={pinSets}
+                setPinSet={selectionListUpdated}
+              />
+            }
           </>
         )}
       </>
