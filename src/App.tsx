@@ -9,6 +9,7 @@ import {
 } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmpty } from './utils';
+import { getStoredLanyardList, getStoredLanyards, saveListToLocal } from './lanyardStorage';
 
 import { FilterQRCode } from './components/FilterQRCode';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
@@ -65,11 +66,6 @@ const App = (): JSX.Element => {
     const id: string = isEmpty(idHash) ? generateListId() : idHash;
     const name: string = isEmpty(listNameHash) ? '' : listNameHash;
 
-    // console.log(availIdHash);
-    // console.log(wantedIdHash);
-    // console.log(availableIds);
-    // console.log(wantedIds);
-
     const selection: PinSelectionList = {
       ...newSelectionList(),
       availableIds,
@@ -112,6 +108,8 @@ const App = (): JSX.Element => {
       }
     };
 
+    console.log(getStoredLanyards());
+
     fetchPins();
     assignRandomName();
   }, []);
@@ -141,6 +139,7 @@ const App = (): JSX.Element => {
     updateLists(recreatedList);
     updateListHash(updatedList);
     setActivePinList(updatedList);
+    saveListToLocal(updatedList);
   };
 
   const getPinListHeading = (): string => {
