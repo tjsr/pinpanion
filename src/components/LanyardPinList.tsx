@@ -1,8 +1,9 @@
-import { PAX, Pin, PinSet } from '../types';
+import { PAX, Pin, PinSet, SizesType } from '../types';
 
 import { PinInfo } from './PinInfo';
 
 type LanyardPinListPropTypes = {
+  displaySize?: SizesType;
   heading: string;
   availablePins: Pin[];
   wantedPins: Pin[];
@@ -12,7 +13,7 @@ type LanyardPinListPropTypes = {
 
 
 export const LanyardPinList = ({
-  availablePins, heading, paxs, pinSets, wantedPins
+  availablePins, displaySize = 'normal', heading, paxs, pinSets, wantedPins
 }: LanyardPinListPropTypes): JSX.Element => {
   return (
     <>
@@ -23,7 +24,7 @@ export const LanyardPinList = ({
           <h3>Available for trade</h3>
           {availablePins.map((pin: Pin) => {
             return (
-              <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />
+              <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />
             );
           })}
         </div>
@@ -33,7 +34,7 @@ export const LanyardPinList = ({
           <h3>Wanted</h3>
           {wantedPins.map((pin: Pin) => {
             return (
-              <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />
+              <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />
             );
           })}
         </div>

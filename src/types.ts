@@ -55,3 +55,5 @@ export type PinSet = {
 };
 
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
+
+export type SizesType = 'tiny' | 'sm' | 'normal' | 'large';

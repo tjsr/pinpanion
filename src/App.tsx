@@ -2,15 +2,17 @@ import './css/App.css';
 import './css/pins.css';
 
 import { EMPTY_FILTER, generateListId, newSelectionList } from './fixture';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from './types';
 import {
   PinSearchFilterDisplay,
   isPinFiltered,
 } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmpty } from './utils';
-import { getStoredLanyardList, getStoredLanyards, saveListToLocal } from './lanyardStorage';
+import { getDisplaySize, saveDisplaySize } from './settingsStorage';
+import { getStoredLanyards, saveListToLocal } from './lanyardStorage';
 
+import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
 import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
@@ -39,6 +41,7 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
+  const [displaySize, setDisplaySize] = useState<SizesType>(getDisplaySize());
 
   const shouldDefaultShowSelection = (): boolean => {
     const rh: number = parseInt(revisionHash);
@@ -117,6 +120,11 @@ const App = (): JSX.Element => {
     assignRandomName();
   }, []);
 
+  const displaySizeChanged = (size: SizesType): void => {
+    saveDisplaySize(size);
+    setDisplaySize(size);
+  };
+
   const updateListHash = (selection: PinSelectionList): void => {
     setAvailIdHash(selection.availableIds.join(','));
     setWantedIdHash(selection.wantedIds.join(','));
@@ -161,6 +169,7 @@ const App = (): JSX.Element => {
         {pins && (
           <>
             <PinAppDrawerSet
+              appSettingsPanel={<AppSettingsPanel size={displaySize} setObjectSize={displaySizeChanged} />}
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
               pinSelection={activePinList}
@@ -185,13 +194,14 @@ const App = (): JSX.Element => {
               }
             />
             { splitActiveAndWanted && selectionFilterEnabled ?
-              <LanyardPinList heading={`Lanyard for ${activePinList.name}`}
+              <LanyardPinList displaySize={displaySize} heading={`Lanyard for ${activePinList.name}`}
                 availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
                 wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets} /> :
               <PinList
                 activePinSet={activePinList}
+                displaySize={displaySize}
                 filter={filter}
                 heading={getPinListHeading()}
                 isPinFiltered={(pin: Pin) => {

@@ -35,9 +35,14 @@ div.pinInfo h3 {
   max-width: 100px;
 }
 
-.pin-normal img.pinImage, .pin-large img.pinImage {
+.pin-normal img.pinImage {
   max-height: 140px;
   max-width: 140px;
+}
+
+ .pin-large img.pinImage {
+  max-height: 240px;
+  max-width: 240px;
 }
 
 div.filterQrCode { 
@@ -91,11 +96,6 @@ div.listButtons button.removeButton, div.listButtons button.wantedButton {
 
 .drawerButton {
   min-width: 100;
-}
-
-div.qrQuietZone {
-  background: 'white';
-  padding: 32px;
 }
 
 div.drawer {

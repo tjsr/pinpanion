@@ -1,6 +1,6 @@
 import '../css/pins.css';
 
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from '../types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
 
 import { PinInfo } from './PinInfo';
 import { PinListButtons } from './PinButtons';
@@ -10,6 +10,7 @@ import { removeOrAddId } from '../listutils';
 
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;
+  displaySize?: SizesType;
   filter?: PinListFilter;
   heading: string;
   isPinFiltered: (pin: Pin, filter?: PinListFilter) => boolean;
@@ -20,6 +21,7 @@ interface PinListPropTypes {
 }
 
 export const PinList = ({
+  displaySize = 'normal',
   heading,
   pins,
   paxs,
@@ -83,7 +85,7 @@ export const PinList = ({
           <div className="pinListContent">
             {displayedPins.map((pin: Pin) => {
               return (
-                <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+                <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
                   {activePinSet?.editable && (
                     <PinListButtons
                       availableCount={countPinAvailable(pin.id)}

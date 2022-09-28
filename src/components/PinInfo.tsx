@@ -1,11 +1,13 @@
-import { PAX, Pin, PinSet } from '../types';
+import { PAX, Pin, PinSet, SizesType } from '../types';
 
 import React from 'react';
 import eventnames from '../eventnames.json';
+import { getPinClassForSize } from '../utils';
 
 const PIN_IMG_PREFIX = 'https://pinnypals.com/imgs';
 
 type PinInfoPropTypes = {
+  displaySize: SizesType;
   pin: Pin;
   paxs?: PAX[];
   pinSets?: PinSet[];
@@ -13,6 +15,7 @@ type PinInfoPropTypes = {
 };
 
 export const PinInfo = ({
+  displaySize = 'normal',
   pin,
   paxs,
   pinSets,
@@ -25,7 +28,8 @@ export const PinInfo = ({
   const pinSet: PinSet | undefined = pinSets?.find((set: PinSet) => {
     return set?.id == pin.set_id || set?.id == pin.sub_set_id;
   });
-  const pinClasses = 'pin pin-normal';
+
+  const pinClasses = getPinClassForSize(displaySize);
 
   return (
     <>
