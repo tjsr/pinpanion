@@ -13,8 +13,8 @@ export const QRCodeDrawerFragment = ({
   qrCode,
 }: QRCodeDrawerFragmentProps): JSX.Element => {
   return (
-    <DrawerFragment
-      drawerId="qr" label="QR code"
-    >{qrCode}</DrawerFragment>
+    <DrawerFragment drawerId="qr" label="QR code">
+      {qrCode}
+    </DrawerFragment>
   );
 };

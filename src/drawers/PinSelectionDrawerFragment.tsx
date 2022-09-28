@@ -25,7 +25,11 @@ export const PinSelectionDrawerFragment = ({
 
   return (
     <DrawerFragment
-      active={isSelectionActive} drawerId="selection" label={getSelectionButtonLabel()}
-    >{pinSelectionFilter}</DrawerFragment>
+      active={isSelectionActive}
+      drawerId="selection"
+      label={getSelectionButtonLabel()}
+    >
+      {pinSelectionFilter}
+    </DrawerFragment>
   );
 };

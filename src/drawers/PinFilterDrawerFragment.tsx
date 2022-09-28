@@ -28,7 +28,11 @@ export const PinFilterDrawerFragment = ({
 
   return (
     <DrawerFragment
-      active={countFilters(filter) > 0} drawerId="filter" label={getFilterButtonLabel()}
-    >{pinListFilterDisplay}</DrawerFragment>
+      active={countFilters(filter) > 0}
+      drawerId="filter"
+      label={getFilterButtonLabel()}
+    >
+      {pinListFilterDisplay}
+    </DrawerFragment>
   );
 };

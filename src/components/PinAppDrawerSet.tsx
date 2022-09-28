@@ -38,9 +38,7 @@ export const PinAppDrawerSet = ({
         pinListFilterDisplay={pinListFilterDisplay}
       />
 
-      <QRCodeDrawerFragment
-        qrCode={qrCode}
-      />
+      <QRCodeDrawerFragment qrCode={qrCode} />
     </>
   );
 };
