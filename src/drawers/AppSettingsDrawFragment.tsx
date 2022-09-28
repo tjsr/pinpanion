@@ -6,15 +6,12 @@ type AppSettingsDrawerFragmentProps = {
   appSettingsPanel: ReactElement<AppSettingsPanelProps>;
 };
 
-export const AppSettingsDrawerFragment = ({ appSettingsPanel } : AppSettingsDrawerFragmentProps):JSX.Element => {
+export const AppSettingsDrawerFragment = ({
+  appSettingsPanel,
+}: AppSettingsDrawerFragmentProps): JSX.Element => {
   return (
-    <DrawerFragment
-      drawerId="settings"
-      label="App settings"
-    >
-      <div>
-        {appSettingsPanel}
-      </div>
+    <DrawerFragment drawerId="settings" label="App settings">
+      {appSettingsPanel}
     </DrawerFragment>
   );
 };

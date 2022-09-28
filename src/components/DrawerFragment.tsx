@@ -53,7 +53,7 @@ export const DrawerFragment = ({
         ModalProps={{
           keepMounted: true,
         }}
-        variant="persistent"
+        variant="temporary"
       >
         <div className="drawer">
           <div className="drawerContent">{children}</div>
