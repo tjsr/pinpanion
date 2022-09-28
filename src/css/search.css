@@ -1,0 +1,11 @@
+.searchFields label {
+  display: inline-flexbox;
+  text-align: left;
+  font-weight: bolder;
+}
+
+.searchFields input[type="text"], .searchFields textarea, .searchFields select {
+  display: inline;
+  width: 300px;
+}
+

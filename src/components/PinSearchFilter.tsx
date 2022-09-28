@@ -1,4 +1,5 @@
 import '../css/pins.css';
+import '../css/search.css';
 
 import { PAX, Pin, PinListFilter, PinSet } from '../types';
 
