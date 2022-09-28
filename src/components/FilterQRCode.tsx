@@ -1,3 +1,5 @@
+import '../css/qr.css';
+
 import { PinSelectionList } from '../types';
 import QRCode from 'react-qr-code';
 import { QR_CODE_SIZE } from '../globals';

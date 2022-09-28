@@ -1,0 +1,16 @@
+div.qrDescription {
+  margin: auto;
+  text-align: center;
+  margin-bottom: 16pt;
+  width: 30ch;
+}
+
+div.qrQuietZone {
+  background: 'white';
+  padding: 32px;
+}
+
+svg.selectionQrCode {
+  display: block;
+  margin: auto;
+}

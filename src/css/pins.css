@@ -111,18 +111,6 @@ div.drawerContent {
   display: flex;
 }
 
-svg.selectionQrCode {
-  display: block;
-  margin: auto;
-}
-
-div.qrDescription {
-  margin: auto;
-  text-align: center;
-  margin-bottom: 16pt;
-  width: 30ch;
-}
-
 div.selectionFilterItem {
   display: block;
 }
