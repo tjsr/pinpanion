@@ -70,7 +70,7 @@ export const PinSearchFilterDisplay = ({
             selectedYear={filter?.startYear}
             minYear={config.minYear}
             maxYear={config.maxYear}
-            label="Year from"
+            label="Earliest release year"
             yearChanged={(startYear: number) => {
               const updatedFilter = {
                 ...filter,
@@ -90,7 +90,7 @@ export const PinSearchFilterDisplay = ({
             selectedYear={filter?.endYear}
             minYear={config.minYear}
             maxYear={config.maxYear}
-            label="Year until"
+            label="Latest release year"
             yearChanged={(endYear: number) => {
               const updatedFilter = {
                 ...filter,
