@@ -123,6 +123,7 @@ export const PinSelectionListEditor = ({
     <>
       {pinLists.map((pl) => (
         <PinSelectionEditor
+          key={pl.id}
           pinList={pl}
           displayList={enableFilter}
           changeListDisplayed={(display: boolean) =>
