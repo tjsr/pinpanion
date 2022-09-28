@@ -79,22 +79,24 @@ export const PinList = ({
       <h2>{heading}</h2>
       {pins && displayedPins && (
         <>
-          <div>Total pins: {displayedPins.length}</div>
-          {displayedPins.map((pin: Pin) => {
-            return (
-              <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-                {activePinSet?.editable && (
-                  <PinListButtons
-                    availableCount={countPinAvailable(pin.id)}
-                    wantedCount={countPinWanted(pin.id)}
-                    pinId={pin.id}
-                    setPinAvailable={togglePinAvailable}
-                    setPinWanted={togglePinWanted}
-                  />
-                )}
-              </PinInfo>
-            );
-          })}
+          <div className="totalPins">Total pins: {displayedPins.length}</div>
+          <div className="pinListContent">
+            {displayedPins.map((pin: Pin) => {
+              return (
+                <PinInfo key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+                  {activePinSet?.editable && (
+                    <PinListButtons
+                      availableCount={countPinAvailable(pin.id)}
+                      wantedCount={countPinWanted(pin.id)}
+                      pinId={pin.id}
+                      setPinAvailable={togglePinAvailable}
+                      setPinWanted={togglePinWanted}
+                    />
+                  )}
+                </PinInfo>
+              );
+            })}
+          </div>
         </>
       )}
     </>

@@ -1,22 +1,43 @@
 .pin {
  display: inline-block;
- width: 12rem;
+ margin: 2px;
+ background-color: #e1e1e1;
 }
 
-.searchFields label {
-  display: inline-flexbox;
-  text-align: left;
-  font-weight: bolder;
+div.pinInfo h3 {
+  margin-top: 0.2em;
+  height: 2em;
 }
 
-.searchFields input[type="text"], .searchFields textarea, .searchFields select {
-  display: inline;
-  width: 300px;
+.pin-tiny {
+  width: 6rem;
 }
 
-img.pinImage {
-  max-height: 120px;
-  max-width: 120px;
+.pin-sm {
+  width: 8rem;
+}
+
+.pin-normal {
+  width: 12rem;
+}
+
+.pin-large {
+  width: 14rem;
+}
+
+.pin-tiny img.pinImage {
+  max-height: 70px;
+  max-width: 70px;
+}
+
+.pin-sm img.pinImage {
+  max-height: 100px;
+  max-width: 100px;
+}
+
+.pin-normal img.pinImage, .pin-large img.pinImage {
+  max-height: 140px;
+  max-width: 140px;
 }
 
 div.filterQrCode { 
@@ -31,16 +52,31 @@ div.searchFields {
 
 div.listButtons button {
   margin: 4px;
-  width: 64px;
-  height: 64px;
   border-radius: 100%;
   border: 3px solid #000;
   color: #000;
 }
 
 div.listButtons button.addButton, div.listButtons button.availableButton {
-  font-size: 36pt;
   background-color: rgb(90, 180, 90);
+}
+
+.pin-tiny div.listButtons button {
+  font-size: 16pt;
+  width: 32px;
+  height: 32px;
+}
+
+.pin-sm div.listButtons button {
+  font-size: 24pt;
+  width: 48px;
+  height: 48px;
+}
+
+.pin-normal div.listButtons button {
+  font-size: 36pt;
+  width: 64px;
+  height: 64px;
 }
 
 div.listButtons button:disabled, button.pinNotAvailable, button.pinNotWanted {
@@ -50,7 +86,6 @@ div.listButtons button:disabled, button.pinNotAvailable, button.pinNotWanted {
 }
 
 div.listButtons button.removeButton, div.listButtons button.wantedButton {
-  font-size: 36pt;
   background-color: rgb(150, 82, 82);
 }
 
@@ -105,4 +140,8 @@ div.lanyardName {
   border: 2mm solid #000;
   font-weight: bold;
   font-size: 1.2rem;
+}
+
+div.pinListContent {
+  margin: 0; 
 }
