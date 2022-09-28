@@ -1,3 +1,5 @@
+import '../css/pins.css';
+
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import React from 'react';
@@ -51,10 +53,12 @@ export const DrawerFragment = ({
         ModalProps={{
           keepMounted: true,
         }}
+        variant="persistent"
       >
         <div className="drawer">
           <div className="drawerContent">{children}</div>
         </div>
+        <div className="closeButton"><Button variant="outlined" onClick={toggleDrawer(false)}>Close</Button></div>
       </Drawer>
     </React.Fragment>
   );

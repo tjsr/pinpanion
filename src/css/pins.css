@@ -111,6 +111,12 @@ div.drawerContent {
   display: flex;
 }
 
+div.closeButton {
+  clear: left;
+  display: block;
+  margin: 1em;
+}
+
 div.selectionFilterItem {
   display: block;
 }
