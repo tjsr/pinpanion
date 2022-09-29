@@ -117,11 +117,11 @@ div.closeButton {
   margin: 1em;
 }
 
-div.selectionFilterItem {
+div.selectionFilterItem, div.settingItem {
   display: block;
 }
 
-div.filterInfo, div.pinSelectionFilter, div.setSelection {
+div.filterInfo, div.pinSelectionFilter, div.setSelection, div.settingFields {
   display: block;
 }
 

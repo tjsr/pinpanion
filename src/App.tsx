@@ -16,7 +16,12 @@ import {
 } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmpty } from './utils';
-import { getDisplaySize, saveDisplaySize } from './settingsStorage';
+import {
+  getDisplaySize,
+  getSplitActiveAndWanted,
+  saveDisplaySize,
+  saveSplitActive,
+} from './settingsStorage';
 import { getStoredLanyards, saveListToLocal } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -95,8 +100,13 @@ const App = (): JSX.Element => {
     pinSelectionLists[0]
   );
 
-  const [splitActiveAndWanted, setSplitActiveAndWanted] =
-    useState<boolean>(true);
+  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(
+    getSplitActiveAndWanted()
+  );
+
+  useEffect(() => {
+    saveSplitActive(splitActiveAndWanted);
+  }, [splitActiveAndWanted]);
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -181,6 +191,8 @@ const App = (): JSX.Element => {
                 <AppSettingsPanel
                   size={displaySize}
                   setObjectSize={displaySizeChanged}
+                  splitActiveAndWanted={splitActiveAndWanted}
+                  setSplitActiveAndWanted={setSplitActiveAndWanted}
                 />
               }
               filter={filter}

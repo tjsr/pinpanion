@@ -7,3 +7,18 @@ export const getDisplaySize = (): SizesType => {
 export const saveDisplaySize = (size: SizesType) => {
   localStorage.setItem('displaySize', size || 'normal');
 };
+
+export const getSplitActiveAndWanted = (): boolean => {
+  const existingValue: string | null = localStorage.getItem(
+    'setSplitActiveAndWanted'
+  );
+  if (existingValue === null) {
+    saveSplitActive(true);
+    return true;
+  }
+  return Boolean(existingValue);
+};
+
+export const saveSplitActive = (enabled: boolean) => {
+  localStorage.setItem('splitActiveAndWanted', enabled.toString());
+};
