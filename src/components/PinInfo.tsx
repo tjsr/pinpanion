@@ -20,7 +20,7 @@ export const PinInfo = ({
   pinSets,
   children,
 }: PinInfoPropTypes): JSX.Element => {
-  const url = `${config.imagePrefix}/${pin.image_name}`;
+  const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
   const pinPax: PAX | undefined = paxs?.find(
     (pax: PAX) => pax.id == pin.pax_id
   );
