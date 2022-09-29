@@ -93,7 +93,7 @@ const SplitActiveAndWantedSetting = ({
           control={
             <Switch
               id="splitActiveAndWanted"
-              value={splitActiveAndWanted}
+              checked={splitActiveAndWanted}
               onChange={() => setSplitActiveAndWanted(!splitActiveAndWanted)}
             />
           }

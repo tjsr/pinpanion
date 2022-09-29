@@ -10,13 +10,13 @@ export const saveDisplaySize = (size: SizesType) => {
 
 export const getSplitActiveAndWanted = (): boolean => {
   const existingValue: string | null = localStorage.getItem(
-    'setSplitActiveAndWanted'
+    'splitActiveAndWanted'
   );
   if (existingValue === null) {
     saveSplitActive(true);
     return true;
   }
-  return Boolean(existingValue);
+  return JSON.parse(existingValue) === true;
 };
 
 export const saveSplitActive = (enabled: boolean) => {
