@@ -23,17 +23,24 @@ fetch(config.pinnypals)
     if (!fs.existsSync(IMG_DIR)) {
       fs.mkdirSync(IMG_DIR);
     }
+    let hadErrors = false;
     ppd.pins.forEach((p) => {
-      const url: string = config.imagePrefix + '/' + p.image_name;
+      const url: string = config.pinnypalsImagePrefix + '/' + p.image_name;
       const outputFilePath: string = path.join(IMG_DIR, p.image_name.split('?')[0]);
       if (!fs.existsSync(outputFilePath)) {
-        console.log(`Downloaded ${url} to ${outputFilePath}`);
+        downloadFile(url, outputFilePath).then(() => {
+          console.log(`Downloaded ${url} to ${outputFilePath}`);
+        }).catch((err) => {
+          hadErrors = true;
+          console.error(`Error downloading ${url} to ${outputFilePath}: ${err}`);
+        });
       } else {
         console.log(`Skipped downloading ${url} because ${outputFilePath} exists.`);
       }
-
-      downloadFile(url, outputFilePath);
     });
+    if (hadErrors) {
+      throw Error('Errors occurred while downloading');
+    }
   })
   .catch((err) => {
     console.log(err);
