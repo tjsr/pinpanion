@@ -1,10 +1,9 @@
 import { PAX, Pin, PinSet, SizesType } from '../types';
 
 import React from 'react';
+import config from '../config.json';
 import eventnames from '../eventnames.json';
 import { getPinClassForSize } from '../utils';
-
-const PIN_IMG_PREFIX = 'https://pinnypals.com/imgs';
 
 type PinInfoPropTypes = {
   displaySize: SizesType;
@@ -21,7 +20,7 @@ export const PinInfo = ({
   pinSets,
   children,
 }: PinInfoPropTypes): JSX.Element => {
-  const url = `${PIN_IMG_PREFIX}/${pin.image_name}`;
+  const url = `${config.imagePrefix}/${pin.image_name}`;
   const pinPax: PAX | undefined = paxs?.find(
     (pax: PAX) => pax.id == pin.pax_id
   );

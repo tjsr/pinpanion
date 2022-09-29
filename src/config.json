@@ -1,7 +1,8 @@
 {
   "pinnypals": "https://pinnypals.com/scripts/queryPins.php",
   "proxy": "http://localhost:8080/pins",
-  "imagePrefix": "https://pinnypals.com/imgs",
+  "pinnypalsImagePrefix": "https://pinnypals.com/imgs",
+  "imagePrefix": "imgs",
   "minYear": 2013,
   "maxYear": 2022,
   "reverseYears": true

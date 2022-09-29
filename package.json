@@ -34,7 +34,8 @@
   "scripts": {
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "npm run download && react-scripts build",
+    "download": "node --experimental-specifier-resolution=node --loader ts-node/esm ./src/utils/pindownload.ts",
     "test:react": "react-scripts test",
     "test": "npx jest",
     "lint": "eslint --fix \"./src/**/*.{ts,tsx}\"",

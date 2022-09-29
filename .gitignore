@@ -21,3 +21,5 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+public/imgs/pin_*.png
+public/imgs/set_*.png
