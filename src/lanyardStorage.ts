@@ -26,6 +26,14 @@ export const getStoredLanyards = (): PinSelectionList[] => {
   return lanyards;
 };
 
+export const getStoredLanyard = (lanyardId: string): PinSelectionList| undefined => {
+  const data: string | null = localStorage.getItem(`lanyard.${lanyardId}`);
+  if (null === data) {
+    return undefined;
+  }
+  return JSON.parse(data);
+};
+
 export const saveListToLocal = (list: PinSelectionList): void => {
   if (!list.id) {
     throw Error(

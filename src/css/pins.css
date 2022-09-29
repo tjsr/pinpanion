@@ -108,7 +108,7 @@ div.drawer {
 div.drawerContent {
   justify-content: center;
   width: 320pt;
-  display: flex;
+  display: block;
 }
 
 div.closeButton {
@@ -121,7 +121,7 @@ div.selectionFilterItem, div.settingItem {
   display: block;
 }
 
-div.filterInfo, div.pinSelectionFilter, div.setSelection, div.settingFields {
+div.filterInfo, div.pinSelectionFilter, div.setSelection, div.settingFields, div.pinSelectionList {
   display: block;
 }
 

@@ -1,5 +1,6 @@
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
 import { PinSelectionList } from '../types';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import Switch from '@mui/material/Switch';
@@ -7,38 +8,41 @@ import TextField from '@mui/material/TextField';
 import { filterStringToIds } from '../listutils';
 
 type PinSelectionProps = {
-  displayList: boolean;
-  pinList: PinSelectionList;
-  onChange: (updatedList: PinSelectionList) => void;
+  activeLanyard: PinSelectionList;
   changeListDisplayed: (display: boolean) => void;
+  displayList: boolean;
+  lanyardSelected: (lanyardId:string) => void;
+  onChange: (updatedList: PinSelectionList) => void;
 };
 
 export type PinSelectionFilterProps = {
-  enableFilter: boolean;
-  pinLists: PinSelectionList[];
-  onChange: (updatedList: PinSelectionList) => void;
+  activeLanyard: PinSelectionList;
   changeListDisplayed: (id: string, display: boolean) => void;
+  enableFilter: boolean;
+  lanyardSelected: (lanyardId:string) => void;
+  onChange: (updatedList: PinSelectionList) => void;
 };
 
 export const PinSelectionEditor = ({
+  activeLanyard,
   changeListDisplayed,
   displayList,
   onChange,
-  pinList,
 }: PinSelectionProps): JSX.Element => {
   return (
     <>
       <div className="pinSelectionFilter">
+        Current:
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
               id="listName"
               label="List Name"
               variant="outlined"
-              value={pinList?.name}
+              value={activeLanyard.name}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const updatedList: PinSelectionList = {
-                  ...pinList,
+                  ...activeLanyard,
                   name: event.target.value,
                 };
                 onChange(updatedList);
@@ -53,15 +57,15 @@ export const PinSelectionEditor = ({
               id="selectedPins"
               label="Wanted"
               variant="outlined"
-              value={pinList?.wantedIds}
+              value={activeLanyard.wantedIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const wantedIds: number[] = filterStringToIds(
                   event.target.value
                 );
 
                 const updatedList: PinSelectionList = {
-                  ...pinList,
-                  revision: pinList.revision + 1,
+                  ...activeLanyard,
+                  revision: activeLanyard.revision + 1,
                   wantedIds,
                 };
                 onChange(updatedList);
@@ -76,15 +80,15 @@ export const PinSelectionEditor = ({
               id="selectedPins"
               label="Available"
               variant="outlined"
-              value={pinList?.availableIds}
+              value={activeLanyard.availableIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const availableIds: number[] = filterStringToIds(
                   event.target.value
                 );
                 const updatedList: PinSelectionList = {
-                  ...pinList,
+                  ...activeLanyard,
                   availableIds,
-                  revision: pinList.revision + 1,
+                  revision: activeLanyard.revision + 1,
                 };
                 onChange(updatedList);
                 return true;
@@ -114,24 +118,25 @@ export const PinSelectionEditor = ({
 };
 
 export const PinSelectionListEditor = ({
-  pinLists,
+  activeLanyard,
+  lanyardSelected,
   onChange,
   enableFilter,
   changeListDisplayed,
 }: PinSelectionFilterProps): JSX.Element => {
   return (
     <>
-      {pinLists.map((pl) => (
-        <PinSelectionEditor
-          key={pl.id}
-          pinList={pl}
-          displayList={enableFilter}
-          changeListDisplayed={(display: boolean) =>
-            changeListDisplayed(pl.id, display)
-          }
-          onChange={onChange}
-        />
-      ))}
+      <div className="pinSelectionList">
+        <LanyardSelectionDropdown
+          lanyardSelected={lanyardSelected}
+          activeLanyard={activeLanyard}
+          id='lanyardSelect' />
+      </div>
+      <PinSelectionEditor
+        key={activeLanyard.id}
+        displayList={enableFilter}
+        changeListDisplayed={(display: boolean) => changeListDisplayed(activeLanyard.id, display)}
+        onChange={onChange} activeLanyard={activeLanyard} lanyardSelected={lanyardSelected} />
     </>
   );
 };

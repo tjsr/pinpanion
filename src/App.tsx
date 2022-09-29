@@ -22,7 +22,7 @@ import {
   saveDisplaySize,
   saveSplitActive,
 } from './settingsStorage';
-import { getStoredLanyards, saveListToLocal } from './lanyardStorage';
+import { getStoredLanyard, getStoredLanyards, saveListToLocal } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
@@ -181,6 +181,13 @@ const App = (): JSX.Element => {
     }
   };
 
+  const lanyardSelected = (lanyardId: string):void => {
+    const lanyard: PinSelectionList|undefined = getStoredLanyard(lanyardId);
+    if (lanyard) {
+      setActivePinList(lanyard);
+    }
+  };
+
   return (
     <div className="App">
       <>
@@ -210,11 +217,11 @@ const App = (): JSX.Element => {
               pinSelectionFilter={
                 <PinSelectionListEditor
                   enableFilter={selectionFilterEnabled}
-                  pinLists={pinSelectionLists}
                   onChange={selectionListUpdated}
                   changeListDisplayed={(id: string, display: boolean) => {
                     setSelectionFilterEnabled(display);
-                  }}
+                  } } activeLanyard={activePinList}
+                  lanyardSelected={lanyardSelected}
                 />
               }
             />
