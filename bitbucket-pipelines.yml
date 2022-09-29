@@ -1,0 +1,28 @@
+#  Template NodeJS build
+
+#  This template allows you to validate your NodeJS code.
+#  The workflow allows running tests and code linting on the default branch.
+
+image: atlassian/default-image:3
+options:
+  docker: true
+
+definitions:
+  services:
+    docker:
+      image: tjsrowe/bb-dind-aws:latest
+      variables:
+         DOCKER_OPTS: "--insecure-registry=172.29.0.214:5000"
+
+pipelines:
+  default:
+    - step:
+        name: Build Docker image
+        runs-on:
+        - 'self.hosted'
+        - 'linux'
+        script:
+        - npm test
+        - npm run build
+        caches:
+          - docker
