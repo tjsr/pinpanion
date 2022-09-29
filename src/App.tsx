@@ -185,6 +185,7 @@ const App = (): JSX.Element => {
     const lanyard: PinSelectionList|undefined = getStoredLanyard(lanyardId);
     if (lanyard) {
       setActivePinList(lanyard);
+      updateListHash(lanyard);
     }
   };
 
