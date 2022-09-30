@@ -132,7 +132,7 @@ const App = (): JSX.Element => {
       }
     };
 
-    console.log(getStoredLanyards());
+    // console.log(getStoredLanyards());
 
     fetchPins();
     assignRandomName();

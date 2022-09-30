@@ -3,6 +3,7 @@
   "proxy": "http://localhost:8080/pins",
   "pinnypalsImagePrefix": "https://pinnypals.com/imgs",
   "imagePrefix": "imgs",
+  "imageCacheDir": "/tmp/imgs",
   "minYear": 2013,
   "maxYear": 2022,
   "reverseYears": true
