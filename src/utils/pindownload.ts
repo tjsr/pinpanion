@@ -24,22 +24,24 @@ const downloadFile = async (url: string, outputPath: string): Promise<void> => {
 };
 
 let destinationPath: string = config.imageCacheDir;
-if (process.argv) {
-  if (process.argv.length > 1 && process.argv[2] !== undefined) {
-    destinationPath = process.argv[2];
-  }
+if (process.argv && process.argv.length > 1 && process.argv[2] !== undefined) {
+  destinationPath = process.argv[2];
+} else if (process.env.IMAGES_CACHE_DIR !== undefined) {
+  destinationPath = process.env.IMAGES_CACHE_DIR;
 }
+
 destinationPath = path.resolve(destinationPath);
 
+let hadErrors = false;
 console.log('Pinnypals:', config.pinnypals);
 fetch(config.pinnypals)
   .then((response) => response.json())
   .then((data: unknown) => {
     const ppd: PinnypalsPinsRequest = data as PinnypalsPinsRequest;
     if (!fs.existsSync(destinationPath)) {
+      hadErrors = true;
       fs.mkdirSync(destinationPath);
     }
-    let hadErrors = false;
     if (TEST_MODE) {
       ppd.pins = [ppd.pins[0]];
     }
@@ -60,7 +62,4 @@ fetch(config.pinnypals)
     if (hadErrors) {
       throw Error('Errors occurred while downloading');
     }
-  })
-  .catch((err) => {
-    console.log(err);
   });
