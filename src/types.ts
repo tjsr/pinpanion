@@ -67,4 +67,4 @@ export interface ConfigType {
   minYear: number,
   maxYear: number,
   reverseYears: boolean
-};
+}
