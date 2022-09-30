@@ -29,6 +29,7 @@ if (process.argv) {
     destinationPath = process.argv[2];
   }
 }
+destinationPath = path.resolve(destinationPath);
 
 console.log('Pinnypals:', config.pinnypals);
 fetch(config.pinnypals)
