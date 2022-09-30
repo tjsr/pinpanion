@@ -17,6 +17,17 @@ definitions:
 pipelines:
   default:
     - step:
+        name: Create image cache
+        runs-on:
+        - 'self.hosted'
+        - 'linux'
+        script:
+        - npm install
+        - npm run download -- ~/images
+        caches:
+          - docker
+          - images
+    - step:
         name: Build React project
         runs-on:
         - 'self.hosted'
@@ -30,17 +41,7 @@ pipelines:
         caches:
           - docker
           - images
-    - step:
-        name: Create image cache
-        runs-on:
-        - 'self.hosted'
-        - 'linux'
-        script:
-        - npm install
-        - npm run download -- ~/images
-        caches:
-          - docker
-          - images
+
 definitions:
   caches:
     images: ~/images
