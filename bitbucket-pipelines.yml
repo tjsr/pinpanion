@@ -25,7 +25,7 @@ pipelines:
         - npm install
         - npm test
         - mkdir public/imgs
-        - cp -Rf /tmp/images/* public/imgs
+        - cp -Rf ~/images/* public/imgs || true
         - npm run build
         caches:
           - docker
@@ -37,10 +37,10 @@ pipelines:
         - 'linux'
         script:
         - npm install
-        - npm run download -- /tmp/images
+        - npm run download -- ~/images
         caches:
           - docker
           - images
 definitions:
   caches:
-    images: /tmp/images
+    images: ~/images
