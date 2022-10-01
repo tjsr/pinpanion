@@ -23,6 +23,7 @@ pipelines:
         - 'linux'
         script:
         - npm install
+        - touch $IMAGES_CACHE_DIR/empty.txt
         - npm run download -- $IMAGES_CACHE_DIR
         caches:
           - docker
