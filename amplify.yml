@@ -4,12 +4,18 @@ frontend:
     preBuild:
       commands:
         - npm ci
-    build:
+    images:
       commands:
-        - mkdir -p public/imgs || true
+        - npm install
         - mkdir -p $IMAGES_CACHE_DIR || true
         - touch $IMAGES_CACHE_DIR/empty.txt
-        - cp $IMAGES_CACHE_DIR/* public/imgs
+        - npm run download -- $IMAGES_CACHE_DIR
+    build:
+      commands:
+        - npm install
+        - npm test
+        - mkdir -p public/imgs || true
+        - cp -Rf $IMAGES_CACHE_DIR/* public/imgs || true
         - npm run build
   artifacts:
     baseDirectory: build
@@ -18,5 +24,4 @@ frontend:
   cache:
     paths:
       - node_modules/**/*
-      - public/imgs
       - images
