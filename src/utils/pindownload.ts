@@ -6,6 +6,8 @@ import path from 'path';
 
 // import configJson from '../config.json';
 const TEST_MODE = process.env.TEST_MODE == 'true';
+const DEFAULT_IMAGE_LIMIT = TEST_MODE ? 10 : -1;
+const LIMIT_IMAGE_DOWNLOADS = process.env.TEST_MODE ? parseInt(process.env.TEST_MODE) : DEFAULT_IMAGE_LIMIT;
 
 const configFile = 'src/config.json';
 if (!fs.existsSync(configFile)) {
@@ -36,12 +38,14 @@ fetch(config.pinnypals)
   .then((response) => response.json())
   .then((data: unknown) => {
     const ppd: PinnypalsPinsRequest = data as PinnypalsPinsRequest;
+
+    fs.writeFileSync('public/pins.json', JSON.stringify(data), 'utf-8');
+    console.log('Wrote updated JSON to public/pins.json');
     if (!fs.existsSync(destinationPath)) {
-      hadErrors = true;
       fs.mkdirSync(destinationPath);
     }
-    if (TEST_MODE) {
-      ppd.pins = [ppd.pins[0]];
+    if (LIMIT_IMAGE_DOWNLOADS > -1) {
+      ppd.pins = ppd.pins.filter((p) => p.id < LIMIT_IMAGE_DOWNLOADS);
     }
     ppd.pins.forEach((p) => {
       const url: string = config.pinnypalsImagePrefix + '/' + p.image_name;
