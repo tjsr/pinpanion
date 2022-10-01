@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 
 // import configJson from '../config.json';
-const TEST_MODE = process.env.TEST_MODE;
+const TEST_MODE = process.env.TEST_MODE == 'true';
 
 const configFile = 'src/config.json';
 if (!fs.existsSync(configFile)) {
