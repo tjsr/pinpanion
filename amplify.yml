@@ -1,0 +1,22 @@
+version: 1
+frontend:
+  phases:
+    preBuild:
+      commands:
+        - npm ci
+    build:
+      commands:
+        - mkdir -p public/imgs || true
+        - mkdir -p $IMAGES_CACHE_DIR || true
+        - touch $IMAGES_CACHE_DIR/empty.txt
+        - cp $IMAGES_CACHE_DIR/* public/imgs
+        - npm run build
+  artifacts:
+    baseDirectory: build
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
+      - public/imgs
+      - images

@@ -57,3 +57,14 @@ export type PinSet = {
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
 
 export type SizesType = 'tiny' | 'sm' | 'normal' | 'large';
+
+export interface ConfigType {
+  pinnypals: string,
+  proxy: string,
+  pinnypalsImagePrefix: string,
+  imagePrefix: string,
+  imageCacheDir: string,
+  minYear: number,
+  maxYear: number,
+  reverseYears: boolean
+}

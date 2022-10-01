@@ -17,13 +17,31 @@ definitions:
 pipelines:
   default:
     - step:
-        name: Build Docker image
+        name: Create image cache
+        runs-on:
+        - 'self.hosted'
+        - 'linux'
+        script:
+        - npm install
+        - npm run download -- $IMAGES_CACHE_DIR
+        caches:
+          - docker
+          - images
+    - step:
+        name: Build React project
         runs-on:
         - 'self.hosted'
         - 'linux'
         script:
         - npm install
         - npm test
+        - mkdir public/imgs
+        - cp -Rf $IMAGES_CACHE_DIR/* public/imgs || true
         - npm run build
         caches:
           - docker
+          - images
+
+definitions:
+  caches:
+    images: $IMAGES_CACHE_DIR

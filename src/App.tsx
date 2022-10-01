@@ -22,7 +22,7 @@ import {
   saveDisplaySize,
   saveSplitActive,
 } from './settingsStorage';
-import { getStoredLanyard, getStoredLanyards, saveListToLocal } from './lanyardStorage';
+import { getStoredLanyard, saveListToLocal } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
@@ -132,7 +132,7 @@ const App = (): JSX.Element => {
       }
     };
 
-    console.log(getStoredLanyards());
+    // console.log(getStoredLanyards());
 
     fetchPins();
     assignRandomName();
