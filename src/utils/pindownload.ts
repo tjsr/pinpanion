@@ -26,8 +26,6 @@ const downloadFile = async (url: string, outputPath: string): Promise<void> => {
 let destinationPath: string = config.imageCacheDir;
 if (process.argv && process.argv.length > 1 && process.argv[2] !== undefined) {
   destinationPath = process.argv[2];
-} else if (process.env.IMAGES_CACHE_DIR !== undefined) {
-  destinationPath = process.env.IMAGES_CACHE_DIR;
 }
 
 destinationPath = path.resolve(destinationPath);
