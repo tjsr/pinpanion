@@ -181,11 +181,19 @@ const App = (): JSX.Element => {
     }
   };
 
-  const lanyardSelected = (lanyardId: string):void => {
-    const lanyard: PinSelectionList|undefined = getStoredLanyard(lanyardId);
+  const lanyardSelected = async (lanyardId: string): Promise<void> => {
+    console.log('Lanyard: ', lanyardId);
+    const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId);
     if (lanyard) {
       setActivePinList(lanyard);
       updateListHash(lanyard);
+      return Promise.resolve();
+    } else {
+      const newList: PinSelectionList = newSelectionList();
+      const randomAnimal: string = await generateRandomName();
+      newList.name = randomAnimal;
+      selectionListUpdated(newList);
+      return Promise.resolve();
     }
   };
 
