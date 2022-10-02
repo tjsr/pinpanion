@@ -115,6 +115,7 @@ div.closeButton {
   clear: left;
   display: block;
   margin: 1em;
+  align-self: center;
 }
 
 div.selectionFilterItem, div.settingItem {
