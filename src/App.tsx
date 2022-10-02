@@ -63,46 +63,33 @@ const App = (): JSX.Element => {
     return false;
   };
 
-  const [selectionFilterEnabled, setSelectionFilterEnabled] = useState<boolean>(
-    shouldDefaultShowSelection()
-  );
+  const [selectionFilterEnabled, setSelectionFilterEnabled] = useState<boolean>(shouldDefaultShowSelection());
 
-  const buildSetsFromFilterHash = (): PinSelectionList[] => {
+  const buildSetsFromFilterHash = (baseList: PinSelectionList = newSelectionList()): PinSelectionList => {
     let revision: number = parseInt(revisionHash);
     if (isNaN(revision)) {
       revision = 0;
     }
-    const availableIds: number[] = isEmpty(availIdHash) ?
-      [] :
-      availIdHash.split(',').map((n) => parseInt(n));
-    const wantedIds: number[] = isEmpty(wantedIdHash) ?
-      [] :
-      wantedIdHash.split(',').map((n) => parseInt(n));
+    const availableIds: number[] = isEmpty(availIdHash) ? [] : availIdHash.split(',').map((n) => parseInt(n));
+    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : wantedIdHash.split(',').map((n) => parseInt(n));
 
     const id: string = isEmpty(idHash) ? generateListId() : idHash;
     const name: string = isEmpty(listNameHash) ? '' : listNameHash;
 
     const selection: PinSelectionList = {
-      ...newSelectionList(),
+      ...baseList,
       availableIds,
       id,
       name,
       revision,
       wantedIds,
     };
-    return [selection];
+    return selection;
   };
 
-  const [pinSelectionLists, updateLists] = useState<PinSelectionList[]>(
-    buildSetsFromFilterHash()
-  );
-  const [activePinList, setActivePinList] = useState<PinSelectionList>(
-    pinSelectionLists[0]
-  );
+  const [activePinList, setActivePinList] = useState<PinSelectionList>(buildSetsFromFilterHash());
 
-  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(
-    getSplitActiveAndWanted()
-  );
+  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(getSplitActiveAndWanted());
 
   useEffect(() => {
     saveSplitActive(splitActiveAndWanted);
@@ -121,18 +108,14 @@ const App = (): JSX.Element => {
     };
     const assignRandomName = async () => {
       const randomAnimal: string = await generateRandomName();
-      if (isEmpty(listNameHash) && isEmpty(pinSelectionLists[0].name)) {
-        console.log(
-          'A random animal name has been assigned to this list: ' + randomAnimal
-        );
+      if (isEmpty(listNameHash) && isEmpty(activePinList.name)) {
+        console.log('A random animal name has been assigned to this list: ' + randomAnimal);
         selectionListUpdated({
-          ...pinSelectionLists[0],
+          ...activePinList,
           name: randomAnimal,
         });
       }
     };
-
-    // console.log(getStoredLanyards());
 
     fetchPins();
     assignRandomName();
@@ -152,21 +135,13 @@ const App = (): JSX.Element => {
     window.location.href = window.location.href.replaceAll('%2C', ',');
   };
 
-  const selectionListUpdated = (updatedList: PinSelectionList): void => {
-    const recreatedList: PinSelectionList[] = [];
-
-    for (let i = 0; i < pinSelectionLists.length; i++) {
-      if (pinSelectionLists[i].id == updatedList.id) {
-        recreatedList[i] = updatedList;
-      } else {
-        recreatedList[i] = pinSelectionLists[i];
-      }
-    }
+  const selectionListUpdated = (updatedList: PinSelectionList, skipHashUpdate = false): void => {
     if (isNaN(updatedList.revision)) {
       updatedList.revision = 0;
     }
-    updateLists(recreatedList);
-    updateListHash(updatedList);
+    if (!skipHashUpdate) {
+      updateListHash(updatedList);
+    }
     setActivePinList(updatedList);
     saveListToLocal(updatedList);
   };
@@ -215,12 +190,7 @@ const App = (): JSX.Element => {
               isSelectionActive={selectionFilterEnabled}
               pinSelection={activePinList}
               pinListFilterDisplay={
-                <PinSearchFilterDisplay
-                  filter={filter}
-                  paxs={paxs}
-                  pinSets={pinSets}
-                  onChange={setFilter}
-                />
+                <PinSearchFilterDisplay filter={filter} paxs={paxs} pinSets={pinSets} onChange={setFilter} />
               }
               qrCode={<FilterQRCode lanyard={activePinList} />}
               pinSelectionFilter={
@@ -229,7 +199,8 @@ const App = (): JSX.Element => {
                   onChange={selectionListUpdated}
                   changeListDisplayed={(id: string, display: boolean) => {
                     setSelectionFilterEnabled(display);
-                  } } activeLanyard={activePinList}
+                  }}
+                  activeLanyard={activePinList}
                   lanyardSelected={lanyardSelected}
                 />
               }
@@ -238,12 +209,8 @@ const App = (): JSX.Element => {
               <LanyardPinList
                 displaySize={displaySize}
                 heading={`Lanyard for ${activePinList.name}`}
-                availablePins={pins.filter((p) =>
-                  activePinList.availableIds.includes(+p.id)
-                )}
-                wantedPins={pins.filter((p) =>
-                  activePinList.wantedIds.includes(+p.id)
-                )}
+                availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
+                wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets}
               />
@@ -255,10 +222,7 @@ const App = (): JSX.Element => {
                 heading={getPinListHeading()}
                 isPinFiltered={(pin: Pin) => {
                   if (selectionFilterEnabled) {
-                    const isOnLanyard: boolean = isPinOnLanyard(
-                      pin,
-                      activePinList
-                    );
+                    const isOnLanyard: boolean = isPinOnLanyard(pin, activePinList);
                     return !isOnLanyard;
                   }
                   return isPinFiltered(pin, filter);
