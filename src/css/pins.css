@@ -128,7 +128,6 @@ div.filterInfo, div.pinSelectionFilter, div.setSelection, div.settingFields, div
 div.lanyardName {
   padding: 1ch;
   height: 3ch;
-  width: 20ch;
   text-align: center;
   display: block;
   border: 2mm solid #000;
