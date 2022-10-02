@@ -6,12 +6,13 @@ import { SEARCH_CONTROL_WIDTH } from '../globals';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import { filterStringToIds } from '../listutils';
+import { isEmptyList } from '../utils';
 
 type PinSelectionProps = {
   activeLanyard: PinSelectionList;
   changeListDisplayed: (display: boolean) => void;
   displayList: boolean;
-  lanyardSelected: (lanyardId:string) => void;
+  lanyardSelected: (lanyardId: string) => void;
   onChange: (updatedList: PinSelectionList) => void;
 };
 
@@ -19,7 +20,7 @@ export type PinSelectionFilterProps = {
   activeLanyard: PinSelectionList;
   changeListDisplayed: (id: string, display: boolean) => void;
   enableFilter: boolean;
-  lanyardSelected: (lanyardId:string) => void;
+  lanyardSelected: (lanyardId: string) => void;
   onChange: (updatedList: PinSelectionList) => void;
 };
 
@@ -29,6 +30,9 @@ export const PinSelectionEditor = ({
   displayList,
   onChange,
 }: PinSelectionProps): JSX.Element => {
+  if (isEmptyList(activeLanyard)) {
+    changeListDisplayed(false);
+  }
   return (
     <>
       <div className="pinSelectionFilter">
@@ -59,9 +63,7 @@ export const PinSelectionEditor = ({
               variant="outlined"
               value={activeLanyard.wantedIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                const wantedIds: number[] = filterStringToIds(
-                  event.target.value
-                );
+                const wantedIds: number[] = filterStringToIds(event.target.value);
 
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
@@ -82,9 +84,7 @@ export const PinSelectionEditor = ({
               variant="outlined"
               value={activeLanyard.availableIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                const availableIds: number[] = filterStringToIds(
-                  event.target.value
-                );
+                const availableIds: number[] = filterStringToIds(event.target.value);
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
                   availableIds,
@@ -101,6 +101,7 @@ export const PinSelectionEditor = ({
             <FormControlLabel
               control={
                 <Switch
+                  disabled={isEmptyList(activeLanyard)}
                   id="selectedPinsOnly"
                   checked={displayList}
                   onChange={(event: React.FormEvent<HTMLInputElement>) => {

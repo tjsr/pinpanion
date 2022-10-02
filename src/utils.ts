@@ -1,7 +1,14 @@
-import { PinListFilter, SizesType } from './types';
+import { PinListFilter, PinSelectionList, SizesType } from './types';
 
 export const isEmpty = (value: string | undefined): boolean => {
   return value === undefined || value.trim() == '';
+};
+
+export const isEmptyList = (lanyard: PinSelectionList): boolean => {
+  return (
+    (lanyard.availableIds === undefined || lanyard.availableIds?.length === 0) &&
+    (lanyard.wantedIds === undefined || lanyard.wantedIds?.length === 0)
+  );
 };
 
 export const countFilters = (filter: PinListFilter): number => {

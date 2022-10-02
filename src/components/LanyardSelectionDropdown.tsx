@@ -6,22 +6,16 @@ import MenuItem from '@mui/material/MenuItem';
 import { PinSelectionList } from '../types';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import { getStoredLanyards } from '../lanyardStorage';
+import { isEmptyList } from '../utils';
 
 type LanyardSelectionDropdownProps = {
   lanyardSelected: (lanyardId: string) => void;
   activeLanyard: PinSelectionList;
-  id: string
+  id: string;
 };
 
 const hasLanyardData = (lanyard: PinSelectionList): boolean => {
   return !isEmptyList(lanyard);
-};
-
-const isEmptyList = (lanyard: PinSelectionList): boolean => {
-  return (
-    (lanyard.availableIds === undefined || lanyard.availableIds?.length === 0) &&
-    (lanyard.wantedIds === undefined || lanyard.wantedIds?.length === 0)
-  );
 };
 
 export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): JSX.Element => {
@@ -39,7 +33,7 @@ export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): 
           props.lanyardSelected(selectedLanyard);
         }}
       >
-        <MenuItem key={0} value="">
+        <MenuItem key={0} value="" disabled={isEmptyList(props.activeLanyard)}>
           <em>Create a new lanyard</em>
         </MenuItem>
         {lanyards.filter(hasLanyardData).map((l: PinSelectionList) => {
