@@ -1,7 +1,7 @@
 {
   "function": {
     "retrievePinnypal": {
-      "build": true,
+      "build": false,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
     }
