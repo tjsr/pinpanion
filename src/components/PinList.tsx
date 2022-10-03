@@ -89,16 +89,16 @@ export const PinList = ({
       {pins && displayedPins && (
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
+          {activePinSet?.editable && (
+            <div className="buttonKey">
+              Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
+              <button className="pinNotWanted">W</button> to add to 'Wanted' list.
+            </div>
+          )}
           <div className="pinListContent">
             {displayedPins.map((pin: Pin) => {
               return (
-                <PinInfo
-                  displaySize={displaySize}
-                  key={pin.id}
-                  paxs={paxs}
-                  pinSets={pinSets}
-                  pin={pin}
-                >
+                <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
                   {activePinSet?.editable && (
                     <PinListButtons
                       availableCount={countPinAvailable(pin.id)}
