@@ -3,6 +3,7 @@ import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
+import React from 'react';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import { SizesType } from '../types';
 import Switch from '@mui/material/Switch';
@@ -21,16 +22,18 @@ export type AppSettingsPanelProps = {
   setSplitActiveAndWanted: (enabled: boolean) => void;
 };
 
-const ObjectSizeSetting = ({
-  size,
-  setObjectSize,
-}: ObjectSizeSettingProps): JSX.Element => {
-  const handleSizeChange = (
-    event: React.MouseEvent<HTMLElement>,
-    newSize: SizesType | null
-  ) => {
-    if (newSize !== null) {
+const ObjectSizeSetting = ({ size, setObjectSize }: ObjectSizeSettingProps): JSX.Element => {
+  const [clickEventsDisabled, setClickEventsDisabled] = React.useState<boolean>(false);
+
+  const handleSizeChange = (event: React.MouseEvent<HTMLElement>, newSize: SizesType | null) => {
+    setClickEventsDisabled(true);
+    if (newSize !== null && !clickEventsDisabled) {
       setObjectSize(newSize);
+      setTimeout(() => {
+        setClickEventsDisabled(false);
+      }, 200);
+    } else if (clickEventsDisabled) {
+      console.warn(`Ghost second click event prevented from being executed, tried to change value to ${newSize}`);
     }
   };
 
