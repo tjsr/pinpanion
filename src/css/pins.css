@@ -78,7 +78,7 @@ div.listButtons button.addButton, div.listButtons button.availableButton, div.bu
   height: 48px;
 }
 
-.pin-normal div.listButtons button {
+.pin-normal div.listButtons button, .pin-large div.listButtons button {
   font-size: 36pt;
   width: 64px;
   height: 64px;

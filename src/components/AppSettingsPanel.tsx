@@ -1,3 +1,5 @@
+import '../css/settings.css';
+
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 
 import FormControl from '@mui/material/FormControl';
@@ -9,6 +11,7 @@ import { SizesType } from '../types';
 import Switch from '@mui/material/Switch';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
 
 type ObjectSizeSettingProps = {
   size: SizesType;
@@ -23,17 +26,9 @@ export type AppSettingsPanelProps = {
 };
 
 const ObjectSizeSetting = ({ size, setObjectSize }: ObjectSizeSettingProps): JSX.Element => {
-  const [clickEventsDisabled, setClickEventsDisabled] = React.useState<boolean>(false);
-
   const handleSizeChange = (event: React.MouseEvent<HTMLElement>, newSize: SizesType | null) => {
-    setClickEventsDisabled(true);
-    if (newSize !== null && !clickEventsDisabled) {
+    if (newSize !== null) {
       setObjectSize(newSize);
-      setTimeout(() => {
-        setClickEventsDisabled(false);
-      }, 200);
-    } else if (clickEventsDisabled) {
-      console.warn(`Ghost second click event prevented from being executed, tried to change value to ${newSize}`);
     }
   };
 
@@ -47,34 +42,29 @@ const ObjectSizeSetting = ({ size, setObjectSize }: ObjectSizeSettingProps): JSX
 
   return (
     <>
-      <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-        <FormControlLabel
-          labelPlacement="top"
-          control={
-            <ToggleButtonGroup
-              id="pinDisplaySize"
-              value={size}
-              exclusive
-              onChange={handleSizeChange}
-              aria-label="text alignment"
-            >
-              <ToggleButton value="tiny" aria-label="Tiny">
-                <HomeIcon fontSize="small" />
-              </ToggleButton>
-              <ToggleButton value="sm" aria-label="Small">
-                <HomeIcon />
-              </ToggleButton>
-              <ToggleButton value="normal" aria-label="Normal">
-                <HomeIcon fontSize="large" />
-              </ToggleButton>
-              <ToggleButton value="large" aria-label="Large">
-                <HomeIcon sx={{ fontSize: 40 }} />
-              </ToggleButton>
-            </ToggleButtonGroup>
-          }
-          label="Pin display size"
-        />
-      </FormControl>
+      <div className="pinDisplaySizeSelect">
+        <Typography>Pin display size</Typography>
+        <ToggleButtonGroup
+          id="pinDisplaySize"
+          value={size}
+          exclusive
+          onChange={handleSizeChange}
+          aria-label="text alignment"
+        >
+          <ToggleButton value="tiny" aria-label="Tiny">
+            <HomeIcon fontSize="small" />
+          </ToggleButton>
+          <ToggleButton value="sm" aria-label="Small">
+            <HomeIcon />
+          </ToggleButton>
+          <ToggleButton value="normal" aria-label="Normal">
+            <HomeIcon fontSize="large" />
+          </ToggleButton>
+          <ToggleButton value="large" aria-label="Large">
+            <HomeIcon sx={{ fontSize: 40 }} />
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </div>
     </>
   );
 };
