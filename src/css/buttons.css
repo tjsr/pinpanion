@@ -1,0 +1,38 @@
+div.listButtons button, div.buttonKey button {
+  margin: 4px;
+  border-radius: 100%;
+  border: 3px solid #000;
+  color: #000;
+}
+
+div.listButtons button.addButton, div.listButtons button.availableButton, div.buttonKey button.pinNotAvailable {
+  background-color: rgb(90, 180, 90);
+}
+
+.pin-tiny div.listButtons button {
+  font-size: 16pt;
+  width: 32px;
+  height: 32px;
+}
+
+.pin-sm div.listButtons button, div.buttonKey button {
+  font-size: 24pt;
+  width: 48px;
+  height: 48px;
+}
+
+.pin-normal div.listButtons button, .pin-large div.listButtons button {
+  font-size: 36pt;
+  width: 64px;
+  height: 64px;
+}
+
+div.listButtons button:disabled, button.pinNotAvailable, button.pinNotWanted {
+  color: #927a56;
+  border: 1px solid #888;
+  opacity: 0.50;
+}
+
+div.listButtons button.removeButton, div.listButtons button.wantedButton, div.buttonKey button.pinNotWanted {
+  background-color: rgb(150, 82, 82);
+}

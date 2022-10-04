@@ -1,3 +1,5 @@
+import '../css/buttons.css';
+
 type PinListButtonsProps = {
   availableCount: number;
   wantedCount: number;
@@ -14,14 +16,10 @@ export const PinListButtons = ({
   setPinAvailable,
 }: PinListButtonsProps): JSX.Element => {
   const isAvailable: boolean = availableCount > 0;
-  const availableClasses: string = isAvailable ?
-    'availableButton' :
-    'availableButton pinNotAvailable';
+  const availableClasses: string = isAvailable ? 'availableButton' : 'availableButton pinNotAvailable';
 
   const isWanted: boolean = wantedCount > 0;
-  const wantedClasses: string = isWanted ?
-    'wantedButton' :
-    'wantedButton pinNotWanted';
+  const wantedClasses: string = isWanted ? 'wantedButton' : 'wantedButton pinNotWanted';
   return (
     <div className="listButtons">
       <button
