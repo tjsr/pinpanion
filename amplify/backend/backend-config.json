@@ -1,9 +1,39 @@
 {
   "function": {
     "retrievePinnypal": {
-      "build": false,
+      "build": true,
       "providerPlugin": "awscloudformation",
       "service": "Lambda"
+    },
+    "retrieveUser2": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "retrievePinnypal",
+          "attributes": [
+            "Name"
+          ]
+        }
+      ]
+    }
+  },
+  "api": {
+    "retrievePinnypal": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "retrieveUser2",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
     }
   }
 }

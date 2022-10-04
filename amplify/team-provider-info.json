@@ -16,6 +16,10 @@
         "retrievePinnypal": {
           "deploymentBucketName": "amplify-amplifye80b1f6557b24-staging-121606-deployment",
           "s3Key": "amplify-builds/retrievePinnypal-4a354576763438627070-build.zip"
+        },
+        "retrieveUser2": {
+          "deploymentBucketName": "amplify-amplifye80b1f6557b24-staging-121606-deployment",
+          "s3Key": "amplify-builds/retrieveUser2-6f614c4c363539446c64-build.zip"
         }
       }
     }

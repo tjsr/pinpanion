@@ -1,11 +1,10 @@
 // import * as express from 'express';
 const express = require('express');
 
-const queryUser = require('./pinnypals/queryUser');
+// import { createLanyardFromPinnypalsUserResult, queryPinnypalsUser } from './queryUser';
+const queryUser = require('./queryUser');
 const createLanyardFromPinnypalsUserResult = queryUser.createLanyardFromPinnypalsUserResult;
 const queryPinnypalsUser = queryUser.queryPinnypalsUser;
-
-// import { createLanyardFromPinnypalsUserResult, queryPinnypalsUser } from './pinnypals/queryUser';
 
 // import bodyParser from 'body-parser';
 const bodyParser = require('body-parser');

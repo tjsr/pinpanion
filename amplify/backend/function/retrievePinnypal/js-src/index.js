@@ -1,8 +1,15 @@
-import { app } from './app';
-import serverlessExpress from '@vendia/serverless-express';
+const awsServerlessExpress = require('aws-serverless-express');
+const app = require('./app');
 
-export const handler = serverlessExpress({ app });
+/**
+ * @type {import('http').Server}
+ */
+const server = awsServerlessExpress.createServer(app);
 
-exports.handler = handler;
-
-// export default handler;
+/**
+ * @type {import('@types/aws-lambda').APIGatewayProxyHandler}
+ */
+exports.handler = (event, context) => {
+  console.log(`EVENT: ${JSON.stringify(event)}`);
+  return awsServerlessExpress.proxy(server, event, context, 'PROMISE').promise;
+};

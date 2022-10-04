@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "paths": {
+    "/pal/{username}": {
+      "name": "/pal/{username}",
+      "lambdaFunction": "retrieveUser2",
+      "permissions": {
+        "setting": "open"
+      }
+    }
+  }
+}
