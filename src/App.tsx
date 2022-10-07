@@ -15,13 +15,8 @@ import {
   isPinFiltered,
 } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmpty } from './utils';
-import {
-  getDisplaySize,
-  getSplitActiveAndWanted,
-  saveDisplaySize,
-  saveSplitActive,
-} from './settingsStorage';
+import { countFilters, isEmpty, numberArrayToEncodedString, stringToNumberArray } from './utils';
+import { getDisplaySize, getSplitActiveAndWanted, saveDisplaySize, saveSplitActive } from './settingsStorage';
 import { getStoredLanyard, saveListToLocal } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -34,10 +29,7 @@ import { generateRandomName } from './namegenerator';
 import useHashParam from 'use-hash-param';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
-  return (
-    lanyard.availableIds.includes(+pin.id) ||
-    lanyard.wantedIds.includes(+pin.id)
-  );
+  return lanyard.availableIds.includes(+pin.id) || lanyard.wantedIds.includes(+pin.id);
 };
 
 const App = (): JSX.Element => {
@@ -70,8 +62,8 @@ const App = (): JSX.Element => {
     if (isNaN(revision)) {
       revision = 0;
     }
-    const availableIds: number[] = isEmpty(availIdHash) ? [] : availIdHash.split(',').map((n) => parseInt(n));
-    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : wantedIdHash.split(',').map((n) => parseInt(n));
+    const availableIds: number[] = isEmpty(availIdHash) ? [] : stringToNumberArray(availIdHash);
+    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : stringToNumberArray(wantedIdHash);
 
     const id: string = isEmpty(idHash) ? generateListId() : idHash;
     const name: string = isEmpty(listNameHash) ? '' : listNameHash;
@@ -127,8 +119,10 @@ const App = (): JSX.Element => {
   };
 
   const updateListHash = (selection: PinSelectionList): void => {
-    setAvailIdHash(selection.availableIds.join(','));
-    setWantedIdHash(selection.wantedIds.join(','));
+    setAvailIdHash(numberArrayToEncodedString(selection.availableIds));
+    setWantedIdHash(numberArrayToEncodedString(selection.wantedIds));
+    // setAvailIdHash(selection.availableIds.join(','));
+    // setWantedIdHash(selection.wantedIds.join(','));
     setIdHash(selection.id);
     setlistNameHash(selection.name);
     setRevisionHash(selection.revision.toString());
