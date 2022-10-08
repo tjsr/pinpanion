@@ -3,6 +3,7 @@ import React, { ReactElement } from 'react';
 
 import { AppSettingsDrawerFragment } from '../drawers/AppSettingsDrawFragment';
 import { AppSettingsPanelProps } from './AppSettingsPanel';
+import { FeedbackDrawerFragment } from '../drawers/FeedbackDrawerFragment';
 import { FilterQRCodeProps } from './FilterQRCode';
 import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment';
 import { PinListFilterDisplayProps } from './PinSearchFilter';
@@ -37,14 +38,12 @@ export const PinAppDrawerSet = ({
         pinSelectionFilter={pinSelectionFilter}
       />
 
-      <PinFilterDrawerFragment
-        filter={filter}
-        pinListFilterDisplay={pinListFilterDisplay}
-      />
+      <PinFilterDrawerFragment filter={filter} pinListFilterDisplay={pinListFilterDisplay} />
 
       <QRCodeDrawerFragment qrCode={qrCode} />
 
       <AppSettingsDrawerFragment appSettingsPanel={appSettingsPanel} />
+      <FeedbackDrawerFragment />
     </>
   );
 };
