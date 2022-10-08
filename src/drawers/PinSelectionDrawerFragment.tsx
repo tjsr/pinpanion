@@ -20,7 +20,7 @@ export const PinSelectionDrawerFragment = ({
   const getSelectionButtonLabel = (): string => {
     const selectedPins: number =
       pinSelection?.availableIds.length + pinSelection?.wantedIds.length;
-    return selectedPins > 0 ? `Selection (${selectedPins})` : 'Selection';
+    return selectedPins > 0 ? `Lanyard (${selectedPins})` : 'Lanyards';
   };
 
   return (
