@@ -22,6 +22,7 @@ export type PinListFilterDisplayProps = {
   paxs?: PAX[];
   pinSets?: PinSet[];
   onChange: (updatedFilter: PinListFilter) => void;
+  isFilterEnabled: boolean;
 };
 
 const filterString = (filter: PinListFilter): string => {
@@ -34,11 +35,23 @@ const filterString = (filter: PinListFilter): string => {
   return output;
 };
 
-export const PinSearchFilterDisplay = ({ filter, paxs, pinSets, onChange }: PinListFilterDisplayProps): JSX.Element => {
+export const PinSearchFilterDisplay = ({
+  filter,
+  isFilterEnabled,
+  paxs,
+  pinSets,
+  onChange,
+}: PinListFilterDisplayProps): JSX.Element => {
   return (
     <>
       <div className="searchFields">
         {filter && <div className="filterInfo">Filtered for {filterString(filter)}</div>}
+        {isFilterEnabled && (
+          <div className="searchHint">
+            <strong>Note:</strong>You currently have a lanyard selected to display only its selected pins. Search
+            results may appear to not update unless you un-check this from the 'Lanyards' drawer.
+          </div>
+        )}
         <div>
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField

@@ -190,7 +190,13 @@ const App = (): JSX.Element => {
               isSelectionActive={selectionFilterEnabled}
               pinSelection={activePinList}
               pinListFilterDisplay={
-                <PinSearchFilterDisplay filter={filter} paxs={paxs} pinSets={pinSets} onChange={setFilter} />
+                <PinSearchFilterDisplay
+                  isFilterEnabled={selectionFilterEnabled}
+                  filter={filter}
+                  paxs={paxs}
+                  pinSets={pinSets}
+                  onChange={setFilter}
+                />
               }
               qrCode={<FilterQRCode lanyard={activePinList} />}
               pinSelectionFilter={
