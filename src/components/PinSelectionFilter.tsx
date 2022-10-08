@@ -112,6 +112,11 @@ export const PinSelectionEditor = ({
               label="Show selected pins only"
             />
           </FormControl>
+          <div className="knownBug">
+            <strong>Known bug:</strong> Due to the app re-rendering 1400 pins on every change, tapping this button might
+            take 3-5 seconds on some mobile devices. Give it a moment as clicking again might just toggle it again, and
+            cause another re-render. This will be fixed ASAP, but not by October 9.
+          </div>
         </div>
       </div>
     </>
