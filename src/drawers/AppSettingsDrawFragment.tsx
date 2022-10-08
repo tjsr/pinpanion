@@ -10,7 +10,7 @@ export const AppSettingsDrawerFragment = ({
   appSettingsPanel,
 }: AppSettingsDrawerFragmentProps): JSX.Element => {
   return (
-    <DrawerFragment drawerId="settings" label="App settings">
+    <DrawerFragment drawerId="settings" label="Settings">
       {appSettingsPanel}
     </DrawerFragment>
   );
