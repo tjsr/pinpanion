@@ -1,5 +1,6 @@
 import '../css/pins.css';
 import '../css/search.css';
+import '../css/App.css';
 
 import { PAX, Pin, PinListFilter, PinSet } from '../types';
 
@@ -24,8 +25,7 @@ export type PinListFilterDisplayProps = {
 };
 
 const filterString = (filter: PinListFilter): string => {
-  const start =
-    filter.startYear && !isNaN(filter.startYear) ? filter.startYear : '*';
+  const start = filter.startYear && !isNaN(filter.startYear) ? filter.startYear : '*';
   const end = filter.endYear && !isNaN(filter.endYear) ? filter.endYear : '*';
   let output = start == '*' && end == '*' ? 'all years' : `${start}-${end}`;
   if (filter.setPinsOnly) {
@@ -34,18 +34,11 @@ const filterString = (filter: PinListFilter): string => {
   return output;
 };
 
-export const PinSearchFilterDisplay = ({
-  filter,
-  paxs,
-  pinSets,
-  onChange,
-}: PinListFilterDisplayProps): JSX.Element => {
+export const PinSearchFilterDisplay = ({ filter, paxs, pinSets, onChange }: PinListFilterDisplayProps): JSX.Element => {
   return (
     <>
       <div className="searchFields">
-        {filter && (
-          <div className="filterInfo">Filtered for {filterString(filter)}</div>
-        )}
+        {filter && <div className="filterInfo">Filtered for {filterString(filter)}</div>}
         <div>
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
@@ -170,6 +163,7 @@ export const PinSearchFilterDisplay = ({
           Clear filters
         </Button>
       </div>
+      <div className="searchHint">Search settings are updated immediately as you type or change selections.</div>
     </>
   );
 };

@@ -37,6 +37,6 @@
   }
 }
 
-div.feedback {
+div.feedback, div.searchHint {
   padding: 0.4em;
 }
