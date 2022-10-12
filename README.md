@@ -6,6 +6,8 @@ This project is an offline tool for managing and sharing your Pinny Arcade pin c
 
 ## Running the app
 
+You'll need assets pin data and image assets to run the app - `npm run build` will pull down the latest data from pinnypals and store it cached locally.
+
 In the project directory, you can run:
 
 ### `npm start`
