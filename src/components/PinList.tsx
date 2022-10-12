@@ -1,17 +1,10 @@
 import '../css/pins.css';
 
-import {
-  PAX,
-  Pin,
-  PinListFilter,
-  PinSelectionList,
-  PinSet,
-  SizesType,
-} from '../types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
 
+import { FilterQRCode } from './FilterQRCode';
+import { MemoizedPinListButtons } from './PinButtons';
 import { PinInfo } from './PinInfo';
-import { PinListButtons } from './PinButtons';
-import React from 'react';
 import { newSelectionList } from '../fixture';
 import { removeOrAddId } from '../listutils';
 
@@ -27,26 +20,23 @@ interface PinListPropTypes {
   setPinSet?: (list: PinSelectionList) => void;
 }
 
-export const PinList = ({
-  displaySize = 'normal',
-  heading,
-  pins,
-  paxs,
-  pinSets,
-  filter,
-  activePinSet,
-  isPinFiltered,
-  setPinSet,
-}: PinListPropTypes): JSX.Element => {
-  const displayedPins: Pin[] = pins.filter(
-    (pin: Pin) => !isPinFiltered(pin, filter)
-  );
+export const PinList = (props: PinListPropTypes): JSX.Element => {
+  const {
+    displaySize = 'normal',
+    heading,
+    pins,
+    paxs,
+    pinSets,
+    filter,
+    activePinSet,
+    isPinFiltered,
+    setPinSet,
+  } = props;
+  const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
 
   const togglePinAvailable = (pinId: number): void => {
-    const availableIds: number[] = removeOrAddId(
-      activePinSet?.availableIds,
-      pinId
-    );
+    console.log(`Toggling pin ${pinId} available`);
+    const availableIds: number[] = removeOrAddId(activePinSet?.availableIds, pinId);
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList();
       setPinSet({
@@ -58,6 +48,7 @@ export const PinList = ({
   };
 
   const togglePinWanted = (pinId: number): void => {
+    console.log(`Toggling pin ${pinId} wanted`);
     const wantedIds: number[] = removeOrAddId(activePinSet?.wantedIds, pinId);
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList();
@@ -83,9 +74,16 @@ export const PinList = ({
     return 0;
   };
 
+  console.log('Re-rendering list');
+
   return (
     <>
       <h2>{heading}</h2>
+      {activePinSet && (
+        <div className="printqr">
+          <FilterQRCode lanyard={activePinSet} />
+        </div>
+      )}
       {pins && displayedPins && (
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
@@ -100,7 +98,7 @@ export const PinList = ({
               return (
                 <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
                   {activePinSet?.editable && (
-                    <PinListButtons
+                    <MemoizedPinListButtons
                       availableCount={countPinAvailable(pin.id)}
                       wantedCount={countPinWanted(pin.id)}
                       pinId={pin.id}

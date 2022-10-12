@@ -20,13 +20,17 @@ const hasLanyardData = (lanyard: PinSelectionList): boolean => {
 
 export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): JSX.Element => {
   const lanyards: PinSelectionList[] = getStoredLanyards();
+  const hasSelected: boolean =
+    lanyards.filter((psl: PinSelectionList) => {
+      psl.id === props.activeLanyard.id;
+    }).length > 0;
 
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
       <InputLabel id={props.id}>Switch lanyard</InputLabel>
       <Select
         id={props.id}
-        value={props.activeLanyard.id}
+        value={hasSelected ? props.activeLanyard.id : ''}
         label="Switch lanyard"
         onChange={(event: SelectChangeEvent) => {
           const selectedLanyard: string = event.target.value;

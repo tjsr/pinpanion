@@ -40,3 +40,18 @@
 div.feedback, div.searchHint {
   padding: 0.4em;
 }
+
+@media print {
+  div.drawers {
+    display: none;
+  }
+  div.printqr {
+    display: normal;
+  }
+}
+
+@media screen {
+  div.printqr {
+    display: none;
+  }
+}

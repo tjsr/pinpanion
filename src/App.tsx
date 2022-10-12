@@ -1,28 +1,13 @@
 import './css/App.css';
 import './css/pins.css';
 
-import { EMPTY_FILTER, generateListId, newSelectionList } from './fixture';
-import {
-  PAX,
-  Pin,
-  PinListFilter,
-  PinSelectionList,
-  PinSet,
-  SizesType,
-} from './types';
-import {
-  PinSearchFilterDisplay,
-  isPinFiltered,
-} from './components/PinSearchFilter';
+import { EMPTY_FILTER, newSelectionList } from './fixture';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from './types';
+import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmpty } from './utils';
-import {
-  getDisplaySize,
-  getSplitActiveAndWanted,
-  saveDisplaySize,
-  saveSplitActive,
-} from './settingsStorage';
-import { getStoredLanyard, saveListToLocal } from './lanyardStorage';
+import { countFilters, isEmptyList } from './utils';
+import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
+import { getDisplaySize, getSplitActiveAndWanted, saveDisplaySize, saveSplitActive } from './settingsStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
@@ -31,22 +16,12 @@ import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { generateRandomName } from './namegenerator';
-import useHashParam from 'use-hash-param';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
-  return (
-    lanyard.availableIds.includes(+pin.id) ||
-    lanyard.wantedIds.includes(+pin.id)
-  );
+  return lanyard.availableIds.includes(+pin.id) || lanyard.wantedIds.includes(+pin.id);
 };
 
 const App = (): JSX.Element => {
-  const [availIdHash, setAvailIdHash] = useHashParam('availableIds', '');
-  const [wantedIdHash, setWantedIdHash] = useHashParam('wantedIds', '');
-  const [idHash, setIdHash] = useHashParam('id', '');
-  const [listNameHash, setlistNameHash] = useHashParam('name', '');
-  const [revisionHash, setRevisionHash] = useHashParam('revision', '');
-
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
   const [paxs, setPaxs] = useState<PAX[]>([]);
@@ -56,44 +31,23 @@ const App = (): JSX.Element => {
   const [displaySize, setDisplaySize] = useState<SizesType>(getDisplaySize());
 
   const shouldDefaultShowSelection = (): boolean => {
-    const rh: number = parseInt(revisionHash);
-    if (!isNaN(rh) && rh > 0) {
-      return true;
-    }
-    return false;
+    return window.location.hash != '';
   };
 
   const [selectionFilterEnabled, setSelectionFilterEnabled] = useState<boolean>(shouldDefaultShowSelection());
-
-  const buildSetsFromFilterHash = (baseList: PinSelectionList = newSelectionList()): PinSelectionList => {
-    let revision: number = parseInt(revisionHash);
-    if (isNaN(revision)) {
-      revision = 0;
-    }
-    const availableIds: number[] = isEmpty(availIdHash) ? [] : availIdHash.split(',').map((n) => parseInt(n));
-    const wantedIds: number[] = isEmpty(wantedIdHash) ? [] : wantedIdHash.split(',').map((n) => parseInt(n));
-
-    const id: string = isEmpty(idHash) ? generateListId() : idHash;
-    const name: string = isEmpty(listNameHash) ? '' : listNameHash;
-
-    const selection: PinSelectionList = {
-      ...baseList,
-      availableIds,
-      id,
-      name,
-      revision,
-      wantedIds,
-    };
-    return selection;
-  };
-
-  const [activePinList, setActivePinList] = useState<PinSelectionList>(buildSetsFromFilterHash());
-
+  const [activePinList, setActivePinList] = useState<PinSelectionList | undefined>(undefined);
   const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(getSplitActiveAndWanted());
 
   useEffect(() => {
     saveSplitActive(splitActiveAndWanted);
   }, [splitActiveAndWanted]);
+
+  useEffect(() => {
+    if (activePinList && !isEmptyList(activePinList)) {
+      setActiveLanyardId(activePinList.id);
+      saveListToLocal(activePinList);
+    }
+  }, [activePinList]);
 
   useEffect(() => {
     const fetchPins = async () => {
@@ -106,19 +60,23 @@ const App = (): JSX.Element => {
       setPinSets(data.sets);
       setPaxs(data.paxs);
     };
-    const assignRandomName = async () => {
-      const randomAnimal: string = await generateRandomName();
-      if (isEmpty(listNameHash) && isEmpty(activePinList.name)) {
-        console.log('A random animal name has been assigned to this list: ' + randomAnimal);
-        selectionListUpdated({
-          ...activePinList,
-          name: randomAnimal,
-        });
+    const loadDefaultLanyard = async () => {
+      let activeLanyard: PinSelectionList | undefined = getActiveLanyard();
+      if (!activeLanyard) {
+        activeLanyard = newSelectionList();
+        setSelectionFilterEnabled(false);
       }
+
+      const randomAnimal: string = await generateRandomName();
+      console.log('A random animal name has been assigned to this list: ' + randomAnimal);
+      selectionListUpdated({
+        ...activeLanyard,
+        name: randomAnimal,
+      });
     };
 
+    loadDefaultLanyard();
     fetchPins();
-    assignRandomName();
   }, []);
 
   const displaySizeChanged = (size: SizesType): void => {
@@ -126,24 +84,11 @@ const App = (): JSX.Element => {
     setDisplaySize(size);
   };
 
-  const updateListHash = (selection: PinSelectionList): void => {
-    setAvailIdHash(selection.availableIds.join(','));
-    setWantedIdHash(selection.wantedIds.join(','));
-    setIdHash(selection.id);
-    setlistNameHash(selection.name);
-    setRevisionHash(selection.revision.toString());
-    window.location.href = window.location.href.replaceAll('%2C', ',');
-  };
-
-  const selectionListUpdated = (updatedList: PinSelectionList, skipHashUpdate = false): void => {
+  const selectionListUpdated = (updatedList: PinSelectionList): void => {
     if (isNaN(updatedList.revision)) {
       updatedList.revision = 0;
     }
-    if (!skipHashUpdate) {
-      updateListHash(updatedList);
-    }
     setActivePinList(updatedList);
-    saveListToLocal(updatedList);
   };
 
   const getPinListHeading = (): string => {
@@ -161,7 +106,6 @@ const App = (): JSX.Element => {
     const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId);
     if (lanyard) {
       setActivePinList(lanyard);
-      updateListHash(lanyard);
       return Promise.resolve();
     } else {
       const newList: PinSelectionList = newSelectionList();
@@ -175,7 +119,7 @@ const App = (): JSX.Element => {
   return (
     <div className="App">
       <>
-        {pins && (
+        {pins && activePinList && (
           <>
             <PinAppDrawerSet
               appSettingsPanel={

@@ -30,9 +30,6 @@ export const PinSelectionEditor = ({
   displayList,
   onChange,
 }: PinSelectionProps): JSX.Element => {
-  if (isEmptyList(activeLanyard)) {
-    changeListDisplayed(false);
-  }
   return (
     <>
       <div className="pinSelectionFilter">

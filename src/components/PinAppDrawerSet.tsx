@@ -1,3 +1,5 @@
+import '../css/App.css';
+
 import { PinListFilter, PinSelectionList } from '../types';
 import React, { ReactElement } from 'react';
 
@@ -32,18 +34,20 @@ export const PinAppDrawerSet = ({
 }: PinAppDrawerSetProps): JSX.Element => {
   return (
     <>
-      <PinSelectionDrawerFragment
-        isSelectionActive={isSelectionActive}
-        pinSelection={pinSelection}
-        pinSelectionFilter={pinSelectionFilter}
-      />
+      <div className="drawers">
+        <PinSelectionDrawerFragment
+          isSelectionActive={isSelectionActive}
+          pinSelection={pinSelection}
+          pinSelectionFilter={pinSelectionFilter}
+        />
 
-      <PinFilterDrawerFragment filter={filter} pinListFilterDisplay={pinListFilterDisplay} />
+        <PinFilterDrawerFragment filter={filter} pinListFilterDisplay={pinListFilterDisplay} />
 
-      <QRCodeDrawerFragment qrCode={qrCode} />
+        <QRCodeDrawerFragment qrCode={qrCode} />
 
-      <AppSettingsDrawerFragment appSettingsPanel={appSettingsPanel} />
-      <FeedbackDrawerFragment />
+        <AppSettingsDrawerFragment appSettingsPanel={appSettingsPanel} />
+        <FeedbackDrawerFragment />
+      </div>
     </>
   );
 };

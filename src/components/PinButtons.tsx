@@ -1,5 +1,7 @@
 import '../css/buttons.css';
 
+import React from 'react';
+
 type PinListButtonsProps = {
   availableCount: number;
   wantedCount: number;
@@ -45,3 +47,6 @@ export const PinListButtons = ({
     </div>
   );
 };
+
+export const MemoizedPinListButtons: React.NamedExoticComponent<PinListButtonsProps> =
+  React.memo<PinListButtonsProps>(PinListButtons);

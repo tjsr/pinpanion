@@ -46,3 +46,22 @@ export const saveListToLocal = (list: PinSelectionList): void => {
   localStorage.setItem(`lanyard.${list.id}`, JSON.stringify(list));
   return;
 };
+
+export const setActiveLanyardId = (id: string) => {
+  localStorage.setItem('latestLanyard', id);
+};
+
+export const getActiveLanyardId = ():string|undefined => {
+  const id: string | null = localStorage.getItem('latestLanyard');
+  if (null === id) {
+    return undefined;
+  }
+  return id;
+};
+
+export const getActiveLanyard = (): PinSelectionList|undefined => {
+  const id: string|undefined = getActiveLanyardId();
+  if (id) {
+    return getStoredLanyard(id);
+  }
+};
