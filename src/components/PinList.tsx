@@ -1,10 +1,10 @@
 import '../css/pins.css';
 
+import { MemoizedPinInfo, PinInfo } from './PinInfo';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
 import { MemoizedPinListButtons } from './PinButtons';
-import { PinInfo } from './PinInfo';
 import { newSelectionList } from '../fixture';
 import { removeOrAddId } from '../listutils';
 
@@ -96,7 +96,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
           <div className="pinListContent">
             {displayedPins.map((pin: Pin) => {
               return (
-                <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+                <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
                   {activePinSet?.editable && (
                     <MemoizedPinListButtons
                       availableCount={countPinAvailable(pin.id)}
@@ -106,7 +106,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
                       setPinWanted={togglePinWanted}
                     />
                   )}
-                </PinInfo>
+                </MemoizedPinInfo>
               );
             })}
           </div>

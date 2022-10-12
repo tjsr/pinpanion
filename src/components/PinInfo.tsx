@@ -55,3 +55,5 @@ export const PinInfo = ({ displaySize = 'normal', pin, paxs, pinSets, children }
     </>
   );
 };
+
+export const MemoizedPinInfo: React.NamedExoticComponent<PinInfoPropTypes> = React.memo<PinInfoPropTypes>(PinInfo);
