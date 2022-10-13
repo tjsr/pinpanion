@@ -13,13 +13,21 @@ type PinInfoPropTypes = {
   paxs?: PAX[];
   pinSets?: PinSet[];
   children?: React.ReactNode;
+  style?: any;
 };
 
 const getPaxCssClass = (prefix: string, paxId: number): string => {
   return prefix + eventnames[paxId].cssClass;
 };
 
-export const PinInfo = ({ displaySize = 'normal', pin, paxs, pinSets, children }: PinInfoPropTypes): JSX.Element => {
+export const PinInfo = ({
+  displaySize = 'normal',
+  pin,
+  paxs,
+  pinSets,
+  children,
+  style,
+}: PinInfoPropTypes): JSX.Element => {
   const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
   const pinPax: PAX | undefined = paxs?.find((pax: PAX) => pax.id == pin.pax_id);
   const pinSet: PinSet | undefined = pinSets?.find((set: PinSet) => {
@@ -38,7 +46,7 @@ export const PinInfo = ({ displaySize = 'normal', pin, paxs, pinSets, children }
 
   return (
     <>
-      <div className={pinClasses} id={`pin_${pin.id}`}>
+      <div className={pinClasses} id={`pin_${pin.id}`} style={style}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
           {pinSet?.name ? (

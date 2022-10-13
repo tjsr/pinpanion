@@ -1,9 +1,10 @@
 import '../css/pins.css';
 
+import { InfoSize, PIN_INFO_PANE_SIZES } from '../utils/sizingHints';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
-import { VariableSizeGrid as Grid } from 'react-window';
+import { FixedSizeGrid as Grid } from 'react-window';
 import { MemoizedPinInfo } from './PinInfo';
 import { PinListButtons } from './PinButtons';
 import React from 'react';
@@ -26,8 +27,41 @@ interface PinListPropTypes {
 interface GridPinRendererProps {
   columnIndex: number;
   rowIndex: number;
-  style: any;
+  style: React.CSSProperties;
 }
+
+function getEmSize(el: HTMLElement | null): number {
+  if (el === undefined) {
+    el = document.getElementById('root');
+  }
+  const computedFont: string = getComputedStyle(el!, '').fontSize;
+  if (!computedFont) {
+    return 16;
+  }
+  const matches: RegExpMatchArray | null = computedFont.match(/(\d+)px/);
+  if (!matches) {
+    return 16;
+  }
+  return Number(matches[1]);
+}
+
+const getPinInfoColumnWidth = (displaySize: SizesType): number => {
+  let sizeInfo: InfoSize | undefined = PIN_INFO_PANE_SIZES.get(displaySize);
+  if (!sizeInfo) {
+    sizeInfo = { heightPx: 120, widthEm: 10 };
+  }
+  const emsize = getEmSize(document.getElementById('root'));
+  const columnWidth = emsize * sizeInfo.widthEm + 4;
+  return columnWidth;
+};
+
+const getPinInfoRowHeight = (displaySize: SizesType): number => {
+  let sizeInfo: InfoSize | undefined = PIN_INFO_PANE_SIZES.get(displaySize);
+  if (!sizeInfo) {
+    sizeInfo = { heightPx: 120, widthEm: 10 };
+  }
+  return sizeInfo.heightPx;
+};
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {
   const {
@@ -86,23 +120,35 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   console.log('Re-rendering list');
 
-  const rowHeights = new Array(displayedPins.length).fill(true).map(() => 25 + Math.round(Math.random() * 50));
+  // const rowHeights = new Array(displayedPins.length).fill(true).map(() => 25 + Math.round(Math.random() * 50));
+  // const rowHeights = new Array(displayedPins.length).fill(true).map(() => 227);
+  // const columnWidths = new Array(displayedPins.length).fill(true).map(() => 132);
 
-  const COLUMN_COUNT = 6;
-  const columnWidths = new Array(displayedPins.length).fill(true).map(() => width - 25 / COLUMN_COUNT);
+  // tiny sm normal large = 6 8 10 12
+
+  const columnWidth = getPinInfoColumnWidth(displaySize);
+  const COLUMN_COUNT = Math.round(width / columnWidth - 0.5);
+  const requestedWidth = columnWidth * COLUMN_COUNT;
+  // const columnWidths = new Array(displayedPins.length).fill(true).map(() => width - 25 / COLUMN_COUNT);
   // new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
-  const ROW_COUNT = displayedPins.length / COLUMN_COUNT + 1;
+
+  const rowHeight = getPinInfoRowHeight(displaySize);
+
+  const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
+  console.log(`Displaying total of ${ROW_COUNT} rows and ${COLUMN_COUNT} columns`);
+  // const ROW_COUNT = 7;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
-    const pin: Pin = displayedPins[index];
+    console.info(`Displaying ${index} as row ${rowIndex} col ${columnIndex} is out of range of displayable pins.`);
     if (index >= displayedPins.length) {
-      console.warn(`Index ${index} on row ${rowIndex} is out of range of displayable pins.`);
+      console.warn(`Index ${index} on row ${rowIndex} col ${columnIndex} is out of range of displayable pins.`);
       return <></>;
     }
+    const pin: Pin = displayedPins[index];
 
     return (
-      <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+      <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} style={style}>
         {activePinSet?.editable && (
           <PinListButtons
             availableCount={countPinAvailable(pin.id)}
@@ -136,11 +182,11 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
           <div className="pinListContent">
             <Grid
               columnCount={COLUMN_COUNT}
-              columnWidth={(index: number) => columnWidths[index]}
-              height={height}
+              columnWidth={columnWidth}
+              height={height - 185}
               rowCount={ROW_COUNT}
-              rowHeight={(index: number) => rowHeights[index]}
-              width={width - 25}
+              rowHeight={rowHeight}
+              width={requestedWidth + 32}
             >
               {GridPinRenderer}
             </Grid>
