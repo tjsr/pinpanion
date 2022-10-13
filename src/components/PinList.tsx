@@ -46,12 +46,13 @@ function getEmSize(el: HTMLElement | null): number {
 }
 
 const getPinInfoColumnWidth = (displaySize: SizesType): number => {
+  const columnPadding = 8;
   let sizeInfo: InfoSize | undefined = PIN_INFO_PANE_SIZES.get(displaySize);
   if (!sizeInfo) {
     sizeInfo = { heightPx: 120, widthEm: 10 };
   }
   const emsize = getEmSize(document.getElementById('root'));
-  const columnWidth = emsize * sizeInfo.widthEm + 4;
+  const columnWidth = emsize * sizeInfo.widthEm + columnPadding;
   return columnWidth;
 };
 
@@ -77,6 +78,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   } = props;
   const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
   const { height, width } = useWindowDimensions();
+  const scrollbarAllowance = 32;
 
   const togglePinAvailable = (pinId: number): void => {
     console.log(`Toggling pin ${pinId} available`);
@@ -127,7 +129,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   // tiny sm normal large = 6 8 10 12
 
   const columnWidth = getPinInfoColumnWidth(displaySize);
-  const COLUMN_COUNT = Math.round(width / columnWidth - 0.5);
+  const COLUMN_COUNT = Math.round((width - scrollbarAllowance) / columnWidth - 0.5);
   const requestedWidth = columnWidth * COLUMN_COUNT;
   // const columnWidths = new Array(displayedPins.length).fill(true).map(() => width - 25 / COLUMN_COUNT);
   // new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
@@ -140,27 +142,32 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
-    console.info(`Displaying ${index} as row ${rowIndex} col ${columnIndex} is out of range of displayable pins.`);
     if (index >= displayedPins.length) {
       console.warn(`Index ${index} on row ${rowIndex} col ${columnIndex} is out of range of displayable pins.`);
       return <></>;
+    } else {
+      console.info(`Displaying ${index} as row ${rowIndex} col ${columnIndex}.`);
     }
     const pin: Pin = displayedPins[index];
 
     return (
-      <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} style={style}>
-        {activePinSet?.editable && (
-          <PinListButtons
-            availableCount={countPinAvailable(pin.id)}
-            wantedCount={countPinWanted(pin.id)}
-            pinId={pin.id}
-            setPinAvailable={togglePinAvailable}
-            setPinWanted={togglePinWanted}
-          />
-        )}
-      </MemoizedPinInfo>
+      <div className="pinInfoPadding" style={style}>
+        <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+          {activePinSet?.editable && (
+            <PinListButtons
+              availableCount={countPinAvailable(pin.id)}
+              wantedCount={countPinWanted(pin.id)}
+              pinId={pin.id}
+              setPinAvailable={togglePinAvailable}
+              setPinWanted={togglePinWanted}
+            />
+          )}
+        </MemoizedPinInfo>
+      </div>
     );
   };
+
+  const listCentreOffset = (width - requestedWidth - scrollbarAllowance) / 2;
 
   return (
     <>
@@ -179,18 +186,17 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
               <button className="pinNotWanted">W</button> to add to 'Wanted' list.
             </div>
           )}
-          <div className="pinListContent">
-            <Grid
-              columnCount={COLUMN_COUNT}
-              columnWidth={columnWidth}
-              height={height - 185}
-              rowCount={ROW_COUNT}
-              rowHeight={rowHeight}
-              width={requestedWidth + 32}
-            >
-              {GridPinRenderer}
-            </Grid>
-          </div>
+          <Grid
+            columnCount={COLUMN_COUNT}
+            columnWidth={columnWidth}
+            height={height - 185}
+            rowCount={ROW_COUNT}
+            rowHeight={rowHeight}
+            width={requestedWidth + scrollbarAllowance}
+            style={{ left: listCentreOffset, position: 'absolute' }}
+          >
+            {GridPinRenderer}
+          </Grid>
         </>
       )}
     </>
