@@ -120,33 +120,19 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     return 0;
   };
 
-  console.log('Re-rendering list');
-
-  // const rowHeights = new Array(displayedPins.length).fill(true).map(() => 25 + Math.round(Math.random() * 50));
-  // const rowHeights = new Array(displayedPins.length).fill(true).map(() => 227);
-  // const columnWidths = new Array(displayedPins.length).fill(true).map(() => 132);
-
-  // tiny sm normal large = 6 8 10 12
-
   const columnWidth = getPinInfoColumnWidth(displaySize);
   const COLUMN_COUNT = Math.round((width - scrollbarAllowance) / columnWidth - 0.5);
   const requestedWidth = columnWidth * COLUMN_COUNT;
-  // const columnWidths = new Array(displayedPins.length).fill(true).map(() => width - 25 / COLUMN_COUNT);
-  // new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
 
   const rowHeight = getPinInfoRowHeight(displaySize);
 
   const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
-  console.log(`Displaying total of ${ROW_COUNT} rows and ${COLUMN_COUNT} columns`);
-  // const ROW_COUNT = 7;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
     if (index >= displayedPins.length) {
-      console.warn(`Index ${index} on row ${rowIndex} col ${columnIndex} is out of range of displayable pins.`);
       return <></>;
     } else {
-      console.info(`Displaying ${index} as row ${rowIndex} col ${columnIndex}.`);
     }
     const pin: Pin = displayedPins[index];
 

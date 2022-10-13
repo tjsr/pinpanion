@@ -34,7 +34,6 @@ export class PinListButtons extends React.Component<PinListButtonsProps> {
 
     const isWanted: boolean = wantedCount > 0;
     const wantedClasses: string = isWanted ? 'wantedButton' : 'wantedButton pinNotWanted';
-    console.log(`Rendering pin ${pinId} with ${isWanted}/${isAvailable}`);
 
     return (
       <div className="listButtons">
@@ -62,6 +61,3 @@ export class PinListButtons extends React.Component<PinListButtonsProps> {
     );
   }
 }
-
-// export const MemoizedPinListButtons: React.NamedExoticComponent<PinListButtonsProps> =
-//   React.memo<PinListButtonsProps>(PinListButtons);
