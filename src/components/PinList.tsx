@@ -1,12 +1,15 @@
 import '../css/pins.css';
 
-import { MemoizedPinInfo, PinInfo } from './PinInfo';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
-import { MemoizedPinListButtons } from './PinButtons';
+import { VariableSizeGrid as Grid } from 'react-window';
+import { MemoizedPinInfo } from './PinInfo';
+import { PinListButtons } from './PinButtons';
+import React from 'react';
 import { newSelectionList } from '../fixture';
 import { removeOrAddId } from '../listutils';
+import useWindowDimensions from '../utils/useWindowDimensions';
 
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;
@@ -18,6 +21,12 @@ interface PinListPropTypes {
   pins: Pin[];
   pinSets?: PinSet[];
   setPinSet?: (list: PinSelectionList) => void;
+}
+
+interface GridPinRendererProps {
+  columnIndex: number;
+  rowIndex: number;
+  style: any;
 }
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {
@@ -33,6 +42,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     setPinSet,
   } = props;
   const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
+  const { height, width } = useWindowDimensions();
 
   const togglePinAvailable = (pinId: number): void => {
     console.log(`Toggling pin ${pinId} available`);
@@ -76,6 +86,38 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   console.log('Re-rendering list');
 
+  const columnWidths = new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
+  const rowHeights = new Array(displayedPins.length).fill(true).map(() => 25 + Math.round(Math.random() * 50));
+
+  const COLUMN_COUNT = 6;
+  const ROW_COUNT = displayedPins.length / COLUMN_COUNT + 1;
+
+  const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
+    const index = rowIndex * COLUMN_COUNT + columnIndex;
+    // const {list} = this.context;
+    const pin: Pin = displayedPins[index];
+
+    // // const row = list.get(index);
+    // const className = clsx(styles.row, {
+    //   [styles.rowScrolling]: isScrolling,
+    //   isVisible: isVisible,
+    // });
+
+    return (
+      <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+        {activePinSet?.editable && (
+          <PinListButtons
+            availableCount={countPinAvailable(pin.id)}
+            wantedCount={countPinWanted(pin.id)}
+            pinId={pin.id}
+            setPinAvailable={togglePinAvailable}
+            setPinWanted={togglePinWanted}
+          />
+        )}
+      </MemoizedPinInfo>
+    );
+  };
+
   return (
     <>
       <h2>{heading}</h2>
@@ -94,21 +136,16 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
             </div>
           )}
           <div className="pinListContent">
-            {displayedPins.map((pin: Pin) => {
-              return (
-                <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-                  {activePinSet?.editable && (
-                    <MemoizedPinListButtons
-                      availableCount={countPinAvailable(pin.id)}
-                      wantedCount={countPinWanted(pin.id)}
-                      pinId={pin.id}
-                      setPinAvailable={togglePinAvailable}
-                      setPinWanted={togglePinWanted}
-                    />
-                  )}
-                </MemoizedPinInfo>
-              );
-            })}
+            <Grid
+              columnCount={COLUMN_COUNT}
+              columnWidth={(index: number) => columnWidths[index]}
+              height={height}
+              rowCount={ROW_COUNT}
+              rowHeight={(index: number) => rowHeights[index]}
+              width={width}
+            >
+              {GridPinRenderer}
+            </Grid>
           </div>
         </>
       )}
