@@ -86,22 +86,20 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   console.log('Re-rendering list');
 
-  const columnWidths = new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
   const rowHeights = new Array(displayedPins.length).fill(true).map(() => 25 + Math.round(Math.random() * 50));
 
   const COLUMN_COUNT = 6;
+  const columnWidths = new Array(displayedPins.length).fill(true).map(() => width - 25 / COLUMN_COUNT);
+  // new Array(displayedPins.length).fill(true).map(() => 75 + Math.round(Math.random() * 50));
   const ROW_COUNT = displayedPins.length / COLUMN_COUNT + 1;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
-    // const {list} = this.context;
     const pin: Pin = displayedPins[index];
-
-    // // const row = list.get(index);
-    // const className = clsx(styles.row, {
-    //   [styles.rowScrolling]: isScrolling,
-    //   isVisible: isVisible,
-    // });
+    if (index >= displayedPins.length) {
+      console.warn(`Index ${index} on row ${rowIndex} is out of range of displayable pins.`);
+      return <></>;
+    }
 
     return (
       <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
@@ -142,7 +140,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
               height={height}
               rowCount={ROW_COUNT}
               rowHeight={(index: number) => rowHeights[index]}
-              width={width}
+              width={width - 25}
             >
               {GridPinRenderer}
             </Grid>
