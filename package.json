@@ -2,6 +2,7 @@
   "name": "pinnysets",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "dependencies": {
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
@@ -47,8 +48,10 @@
     "format": "npm run prettier && npm run lint",
     "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
     "android": "node node_modules/react-native/local-cli/cli.js run-android",
-    "amplify:retrievePinnypal": "cd amplify/backend/function/retrievePinnypal && tsc -p ./tsconfig.json && cd -",
-    "amplify:retrievePinnypal:windows": "cd amplify\\backend\\function\\retrievePinnypal && tsc -p ./tsconfig.json && cd ..\\..\\..\\..",
+    "amplify:retrievePinnypal": "npm run amplify:retrievePinnypal:windows && echo \"Running amplify build\" && amplify push",
+    "amplify:retrievePinnypal:linux": "cd amplify/backend/function/retrievePinnypal && tsc -p ./tsconfig.json && cd -",
+    "amplify:retrievePinnypal:windows:clean": "cd amplify\\backend\\function\\retrievePinnypal && rimraf src dist node_modules",
+    "amplify:retrievePinnypal:windows": "cd amplify\\backend\\function\\retrievePinnypal && rimraf src dist node_modules && cd ts-src && npm install && tsc -p ../tsconfig.json && cd .. && copy /y ts-src\\package.json src\\package.json && cd src && npm install && cd ..\\..\\..\\..",
     "amplify:babel:retrievePinnypal": "cd amplify/backend/function/retrievePinnypal && babel lib -d src && cd -"
   },
   "eslintConfig": {

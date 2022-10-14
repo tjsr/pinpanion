@@ -6,13 +6,10 @@
     "moduleResolution": "node",
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "outDir": "./build",
+    "outDir": "./src",
+    "strict": true,
     "baseUrl": "./",
-    "rootDir": "../../../../..",
-    "paths": {
-      "root": ["../../../../../src"],
-      "pinnypals": ["../../../../../src/pinnypals"],
-      "src": ["./src"]
-    }
-  }
+    "rootDir": "./ts-src"
+  },
+  "include": ["**/*"]
 }

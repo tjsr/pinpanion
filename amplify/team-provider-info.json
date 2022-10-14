@@ -10,6 +10,14 @@
       "StackName": "amplify-amplifye80b1f6557b24-staging-121606",
       "StackId": "arn:aws:cloudformation:ap-southeast-2:286449578293:stack/amplify-amplifye80b1f6557b24-staging-121606/d3864760-4182-11ed-a078-0af28d8b7650",
       "AmplifyAppId": "d3njmn6y7ek9a3"
+    },
+    "categories": {
+      "function": {
+        "retrievePinnypal": {
+          "deploymentBucketName": "amplify-amplifye80b1f6557b24-staging-121606-deployment",
+          "s3Key": "amplify-builds/retrievePinnypal-4a354576763438627070-build.zip"
+        }
+      }
     }
   }
 }

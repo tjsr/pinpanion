@@ -1,0 +1,14 @@
+{
+  "presets": [
+    [
+      "env",
+      {
+        "exclude": ["transform-regenerator"],
+        "targets": {
+          "node": "14"
+        }
+      }
+    ]
+  ],
+  "plugins": ["transform-async-to-generator", "transform-exponentiation-operator", "transform-object-rest-spread"]
+}
