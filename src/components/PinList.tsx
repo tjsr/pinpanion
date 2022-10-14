@@ -15,6 +15,7 @@ import useWindowDimensions from '../utils/useWindowDimensions';
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;
   displaySize?: SizesType;
+  descendingAge: boolean;
   filter?: PinListFilter;
   heading: string;
   isPinFiltered: (pin: Pin, filter?: PinListFilter) => boolean;
@@ -66,6 +67,7 @@ const getPinInfoRowHeight = (displaySize: SizesType): number => {
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {
   const {
+    descendingAge,
     displaySize = 'normal',
     heading,
     pins,
@@ -76,7 +78,10 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     isPinFiltered,
     setPinSet,
   } = props;
-  const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
+  let displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
+  if (descendingAge) {
+    displayedPins = displayedPins.reverse();
+  }
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
 

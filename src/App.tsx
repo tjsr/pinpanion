@@ -1,13 +1,13 @@
 import './css/App.css';
 import './css/pins.css';
 
+import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from './types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmptyList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
-import { getDisplaySize, getSplitActiveAndWanted, saveDisplaySize, saveSplitActive } from './settingsStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
@@ -15,6 +15,7 @@ import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
+import { application } from 'express';
 import { generateRandomName } from './namegenerator';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
@@ -28,7 +29,6 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
-  const [displaySize, setDisplaySize] = useState<SizesType>(getDisplaySize());
 
   const shouldDefaultShowSelection = (): boolean => {
     return window.location.hash != '';
@@ -36,11 +36,11 @@ const App = (): JSX.Element => {
 
   const [selectionFilterEnabled, setSelectionFilterEnabled] = useState<boolean>(shouldDefaultShowSelection());
   const [activePinList, setActivePinList] = useState<PinSelectionList | undefined>(undefined);
-  const [splitActiveAndWanted, setSplitActiveAndWanted] = useState<boolean>(getSplitActiveAndWanted());
+  const [applicationSettings, setApplicationSettings] = useState<ApplicationSettings>(loadSettings());
 
   useEffect(() => {
-    saveSplitActive(splitActiveAndWanted);
-  }, [splitActiveAndWanted]);
+    saveSettings(applicationSettings);
+  }, [applicationSettings]);
 
   useEffect(() => {
     if (activePinList && !isEmptyList(activePinList)) {
@@ -78,11 +78,6 @@ const App = (): JSX.Element => {
     loadDefaultLanyard();
     fetchPins();
   }, []);
-
-  const displaySizeChanged = (size: SizesType): void => {
-    saveDisplaySize(size);
-    setDisplaySize(size);
-  };
 
   const selectionListUpdated = (updatedList: PinSelectionList): void => {
     if (isNaN(updatedList.revision)) {
@@ -123,12 +118,7 @@ const App = (): JSX.Element => {
           <>
             <PinAppDrawerSet
               appSettingsPanel={
-                <AppSettingsPanel
-                  size={displaySize}
-                  setObjectSize={displaySizeChanged}
-                  splitActiveAndWanted={splitActiveAndWanted}
-                  setSplitActiveAndWanted={setSplitActiveAndWanted}
-                />
+                <AppSettingsPanel settings={applicationSettings} updateSettings={setApplicationSettings} />
               }
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
@@ -155,9 +145,10 @@ const App = (): JSX.Element => {
                 />
               }
             />
-            {splitActiveAndWanted && selectionFilterEnabled ? (
+            {applicationSettings.splitActiveAndWanted && selectionFilterEnabled ? (
               <LanyardPinList
-                displaySize={displaySize}
+                descendingAge={applicationSettings.descendingAge}
+                displaySize={applicationSettings.displaySize}
                 heading={`Lanyard for ${activePinList.name}`}
                 availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
                 wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
@@ -167,7 +158,8 @@ const App = (): JSX.Element => {
             ) : (
               <PinList
                 activePinSet={activePinList}
-                displaySize={displaySize}
+                descendingAge={applicationSettings.descendingAge}
+                displaySize={applicationSettings.displaySize}
                 filter={filter}
                 heading={getPinListHeading()}
                 isPinFiltered={(pin: Pin) => {

@@ -2,6 +2,7 @@ import '../css/settings.css';
 
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 
+import { ApplicationSettings } from '../settingsStorage';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
@@ -19,10 +20,8 @@ type ObjectSizeSettingProps = {
 };
 
 export type AppSettingsPanelProps = {
-  size: SizesType;
-  setObjectSize: (size: SizesType) => void;
-  splitActiveAndWanted: boolean;
-  setSplitActiveAndWanted: (enabled: boolean) => void;
+  settings: ApplicationSettings;
+  updateSettings: (settings: ApplicationSettings) => void;
 };
 
 const ObjectSizeSetting = ({ size, setObjectSize }: ObjectSizeSettingProps): JSX.Element => {
@@ -74,6 +73,11 @@ type SplitActiveAndWantedSettingProps = {
   setSplitActiveAndWanted: (enabled: boolean) => void;
 };
 
+type NewestFirstSettingProps = {
+  descendingAge: boolean;
+  setDescendingAge: (enabled: boolean) => void;
+};
+
 const SplitActiveAndWantedSetting = ({
   splitActiveAndWanted,
   setSplitActiveAndWanted,
@@ -99,22 +103,42 @@ const SplitActiveAndWantedSetting = ({
   );
 };
 
-export const AppSettingsPanel = ({
-  size,
-  setObjectSize,
-  splitActiveAndWanted,
-  setSplitActiveAndWanted,
-}: AppSettingsPanelProps): JSX.Element => {
+const NewestFirstSetting = ({ descendingAge, setDescendingAge }: NewestFirstSettingProps): JSX.Element => {
+  return (
+    <>
+      <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+        <FormControlLabel
+          labelPlacement="start"
+          control={<Switch id="oldestLast" checked={descendingAge} onChange={() => setDescendingAge(!descendingAge)} />}
+          label="Display Oldest pins last"
+        />
+
+        <InputLabel id="oldestLast"></InputLabel>
+      </FormControl>
+    </>
+  );
+};
+
+export const AppSettingsPanel = ({ settings, updateSettings }: AppSettingsPanelProps): JSX.Element => {
   return (
     <>
       <div className="settingFields">
         <div className="settingItem">
-          <ObjectSizeSetting size={size} setObjectSize={setObjectSize} />
+          <ObjectSizeSetting
+            size={settings.displaySize}
+            setObjectSize={(displaySize) => updateSettings({ ...settings, displaySize })}
+          />
         </div>
         <div className="settingItem">
           <SplitActiveAndWantedSetting
-            splitActiveAndWanted={splitActiveAndWanted}
-            setSplitActiveAndWanted={setSplitActiveAndWanted}
+            splitActiveAndWanted={settings.splitActiveAndWanted}
+            setSplitActiveAndWanted={(splitActiveAndWanted) => updateSettings({ ...settings, splitActiveAndWanted })}
+          />
+        </div>
+        <div className="settingItem">
+          <NewestFirstSetting
+            descendingAge={settings.descendingAge}
+            setDescendingAge={(descendingAge) => updateSettings({ ...settings, descendingAge })}
           />
         </div>
       </div>
