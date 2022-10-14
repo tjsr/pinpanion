@@ -15,7 +15,6 @@ import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
-import { application } from 'express';
 import { generateRandomName } from './namegenerator';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
