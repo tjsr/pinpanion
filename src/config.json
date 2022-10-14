@@ -1,5 +1,6 @@
 {
   "pinnypals": "https://pinnypals.com/scripts/queryPins.php",
+  "ppQueryUser": "https://pinnypals.com/scripts/queryUserCollection.php",
   "proxy": "http://localhost:8080/pins",
   "pinnypalsImagePrefix": "https://pinnypals.com/imgs",
   "imagePrefix": "imgs",

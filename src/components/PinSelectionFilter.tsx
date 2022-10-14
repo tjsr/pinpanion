@@ -2,6 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
 import { PinSelectionList } from '../types';
+import { PinnypalsUserImport } from './PinnypalsUserImport';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
@@ -134,6 +135,7 @@ export const PinSelectionListEditor = ({
           lanyardSelected={lanyardSelected}
           activeLanyard={activeLanyard}
           id='lanyardSelect' />
+        <PinnypalsUserImport />
       </div>
       <PinSelectionEditor
         key={activeLanyard.id}

@@ -3,12 +3,13 @@ import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 export const EMPTY_FILTER: PinListFilter = {};
 const PINNYSET_NAMESPACE = '00a260b1-8eef-4674-a837-b17fa267594d';
+export const PINNYPALS_NAMESPACE = '1c9f0a31-5f86-4fba-9244-c64b20813c55';
 
 export const generateListId = (): string => {
   return uuidv5(uuidv4(), PINNYSET_NAMESPACE);
 };
 
-const EMPTY_SELECTION_LIST: PinSelectionList = {
+export const EMPTY_SELECTION_LIST: PinSelectionList = {
   availableIds: [],
   editable: false,
   id: generateListId(),

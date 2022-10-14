@@ -31,6 +31,7 @@ export type PinSelectionList = {
   wantedIds: number[];
   revision: number;
   editable: boolean;
+  pinnypalsUser?: string;
 };
 
 export type PinListFilter = {
@@ -60,6 +61,7 @@ export type SizesType = 'tiny' | 'sm' | 'normal' | 'large';
 
 export interface ConfigType {
   pinnypals: string,
+  ppQueryUser: string,
   proxy: string,
   pinnypalsImagePrefix: string,
   imagePrefix: string,
