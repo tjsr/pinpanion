@@ -24,3 +24,4 @@ yarn-error.log*
 public/imgs/pin_*.png
 public/imgs/set_*.png
 images/
+amplify/
