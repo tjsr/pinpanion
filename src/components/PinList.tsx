@@ -1,4 +1,5 @@
 import '../css/pins.css';
+import '../css/pindisplaypanel.css';
 
 import { InfoSize, PIN_INFO_PANE_SIZES } from '../utils/sizingHints';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
