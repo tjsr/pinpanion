@@ -11,7 +11,7 @@ import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment';
 import { PinListFilterDisplayProps } from './PinSearchFilter';
 import { PinSelectionDrawerFragment } from '../drawers/PinSelectionDrawerFragment';
 import { PinSelectionFilterProps } from './PinSelectionFilter';
-import { QRCodeDrawerFragment } from '../drawers/QRCodeDrawerFragment';
+import { ShareDrawerFragment } from '../drawers/ShareDrawerFragment';
 
 type PinAppDrawerSetProps = {
   appSettingsPanel: ReactElement<AppSettingsPanelProps>;
@@ -43,7 +43,7 @@ export const PinAppDrawerSet = ({
 
         <PinFilterDrawerFragment filter={filter} pinListFilterDisplay={pinListFilterDisplay} />
 
-        <QRCodeDrawerFragment qrCode={qrCode} />
+        <ShareDrawerFragment qrCode={qrCode} />
 
         <AppSettingsDrawerFragment appSettingsPanel={appSettingsPanel} />
         <FeedbackDrawerFragment />

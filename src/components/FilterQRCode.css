@@ -1,0 +1,14 @@
+div.shareLink {
+  width: 100%;
+}
+
+div.shareUrl {
+  padding: 0;
+  display: inline-block;
+  width: calc(100% - 3rem);
+}
+
+div.shareUrlCopyIcon {
+  display: inline-block;
+  width: 3rem;
+}
