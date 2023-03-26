@@ -30,6 +30,7 @@ const App = (): JSX.Element => {
     ...EMPTY_FILTER,
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hash, setHash] = React.useState(() => window.location.hash);
 
   const hashChanged = React.useCallback(() => {
@@ -51,7 +52,6 @@ const App = (): JSX.Element => {
   };
 
   React.useEffect(() => {
-    // processInitialHash();
     window.addEventListener('hashchange', hashChanged);
     return () => {
       window.removeEventListener('hashchange', hashChanged);
