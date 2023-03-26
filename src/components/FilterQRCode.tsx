@@ -10,6 +10,7 @@ import { QR_CODE_SIZE } from '../globals';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
+import { createShareUrl } from '../utils/shareUrl';
 import { useState } from 'react';
 
 export type FilterQRCodeProps = {
@@ -21,7 +22,7 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
 
   const AUTOHIDE_DURATION = 5000;
   const generateQrCode = (): string => {
-    return window.location.href;
+    return createShareUrl(lanyard, true);
   };
 
   const copyLinkToClipboard = (): void => {
@@ -42,6 +43,7 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
             size={QR_CODE_SIZE}
             className="selectionQrCode"
             value={generateQrCode()}
+            level="H"
             viewBox={`0 0 ${QR_CODE_SIZE} ${QR_CODE_SIZE}`}
           />
         </div>

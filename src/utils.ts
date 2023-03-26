@@ -127,7 +127,6 @@ export const numberArrayToEncodedString = (input: number[]): string => {
     const currentTmpNum = buildNumberFromFlags(tmpArray);
     const currentChar = numberToEncodingChar(currentTmpNum, letters);
     outputString = currentChar + outputString;
-    console.log('Remaining array', workingArray);
   }
   return outputString;
 };

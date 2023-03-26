@@ -30,6 +30,10 @@ export const PinSelectionEditor = ({
   displayList,
   onChange,
 }: PinSelectionProps): JSX.Element => {
+  const disableShowSelectedOnly = (): boolean => {
+    return isEmptyList(activeLanyard) || !activeLanyard.editable;
+  };
+
   return (
     <>
       <div className="pinSelectionFilter">
@@ -98,7 +102,7 @@ export const PinSelectionEditor = ({
             <FormControlLabel
               control={
                 <Switch
-                  disabled={isEmptyList(activeLanyard)}
+                  disabled={disableShowSelectedOnly()}
                   id="selectedPinsOnly"
                   checked={displayList}
                   onChange={(event: React.FormEvent<HTMLInputElement>) => {

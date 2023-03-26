@@ -15,6 +15,7 @@ import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
+import { decodePinSelectionHash } from './utils/decodePinSelectionList';
 import { generateRandomName } from './namegenerator';
 
 const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
@@ -28,6 +29,34 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
+
+  const [hash, setHash] = React.useState(() => window.location.hash);
+
+  const hashChanged = React.useCallback(() => {
+    setHash(window.location.hash);
+    console.log(`Read hash value: ${window.location.hash}`);
+  }, []);
+
+  const hasListOnUrlHash = (): boolean => {
+    return window.location.hash !== undefined && window.location.hash.startsWith('#');
+  };
+
+  const processCurrentHash = (): void => {
+    if (hasListOnUrlHash()) {
+      const pinSelection: PinSelectionList = decodePinSelectionHash(window.location.hash);
+      // check that we're not the owner of this list
+      pinSelection.editable = false;
+      selectionListUpdated(pinSelection);
+    }
+  };
+
+  React.useEffect(() => {
+    // processInitialHash();
+    window.addEventListener('hashchange', hashChanged);
+    return () => {
+      window.removeEventListener('hashchange', hashChanged);
+    };
+  }, []);
 
   const shouldDefaultShowSelection = (): boolean => {
     return window.location.hash != '';
@@ -74,7 +103,11 @@ const App = (): JSX.Element => {
       });
     };
 
-    loadDefaultLanyard();
+    if (hasListOnUrlHash()) {
+      processCurrentHash();
+    } else {
+      loadDefaultLanyard();
+    }
     fetchPins();
   }, []);
 

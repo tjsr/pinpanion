@@ -178,6 +178,11 @@ describe('numberArrayToEncodedString', () => {
     expect(numberArrayToEncodedString([2, 3, 6, 9, 10, 12, 13, 17, 18, 21])).toEqual('Exsm');
   });
 
+  test('Should create a large set of widely spaced numbers', () => {
+    console.log(numberArrayToEncodedString([13, 114, 172, 78, 984, 622, 621, 682, 691, 715, 591, 1072,
+      1022, 1057, 231, 977, 562, 1031, 1341]));
+  });
+
   test('Should allow a single high number', () => {
     console.log(numberArrayToEncodedString([198]));
   });
