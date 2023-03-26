@@ -12,6 +12,7 @@ type LanyardSelectionDropdownProps = {
   lanyardSelected: (lanyardId: string) => void;
   activeLanyard: PinSelectionList;
   id: string;
+  storedLanyardList?: PinSelectionList[];
 };
 
 const hasLanyardData = (lanyard: PinSelectionList): boolean => {
@@ -19,7 +20,8 @@ const hasLanyardData = (lanyard: PinSelectionList): boolean => {
 };
 
 export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): JSX.Element => {
-  const lanyards: PinSelectionList[] = getStoredLanyards();
+  const lanyards: PinSelectionList[] =
+    props.storedLanyardList === undefined ? getStoredLanyards() : props.storedLanyardList;
   const hasSelected: boolean =
     lanyards.filter((psl: PinSelectionList) => {
       psl.id === props.activeLanyard.id;
@@ -29,6 +31,7 @@ export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): 
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
       <InputLabel id={props.id}>Switch lanyard</InputLabel>
       <Select
+        data-testid="lanyardSelectTestElement"
         id={props.id}
         value={hasSelected ? props.activeLanyard.id : ''}
         label="Switch lanyard"
@@ -37,7 +40,7 @@ export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): 
           props.lanyardSelected(selectedLanyard);
         }}
       >
-        <MenuItem key={0} value="" disabled={isEmptyList(props.activeLanyard)}>
+        <MenuItem key={0} value="new" disabled={isEmptyList(props.activeLanyard)}>
           <em>Create a new lanyard</em>
         </MenuItem>
         {lanyards.filter(hasLanyardData).map((l: PinSelectionList) => {

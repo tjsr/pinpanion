@@ -6,7 +6,7 @@ const config: Config = {
   },
   modulePathIgnorePatterns: ['amplify'],
   preset: 'ts-jest',
-  testEnvironment: 'node',
+  testEnvironment: 'jest-environment-jsdom',
   verbose: true,
 };
 
