@@ -1,7 +1,7 @@
 import { PinSelectionList } from '../types';
 import { encodePinSelectionHash } from './encodePinSelectionList';
 
-const devIp = '172.29.0.47'; // set to 127.0.0.1
+const devIp = '127.0.0.1';
 
 export const createShareUrl = (psl: PinSelectionList, offlineMode?: boolean): string => {
   const collectionShareParams: string = encodePinSelectionHash(psl, offlineMode);
