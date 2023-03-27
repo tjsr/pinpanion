@@ -1,4 +1,4 @@
-import { PinListFilter, PinSelectionList, SizesType } from './types';
+import { Pin, PinListFilter, PinSelectionList, SizesType } from './types';
 
 export const isEmpty = (value: string | undefined): boolean => {
   return value === undefined || value.trim() == '';
@@ -130,3 +130,14 @@ export const numberArrayToEncodedString = (input: number[]): string => {
   }
   return outputString;
 };
+
+export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
+  if (lanyard.availableIds !== undefined && lanyard.availableIds.includes(+pin.id)) {
+    return true;
+  }
+  if (lanyard.wantedIds !== undefined && lanyard.wantedIds.includes(+pin.id)) {
+    return true;
+  }
+  return false;
+};
+

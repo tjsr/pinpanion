@@ -1,8 +1,10 @@
+import { Pin, PinSelectionList } from './types';
 import {
   buildNumberFromFlags,
   buildSet,
   compressArray,
   getMin,
+  isPinOnLanyard,
   letterToNumbers,
   numberArrayToEncodedString,
   numberToEncodingChar,
@@ -204,5 +206,62 @@ describe('Two-way conversion', () => {
   ])('Converts %p expecting %p', (numbers: number[], str: string) => {
     expect(numberArrayToEncodedString(numbers)).toEqual(str);
     expect(stringToNumberArray(str)).toEqual(numbers.sort());
+  });
+});
+
+describe('isPinOnLanyard', () => {
+  const haystackLanyard: PinSelectionList = {
+    availableIds: [2, 5, 9],
+    wantedIds: [4, 5, 7],
+  } as PinSelectionList;
+
+  test('Should verify that a pin is on an available lanyard.', () => {
+    const needlePin: Pin = {
+      id: 2,
+    } as Pin;
+    expect(isPinOnLanyard(needlePin, haystackLanyard)).toBe(true);
+  });
+
+  test('Should verify that a pin is on an wanted lanyard.', () => {
+    const needlePin: Pin = {
+      id: 7,
+    } as Pin;
+    expect(isPinOnLanyard(needlePin, haystackLanyard)).toBe(true);
+  });
+
+  test('Should verify that a pin is on an either wanted or available lanyard.', () => {
+    const needlePin: Pin = {
+      id: 5,
+    } as Pin;
+    expect(isPinOnLanyard(needlePin, haystackLanyard)).toBe(true);
+  });
+
+  test('Should verify that a pin is not on lanyard.', () => {
+    const needlePin: Pin = {
+      id: 3,
+    } as Pin;
+    expect(isPinOnLanyard(needlePin, haystackLanyard)).toBe(false);
+  });
+
+  test('Should not fail if a lanyard is somehow generated which has an undefined wanted array.', () => {
+    const needlePin: Pin = {
+      id: 3,
+    } as Pin;
+    const dodgyHaystackLanyard: PinSelectionList = {
+      wantedIds: [4, 5, 7],
+    } as PinSelectionList;
+
+    expect(isPinOnLanyard(needlePin, dodgyHaystackLanyard)).toBe(false);
+  });
+
+  test('Should not fail if a lanyard is somehow generated which has an undefined available array.', () => {
+    const needlePin: Pin = {
+      id: 3,
+    } as Pin;
+    const dodgyHaystackLanyard: PinSelectionList = {
+      availableIds: [2, 5, 9],
+    } as PinSelectionList;
+
+    expect(isPinOnLanyard(needlePin, dodgyHaystackLanyard)).toBe(false);
   });
 });
