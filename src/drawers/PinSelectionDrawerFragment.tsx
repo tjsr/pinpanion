@@ -19,7 +19,8 @@ export const PinSelectionDrawerFragment = ({
 }: PinSelectionDrawerFragmentProps): JSX.Element => {
   const getSelectionButtonLabel = (): string => {
     const selectedPins: number =
-      pinSelection?.availableIds.length + pinSelection?.wantedIds.length;
+      (pinSelection?.availableIds ? pinSelection?.availableIds.length : 0) +
+      (pinSelection?.wantedIds ? pinSelection?.wantedIds.length : 0);
     return selectedPins > 0 ? `Lanyard (${selectedPins})` : 'Lanyards';
   };
 
