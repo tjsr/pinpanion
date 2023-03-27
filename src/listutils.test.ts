@@ -7,6 +7,13 @@ describe('addIdToList', () => {
 
     expect(output).toEqual(expected);
   });
+
+  test('Should not crash with a junk empty list', () => {
+    const output: string = addIdToList(',,', 5);
+    const expected = '5';
+
+    expect(output).toEqual(expected);
+  });
 });
 
 describe('removeIdFromList', () => {
