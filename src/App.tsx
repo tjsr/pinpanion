@@ -6,7 +6,7 @@ import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList, isPinOnLanyard } from './utils';
+import { countFilters, isEmptyList, isPinOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -131,6 +131,7 @@ const App = (): JSX.Element => {
     }
 
     updateFilterSelectionFromLanyard(updatedList);
+    sanitizePinList(updatedList);
     setActivePinList(updatedList);
   };
 
@@ -148,6 +149,7 @@ const App = (): JSX.Element => {
     console.log('Lanyard: ', lanyardId);
     const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId);
     if (lanyard) {
+      sanitizePinList(lanyard);
       setActivePinList(lanyard);
       updateFilterSelectionFromLanyard(lanyard);
 

@@ -1,4 +1,5 @@
 import { PinSelectionList } from './types';
+import { sanitizePinList } from './utils';
 
 const hasNewerVersionStored = (listId: string, revision: number): boolean => {
   const stored: string | null = localStorage.getItem(`lanyard.${listId}`);
@@ -31,7 +32,9 @@ export const getStoredLanyard = (lanyardId: string): PinSelectionList| undefined
   if (null === data) {
     return undefined;
   }
-  return JSON.parse(data);
+  const output: PinSelectionList = JSON.parse(data);
+  sanitizePinList(output);
+  return output;
 };
 
 export const saveListToLocal = (list: PinSelectionList): void => {

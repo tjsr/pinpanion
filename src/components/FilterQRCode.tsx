@@ -35,6 +35,13 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
     console.log('Alert closed');
   };
 
+  if (lanyard.availableIds === undefined) {
+    console.debug(`Lanyard passed to FilterQRCode had no availableIds array.`);
+  }
+  if (lanyard.wantedIds === undefined) {
+    console.debug(`Lanyard passed to FilterQRCode had no wantedIds array.`);
+  }
+
   return (
     <>
       <div className="selectionQrCode">

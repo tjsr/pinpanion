@@ -141,3 +141,14 @@ export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => 
   return false;
 };
 
+export const sanitizePinList = (pinList: PinSelectionList): void => {
+  if (pinList.availableIds === undefined) {
+    console.trace('A pin list passed to be updated had no availableIds array so is being corrected');
+    pinList.availableIds = [];
+  }
+  if (pinList.wantedIds === undefined) {
+    console.trace('A pin list passed to be updated had no wantedIds array so is being corrected');
+    pinList.wantedIds = [];
+  }
+};
+

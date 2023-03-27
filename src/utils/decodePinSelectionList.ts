@@ -19,6 +19,7 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
   const params: Map<string, string> = urlParamsToMap(hashString);
 
   const outputSet: PinSelectionList = {
+    revision: 1,
   } as PinSelectionList;
 
   if (params.has('r')) {
@@ -45,11 +46,15 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
   if (params.has('a')) {
     const decodedAvailable: number[] = stringToNumberArray(params.get('a')!);
     outputSet.availableIds = decodedAvailable;
+  } else {
+    outputSet.availableIds = [];
   }
 
   if (params.has('w')) {
     const decodedWanted: number[] = stringToNumberArray(params.get('w')!);
     outputSet.wantedIds = decodedWanted;
+  } else {
+    outputSet.wantedIds = [];
   }
 
   return outputSet;
