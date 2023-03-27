@@ -1,3 +1,4 @@
+import Alert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
@@ -117,6 +118,9 @@ export const PinSelectionEditor = ({
               label="Show selected pins only"
             />
           </FormControl>
+          {!activeLanyard.editable && (
+            <Alert severity="info">This lanyard is not editable, so only selected pins will be shown.</Alert>
+          )}
           <div className="knownBug">
             <strong>Known bug:</strong> Due to the app re-rendering 1400 pins on every change, tapping this button might
             take 3-5 seconds on some mobile devices. Give it a moment as clicking again might just toggle it again, and
