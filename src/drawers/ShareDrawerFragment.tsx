@@ -5,13 +5,13 @@ import React, { ReactElement } from 'react';
 import { DrawerFragment } from '../components/DrawerFragment';
 import { FilterQRCodeProps } from '../components/FilterQRCode';
 
-type QRCodeDrawerFragmentProps = {
+type ShareDrawerFragmentProps = {
   qrCode: ReactElement<FilterQRCodeProps>;
 };
 
-export const ShareDrawerFragment = ({ qrCode }: QRCodeDrawerFragmentProps): JSX.Element => {
+export const ShareDrawerFragment = ({ qrCode }: ShareDrawerFragmentProps): JSX.Element => {
   return (
-    <DrawerFragment drawerId="qr" label="QR code">
+    <DrawerFragment drawerId="qr" label="Share">
       {qrCode}
     </DrawerFragment>
   );
