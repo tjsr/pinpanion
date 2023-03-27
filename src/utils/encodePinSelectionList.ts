@@ -2,8 +2,14 @@ import { PinSelectionList } from '../types';
 import { numberArrayToEncodedString } from '../utils';
 
 export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = false): string => {
-  const availableString: string = numberArrayToEncodedString(psl.availableIds);
-  const wantedString: string = numberArrayToEncodedString(psl.wantedIds);
+  if (psl.availableIds === undefined) {
+    console.debug('Input lanyard provided an illegal undefined availableIds');
+  }
+  if (psl.wantedIds === undefined) {
+    console.debug('Input lanyard provided an illegal undefined wantedIds');
+  }
+  const availableString: string = numberArrayToEncodedString(psl.availableIds || []);
+  const wantedString: string = numberArrayToEncodedString(psl.wantedIds || []);
 
   let params: any = {
     'id': psl.id,
