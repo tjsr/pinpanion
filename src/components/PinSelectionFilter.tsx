@@ -53,7 +53,9 @@ export const PinSelectionEditor = ({
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
+                  availableIds: activeLanyard.availableIds === undefined ? [] : activeLanyard.availableIds,
                   name: event.target.value,
+                  wantedIds: activeLanyard.wantedIds === undefined ? [] : activeLanyard.wantedIds,
                 };
                 onChange(updatedList);
                 return true;
@@ -73,8 +75,9 @@ export const PinSelectionEditor = ({
 
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
+                  availableIds: activeLanyard.availableIds === undefined ? [] : activeLanyard.availableIds,
                   revision: activeLanyard.revision + 1,
-                  wantedIds,
+                  wantedIds: wantedIds === undefined ? [] : wantedIds,
                 };
                 onChange(updatedList);
                 return true;
@@ -95,6 +98,7 @@ export const PinSelectionEditor = ({
                   ...activeLanyard,
                   availableIds,
                   revision: activeLanyard.revision + 1,
+                  wantedIds: activeLanyard.wantedIds === undefined ? [] : activeLanyard.wantedIds,
                 };
                 onChange(updatedList);
                 return true;

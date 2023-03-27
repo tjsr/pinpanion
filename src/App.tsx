@@ -6,7 +6,7 @@ import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList } from './utils';
+import { countFilters, isEmptyList, isPinOnLanyard } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -17,10 +17,6 @@ import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { decodePinSelectionHash } from './utils/decodePinSelectionList';
 import { generateRandomName } from './namegenerator';
-
-const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
-  return lanyard.availableIds.includes(+pin.id) || lanyard.wantedIds.includes(+pin.id);
-};
 
 const App = (): JSX.Element => {
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
@@ -99,7 +95,9 @@ const App = (): JSX.Element => {
       console.log('A random animal name has been assigned to this list: ' + randomAnimal);
       selectionListUpdated({
         ...activeLanyard,
+        availableIds: activeLanyard.availableIds === undefined ? [] : activeLanyard.availableIds,
         name: randomAnimal,
+        wantedIds: activeLanyard.wantedIds === undefined ? [] : activeLanyard.wantedIds,
       });
     };
 
@@ -116,7 +114,12 @@ const App = (): JSX.Element => {
     if (!lanyard.editable) {
       console.debug('Set selection filter enabled to true because list is not editable');
       setSelectionFilterEnabled(true);
-    } else if (lanyard.availableIds.length == 0 || lanyard.wantedIds.length == 0) {
+    } else if (
+      lanyard.availableIds === undefined ||
+      lanyard.availableIds.length == 0 ||
+      lanyard.wantedIds === undefined ||
+      lanyard.wantedIds.length == 0
+    ) {
       console.debug('Set selection filter enabled to false because list is empty');
       setSelectionFilterEnabled(false);
     }
@@ -198,8 +201,8 @@ const App = (): JSX.Element => {
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 heading={`Lanyard for ${activePinList.name}`}
-                availablePins={pins.filter((p) => activePinList.availableIds.includes(+p.id))}
-                wantedPins={pins.filter((p) => activePinList.wantedIds.includes(+p.id))}
+                availablePins={pins.filter((p) => activePinList.availableIds?.includes(+p.id))}
+                wantedPins={pins.filter((p) => activePinList.wantedIds?.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets}
               />
