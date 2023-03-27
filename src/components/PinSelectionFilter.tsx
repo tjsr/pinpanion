@@ -11,9 +11,9 @@ import { isEmptyList } from '../utils';
 type PinSelectionProps = {
   activeLanyard: PinSelectionList;
   changeListDisplayed: (display: boolean) => void;
-  displayList: boolean;
-  lanyardSelected: (lanyardId: string) => void;
+  onlyShowSelectedPins: boolean;
   onChange: (updatedList: PinSelectionList) => void;
+  showSelectedOnlyToggleDisabled?: () => boolean;
 };
 
 export type PinSelectionFilterProps = {
@@ -22,17 +22,21 @@ export type PinSelectionFilterProps = {
   enableFilter: boolean;
   lanyardSelected: (lanyardId: string) => void;
   onChange: (updatedList: PinSelectionList) => void;
+  storedLanyardList?: PinSelectionList[];
 };
 
 export const PinSelectionEditor = ({
   activeLanyard,
   changeListDisplayed,
-  displayList,
+  onlyShowSelectedPins,
   onChange,
+  showSelectedOnlyToggleDisabled,
 }: PinSelectionProps): JSX.Element => {
-  const disableShowSelectedOnly = (): boolean => {
-    return isEmptyList(activeLanyard) || !activeLanyard.editable;
-  };
+  if (!showSelectedOnlyToggleDisabled) {
+    showSelectedOnlyToggleDisabled = () => {
+      return isEmptyList(activeLanyard) || !activeLanyard.editable;
+    };
+  }
 
   return (
     <>
@@ -102,9 +106,9 @@ export const PinSelectionEditor = ({
             <FormControlLabel
               control={
                 <Switch
-                  disabled={disableShowSelectedOnly()}
+                  disabled={showSelectedOnlyToggleDisabled()}
                   id="selectedPinsOnly"
-                  checked={displayList}
+                  checked={onlyShowSelectedPins}
                   onChange={(event: React.FormEvent<HTMLInputElement>) => {
                     changeListDisplayed(event.currentTarget.checked);
                   }}
@@ -130,20 +134,25 @@ export const PinSelectionListEditor = ({
   onChange,
   enableFilter,
   changeListDisplayed,
+  storedLanyardList,
 }: PinSelectionFilterProps): JSX.Element => {
   return (
     <>
       <div className="pinSelectionList">
         <LanyardSelectionDropdown
+          storedLanyardList={storedLanyardList}
           lanyardSelected={lanyardSelected}
           activeLanyard={activeLanyard}
-          id='lanyardSelect' />
+          id="lanyardSelect"
+        />
       </div>
       <PinSelectionEditor
         key={activeLanyard.id}
-        displayList={enableFilter}
+        onlyShowSelectedPins={enableFilter}
         changeListDisplayed={(display: boolean) => changeListDisplayed(activeLanyard.id, display)}
-        onChange={onChange} activeLanyard={activeLanyard} lanyardSelected={lanyardSelected} />
+        onChange={onChange}
+        activeLanyard={activeLanyard}
+      />
     </>
   );
 };

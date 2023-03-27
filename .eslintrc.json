@@ -29,7 +29,10 @@
     "requireConfigFile": "off",
     "require-jsdoc": "off",
     // "quotes": ["error", "single"],
-    "comma-dangle": ["error", { "functions": "never", "arrays": "always-multiline", "objects": "always-multiline" }],
+    "comma-dangle": [
+      "error",
+      { "functions": "never", "imports": "never", "arrays": "always-multiline", "objects": "always-multiline" }
+    ],
     // "space-before-function-paren" was causing all kinds fo headaches because prettier won't honour it.
     "space-before-function-paren": "off",
     "operator-linebreak": ["error"],

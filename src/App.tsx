@@ -111,10 +111,23 @@ const App = (): JSX.Element => {
     fetchPins();
   }, []);
 
+  const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {
+    console.log(JSON.stringify(lanyard));
+    if (!lanyard.editable) {
+      console.debug('Set selection filter enabled to true because list is not editable');
+      setSelectionFilterEnabled(true);
+    } else if (lanyard.availableIds.length == 0 || lanyard.wantedIds.length == 0) {
+      console.debug('Set selection filter enabled to false because list is empty');
+      setSelectionFilterEnabled(false);
+    }
+  };
+
   const selectionListUpdated = (updatedList: PinSelectionList): void => {
     if (isNaN(updatedList.revision)) {
       updatedList.revision = 0;
     }
+
+    updateFilterSelectionFromLanyard(updatedList);
     setActivePinList(updatedList);
   };
 
@@ -133,6 +146,8 @@ const App = (): JSX.Element => {
     const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId);
     if (lanyard) {
       setActivePinList(lanyard);
+      updateFilterSelectionFromLanyard(lanyard);
+
       return Promise.resolve();
     } else {
       const newList: PinSelectionList = newSelectionList();
@@ -170,6 +185,7 @@ const App = (): JSX.Element => {
                   enableFilter={selectionFilterEnabled}
                   onChange={selectionListUpdated}
                   changeListDisplayed={(id: string, display: boolean) => {
+                    // When the switch checkbox is toggled, set the show only marked pins selection to match.
                     setSelectionFilterEnabled(display);
                   }}
                   activeLanyard={activePinList}
