@@ -1,0 +1,35 @@
+name: Build Pinpanion app
+run-name: ${{ github.actor }} running Pinpanion build.
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out repository code
+      uses: actions/checkout@v3
+
+    - name: Images Primes
+      id: cache-images
+      uses: actions/cache@v3
+      with:
+        path: cached-images
+        key: ${{ runner.os }}-images
+
+    - name: Generate Prime Numbers
+      if: steps.cache-images.outputs.cache-hit != 'true'
+      run: touch cached-images/empty.txt
+
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    
+    - run: npm ci
+    - run: |
+        touch cached-images/empty.txt
+        npm run download -- cached-images
+        mkdir public/imgs
+        cp -Rf cached-images/* public/imgs || true
+    - run: npm run build
+    - run: npm run test
