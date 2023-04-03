@@ -27,9 +27,8 @@ jobs:
     
     - run: npm ci
     - run: |
-        touch cached-images/empty.txt
-        npm run download -- cached-images
         mkdir public/imgs
         cp -Rf cached-images/* public/imgs || true
+        npm run download -- cached-images
     - run: npm run build
     - run: npm run test
