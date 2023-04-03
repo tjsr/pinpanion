@@ -9,16 +9,16 @@ jobs:
     - name: Check out repository code
       uses: actions/checkout@v3
 
-    - name: Images Primes
+    - name: Images cache
       id: cache-images
       uses: actions/cache@v3
       with:
         path: cached-images
         key: ${{ runner.os }}-images
 
-    - name: Generate Prime Numbers
+    - name: Ensure images dir exists.
       if: steps.cache-images.outputs.cache-hit != 'true'
-      run: touch cached-images/empty.txt
+      run: mkdir cached-images && touch cached-images/empty.txt
 
     - name: Use Node.js
       uses: actions/setup-node@v3
