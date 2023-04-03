@@ -1,5 +1,5 @@
 import { PinSelectionList } from '../types';
-import { stringToNumberArray } from '../utils';
+import { stringToNumberArray } from 'sparse-bit-string';
 
 const decodeQueryParam = (p: string): string => {
   return decodeURIComponent(p.replace(/\+/g, ' '));

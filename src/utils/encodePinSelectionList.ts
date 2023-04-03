@@ -1,5 +1,5 @@
 import { PinSelectionList } from '../types';
-import { numberArrayToEncodedString } from '../utils';
+import { numberArrayToEncodedString } from 'sparse-bit-string';
 
 export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = false): string => {
   if (psl.availableIds === undefined) {
