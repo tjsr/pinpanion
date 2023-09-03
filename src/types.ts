@@ -46,6 +46,7 @@ export type PinListFilter = {
 export type PAX = {
   id: number;
   name: string;
+  shortName?: string;
 };
 
 export type PinSet = {
@@ -59,12 +60,14 @@ export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
 export type SizesType = 'tiny' | 'sm' | 'normal' | 'large';
 
 export interface ConfigType {
-  pinnypals: string,
-  proxy: string,
-  pinnypalsImagePrefix: string,
-  imagePrefix: string,
-  imageCacheDir: string,
-  minYear: number,
-  maxYear: number,
-  reverseYears: boolean
+  pinnypals1?: string;
+  pinnypals2: string;
+  proxy: string;
+  pinnypals1ImagePrefix?: string;
+  pinnypals2ImagePrefix: string;
+  imagePrefix: string;
+  imageCacheDir: string;
+  minYear: number;
+  maxYear: number;
+  reverseYears: boolean;
 }

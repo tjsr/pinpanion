@@ -1,3 +1,5 @@
+import { ALL_PINS_URL1, ALL_PINS_URL2 } from './defaults';
+
 import Express from 'express';
 import { PinnypalsPinsRequest } from './types';
 import fetch from 'node-fetch';
@@ -5,7 +7,7 @@ import fetch from 'node-fetch';
 // eslint-disable-next-line new-cap
 const app = Express();
 
-const ALL_PINS_URL = 'https://pinnypals.com/scripts/queryPins.php';
+const pinUrl: string = process.env.PINNYPALS_VERSION === '1' ? ALL_PINS_URL1 : ALL_PINS_URL2;
 
 let ALL_PINS: PinnypalsPinsRequest | undefined = undefined;
 
@@ -15,7 +17,7 @@ app.get('/', (req, res) => {
 app.get('/pins', (req, res): void => {
   res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   if (ALL_PINS === undefined) {
-    fetch(ALL_PINS_URL)
+    fetch(pinUrl)
       .then((response) => response.json())
       .then((data: unknown) => {
         const ppd: PinnypalsPinsRequest = data as PinnypalsPinsRequest;
