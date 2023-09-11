@@ -18,6 +18,8 @@ import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { decodePinSelectionHash } from './utils/decodePinSelectionList';
 import { generateRandomName } from './namegenerator';
 
+const PINS_CACHE_DATA_FILE = 'pins.json';
+
 const App = (): JSX.Element => {
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
@@ -75,7 +77,7 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     const fetchPins = async () => {
-      const response = await fetch('pins.json', {
+      const response = await fetch(PINS_CACHE_DATA_FILE, {
         mode: 'cors',
       });
       const data: any = await response.json();
@@ -163,6 +165,11 @@ const App = (): JSX.Element => {
     }
   };
 
+  if (pins === undefined) {
+    return <div className="App">Pin list was not loaded.</div>;
+  }
+
+  console.log(`Rendering ${pins?.length} pins`);
   return (
     <div className="App">
       <>

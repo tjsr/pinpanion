@@ -47,6 +47,9 @@ const pinnypalsImagePrefix: string =
   PINNYPALS_VERSION === 1 ? config.pinnypals1ImagePrefix || PINNYPALS1_IMAGE_PREFIX : config.pinnypals2ImagePrefix;
 console.log('Pinnypals:', pinnypalsPinRequestUrl);
 
+const PINNYPALS_PINS_CACHE_FILE = 'public/pinnypalpins.json';
+const PINPANION_PINS_CACHE_FILE = 'public/pins.json';
+
 const parsePinnypalData = (data: unknown): Pin[] => {
   if (LIMIT_IMAGE_DOWNLOADS > -1) {
     console.warn(`Pin images limited to id < ${LIMIT_IMAGE_DOWNLOADS}`);
@@ -73,7 +76,7 @@ const parsePinnypalData = (data: unknown): Pin[] => {
 };
 
 const useLocalCachedData = (): Pin[] => {
-  const dataString = fs.readFileSync('public/pins.json', 'utf-8');
+  const dataString = fs.readFileSync(PINNYPALS_PINS_CACHE_FILE, 'utf-8');
   const data = JSON.parse(dataString);
   const pins: Pin[] = parsePinnypalData(data);
   return pins;
@@ -85,9 +88,14 @@ const fetchAndCachePinnypalData = async (): Promise<Pin[]> => {
 
   const pins: Pin[] = parsePinnypalData(data);
 
-  const jsonStringData: string = JSON.stringify(data);
-  fs.writeFileSync('public/pins.json', jsonStringData, 'utf-8');
-  console.log(`Wrote ${jsonStringData.length} bytes of updated JSON to public/pins.json`);
+  const pinnypalPinData: string = JSON.stringify(data);
+  fs.writeFileSync(PINNYPALS_PINS_CACHE_FILE, pinnypalPinData, 'utf-8');
+  console.log(`Wrote ${pinnypalPinData.length} bytes of updated JSON to ${PINNYPALS_PINS_CACHE_FILE}`);
+
+  const pp2d: PinCollectionData = requestToDataSet(data as Pinnypals2PinsRequest);
+  const pinpanionData: string = JSON.stringify(pp2d);
+  fs.writeFileSync(PINPANION_PINS_CACHE_FILE, pinpanionData, 'utf-8');
+  console.log(`Wrote ${pinpanionData.length} bytes of updated JSON to ${PINPANION_PINS_CACHE_FILE}`);
   return pins;
 };
 
@@ -136,7 +144,7 @@ const cachePinImages = async (pinsToDownload: Pin[]): Promise<void> => {
   });
 };
 
-const useLocal = true;
+const useLocal = false;
 const pins: Pin[] = useLocal ? useLocalCachedData() : await fetchAndCachePinnypalData();
 
 await cachePinImages(pins);

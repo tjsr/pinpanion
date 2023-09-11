@@ -25,3 +25,5 @@ public/imgs/pin_*.png
 public/imgs/set_*.png
 images/
 amplify/
+public/imgs/pins/
+sampledata/
