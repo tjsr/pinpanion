@@ -11,7 +11,7 @@ export const FeedbackDrawerFragment = ({}: FeedbackDrawerFragmentProps): JSX.Ele
     <DrawerFragment drawerId="feedback" label="Feedback">
       <div className="feedback">
         <p>
-          Pinpanion is a very quick project put together in about 10 days prior to PAX. It is intended to become an
+          Pinpanion is a very quick project put together in about 10 days prior to PAX 2022. It is intended to become an
           offline-enabled tool to best enable in-person convention pin trading and help build community interactions and
           friendships via pin trading.
         </p>
@@ -22,11 +22,7 @@ export const FeedbackDrawerFragment = ({}: FeedbackDrawerFragmentProps): JSX.Ele
         </p>
         <p>
           This app is completely open-source and written in Typescript using React and MUI. The source code can be found
-          at{' '}
-          <a href="https://bitbucket.org/tjsrowe/pinnysets/src/main/">
-            https://bitbucket.org/tjsrowe/pinnysets/src/main/
-          </a>
-          .
+          at <a href="https://github.com/tjsr/pinpanion/">https://github.com/tjsr/pinpanion/</a>.
         </p>
         <p>
           For more information, including known bugs, please consult the readme in the above project repo link. Or, send
