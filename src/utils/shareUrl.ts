@@ -3,6 +3,19 @@ import { encodePinSelectionHash } from './encodePinSelectionList';
 
 const devIp = '127.0.0.1';
 
+export const findShareGaps = (values: number[], minSize = 28): [number, number][] => {
+  const sorted: number[] = [0, ...values.sort((a, b) => a - b)];
+  const output: [number, number][] = [];
+  for (let index = 0;index < values.length-2;index++) {
+    const gap = sorted[index+1] - sorted[index];
+    if (gap > minSize+1) {
+      output.push([sorted[index]+1, sorted[index+1]-1]);
+      index++;
+    }
+  }
+  return output;
+};
+
 export const createShareUrl = (psl: PinSelectionList, offlineMode?: boolean): string => {
   const collectionShareParams: string = encodePinSelectionHash(psl, offlineMode);
 
