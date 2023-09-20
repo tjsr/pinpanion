@@ -1,5 +1,8 @@
+import { extractCompressedBitstring, stringToNumberArray } from 'sparse-bit-string';
+
 import { PinSelectionList } from '../types';
-import { stringToNumberArray } from 'sparse-bit-string';
+
+const ENABLE_COMPRESSED_LISTS = true;
 
 const decodeQueryParam = (p: string): string => {
   return decodeURIComponent(p.replace(/\+/g, ' '));
@@ -44,15 +47,31 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
   }
 
   if (params.has('a')) {
-    const decodedAvailable: number[] = stringToNumberArray(params.get('a')!);
-    outputSet.availableIds = decodedAvailable;
+    const availableValue: string = params.get('a')!;
+    try {
+      const decodedAvailable: number[] = ENABLE_COMPRESSED_LISTS ?
+        extractCompressedBitstring(availableValue) :
+        stringToNumberArray(availableValue);
+      outputSet.availableIds = decodedAvailable;
+    } catch (err) {
+      console.error(`Failed while decoding available lanyard data "${availableValue}"`, err);
+      throw err;
+    }
   } else {
     outputSet.availableIds = [];
   }
 
   if (params.has('w')) {
-    const decodedWanted: number[] = stringToNumberArray(params.get('w')!);
-    outputSet.wantedIds = decodedWanted;
+    const wantedValue: string = params.get('w')!;
+    try {
+      const decodedWanted: number[] = ENABLE_COMPRESSED_LISTS ?
+        extractCompressedBitstring(wantedValue) :
+        stringToNumberArray(wantedValue);
+      outputSet.wantedIds = decodedWanted;
+    } catch (err) {
+      console.error(`Failed while decoding wanted lanyard data "${wantedValue}"`, err);
+      throw err;
+    }
   } else {
     outputSet.wantedIds = [];
   }

@@ -77,14 +77,19 @@ const App = (): JSX.Element => {
 
   useEffect(() => {
     const fetchPins = async () => {
-      const response = await fetch(PINS_CACHE_DATA_FILE, {
-        mode: 'cors',
-      });
-      const data: any = await response.json();
+      try {
+        const response = await fetch(PINS_CACHE_DATA_FILE, {
+          mode: 'cors',
+        });
+        const data: any = await response.json();
+        console.log(`Loaded pins list from ${PINS_CACHE_DATA_FILE}`);
 
-      setPins(data.pins);
-      setPinSets(data.sets);
-      setPaxs(data.paxs);
+        setPins(data.pins);
+        setPinSets(data.sets);
+        setPaxs(data.paxs);
+      } catch (err) {
+        console.warn(`Failed while trying to fetch  ${PINS_CACHE_DATA_FILE} file: ${err}`);
+      }
     };
     const loadDefaultLanyard = async () => {
       let activeLanyard: PinSelectionList | undefined = getActiveLanyard();

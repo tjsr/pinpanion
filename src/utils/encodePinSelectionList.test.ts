@@ -12,10 +12,11 @@ describe('encodePinSelectionHash', () => {
       wantedIds: [1, 5, 9, 14],
     };
     const output = encodePinSelectionHash(psl, true);
-    expect(output).toBe('a=BBK&w=CER&id=abc-123-xxx-xyz&n=A+test+list&r=2');
+    // expect(output).toBe('a=BBK&w=CER&id=abc-123-xxx-xyz&n=A+test+list&r=2');
+    expect(output).toBe('id=abc-123-xxx-xyz&n=A+test+list&r=2&a=ANABBK&w=AOACER');
   });
 
-  test('Should create an encoded tring from a PSL', () => {
+  test('Should create an encoded string from a PSL', () => {
     const psl: PinSelectionList = {
       availableIds: [2, 4, 7, 13],
       editable: true,
