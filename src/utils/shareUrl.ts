@@ -10,7 +10,6 @@ export const findShareGaps = (values: number[], minSize = 28): [number, number][
     const gap = sorted[index+1] - sorted[index];
     if (gap > minSize+1) {
       output.push([sorted[index]+1, sorted[index+1]-1]);
-      index++;
     }
   }
   return output;
