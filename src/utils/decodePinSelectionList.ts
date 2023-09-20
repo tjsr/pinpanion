@@ -19,6 +19,9 @@ const urlParamsToMap = (hashString: string): Map<string, string> => {
 };
 
 export const decodePinSelectionHash = (hashString: string): PinSelectionList => {
+  if (hashString.startsWith('#')) {
+    hashString = hashString.substring(1);
+  }
   const params: Map<string, string> = urlParamsToMap(hashString);
 
   const outputSet: PinSelectionList = {
