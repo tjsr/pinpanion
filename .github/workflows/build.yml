@@ -16,9 +16,11 @@ jobs:
         path: cached-images
         key: ${{ runner.os }}-images
 
-    - name: Generate Prime Numbers
+    - name: Ensure cached-images dir exists
       if: steps.cache-images.outputs.cache-hit != 'true'
-      run: touch cached-images/empty.txt
+      run: |
+        mkdir -p cached-images
+        touch cached-images/empty.txt
 
     - name: Use Node.js
       uses: actions/setup-node@v3
@@ -27,6 +29,7 @@ jobs:
     
     - run: npm ci
     - run: |
+        mkdir -p cached-images
         touch cached-images/empty.txt
         npm run download -- cached-images
         mkdir public/imgs
