@@ -6,7 +6,7 @@ import {
   Pinnypals2PinsArray,
   Pinnypals2PinsRequest,
   Pinnypals2SetIdentifier,
-  Pinnypals2SetsArray,
+  Pinnypals2SetsArray
 } from './pinnypals2types';
 
 export interface PinCollectionData {
