@@ -35,7 +35,8 @@
 }
 
 .paxLimited {
-  background-color: var(--pax-colour-limited)
+  background-color: var(--pax-colour-limited);
+  color: var(--pax-text-light);
 }
 
 .paxEast {
