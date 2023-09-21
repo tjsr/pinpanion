@@ -52,7 +52,7 @@ export const PinInfo = ({
           {pinSet?.name ? (
             <div className={setCssClass}>{pinSet?.name}</div>
           ) : pinPax ? (
-            <div className={paxCssClass}>{eventnames[pinPax.id!].description}</div>
+            <div className={paxCssClass}>{eventnames[pinPax.id!].description} {pin.year}</div>
           ) : (
             <></>
           )}
