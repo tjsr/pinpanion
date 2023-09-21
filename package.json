@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
-    "start": "cross-env PORT=3006,BROWSER=chrome-remote-debug,GENERATE_SOURCEMAP=false react-scripts start",
+    "start": "cross-env BROWSER='chrome',BROWSER_ARGS='--remote-debugging-port=9222',PORT=3006,GENERATE_SOURCEMAP=false react-scripts start",
     "chrome-remote-debug": "chrome --remote-debugging-port=9222'",
     "build": "npm run download -- public/imgs && react-scripts build",
     "build:amplify": "npm run download:amplify && react-scripts build",
