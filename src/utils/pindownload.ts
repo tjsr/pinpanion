@@ -43,6 +43,7 @@ destinationPath = path.resolve(destinationPath);
 const PINNYPALS_VERSION = process.env.PINNYPALS_VERSION ? parseInt(process.env.PINNYPALS_VERSION) : 2;
 
 const pinnypalsPinRequestUrl: string = PINNYPALS_VERSION === 1 ? config.pinnypals1 || ALL_PINS_URL1 : config.pinnypals2;
+const pinpanionImagePrefix: string = config.pinpanionImagePrefix;
 const pinnypalsImagePrefix: string =
   PINNYPALS_VERSION === 1 ? config.pinnypals1ImagePrefix || PINNYPALS1_IMAGE_PREFIX : config.pinnypals2ImagePrefix;
 console.log('Pinnypals:', pinnypalsPinRequestUrl);
@@ -100,22 +101,32 @@ const fetchAndCachePinnypalData = async (): Promise<Pin[]> => {
 };
 
 const downloadImageForPin = async (pin: Pin): Promise<boolean> => {
-  const url: string = pinnypalsImagePrefix + '/' + pin.image_name;
+  const pinpanionUrl: string = pinpanionImagePrefix + '/'+ pin.image_name;
+  const pinnypalsUrl: string = pinnypalsImagePrefix + '/' + pin.image_name;
   const outputFilePath: string = path.resolve(path.join(destinationPath, pin.image_name.split('?')[0]));
-  console.debug(`Downloading ${url} to ${outputFilePath}`);
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(outputFilePath)) {
-      downloadFile(url, outputFilePath)
+      console.debug(`Downloading ${pinpanionUrl} to ${outputFilePath}`);
+      downloadFile(pinpanionUrl, outputFilePath)
         .then(() => {
-          console.log(`Downloaded ${url} to ${outputFilePath}`);
+          console.log(`Downloaded ${pinpanionUrl} to ${outputFilePath}`);
           resolve(true);
         })
-        .catch((err) => {
-          console.error(`Error downloading ${url} to ${outputFilePath}: ${err}`);
-          reject(err);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        .catch((_pinpanionErr) => {
+          console.warn(`Didn't find pin image at pinpanion prod host ${pinpanionUrl}, trying pinnypals...`);
+          downloadFile(pinnypalsUrl, outputFilePath)
+            .then(() => {
+              console.log(`Downloaded ${pinnypalsUrl} to ${outputFilePath}`);
+              resolve(true);
+            })
+            .catch((err) => {
+              console.error(`Error downloading ${pinnypalsUrl} to ${outputFilePath}: ${err}`);
+              reject(err);
+            });
         });
     } else {
-      console.log(`Skipped downloading ${url} because ${outputFilePath} exists.`);
+      console.log(`Skipped downloading ${pinpanionUrl} because ${outputFilePath} exists.`);
       resolve(true);
     }
   });

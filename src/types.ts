@@ -65,6 +65,7 @@ export interface ConfigType {
   proxy: string;
   pinnypals1ImagePrefix?: string;
   pinnypals2ImagePrefix: string;
+  pinpanionImagePrefix: string;
   imagePrefix: string;
   imageCacheDir: string;
   minYear: number;
