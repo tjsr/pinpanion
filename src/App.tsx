@@ -103,7 +103,7 @@ const App = (): JSX.Element => {
         setSelectionFilterEnabled(false);
       }
 
-      const randomAnimal: string = await generateRandomName();
+      const randomAnimal: string = activeLanyard ? activeLanyard.name : await generateRandomName();
       console.log('A random animal name has been assigned to this list: ' + randomAnimal);
       selectionListUpdated({
         ...activeLanyard,
