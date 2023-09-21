@@ -43,9 +43,9 @@ const App = (): JSX.Element => {
 
   const processCurrentHash = (): void => {
     if (hasListOnUrlHash()) {
-      const pinSelection: PinSelectionList = decodePinSelectionHash(window.location.hash);
+      const pinSelection: PinSelectionList = decodePinSelectionHash(
+        window.location.hash);
       // check that we're not the owner of this list
-      pinSelection.editable = false;
       selectionListUpdated(pinSelection);
     }
   };
@@ -99,7 +99,7 @@ const App = (): JSX.Element => {
     const loadDefaultLanyard = async () => {
       let activeLanyard: PinSelectionList | undefined = getActiveLanyard();
       if (!activeLanyard) {
-        activeLanyard = newSelectionList();
+        activeLanyard = newSelectionList(applicationSettings.localUserId);
         setSelectionFilterEnabled(false);
       }
 
@@ -123,7 +123,7 @@ const App = (): JSX.Element => {
 
   const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {
     console.log(JSON.stringify(lanyard));
-    if (!lanyard.editable) {
+    if (lanyard.ownerId === applicationSettings.localUserId) {
       console.debug('Set selection filter enabled to true because list is not editable');
       setSelectionFilterEnabled(true);
     } else if (
@@ -143,7 +143,7 @@ const App = (): JSX.Element => {
     }
 
     updateFilterSelectionFromLanyard(updatedList);
-    sanitizePinList(updatedList);
+    sanitizePinList(updatedList, applicationSettings);
     setActivePinList(updatedList);
   };
 
@@ -159,15 +159,15 @@ const App = (): JSX.Element => {
 
   const lanyardSelected = async (lanyardId: string): Promise<void> => {
     console.log('Lanyard: ', lanyardId);
-    const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId);
+    const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId, applicationSettings);
     if (lanyard) {
-      sanitizePinList(lanyard);
+      sanitizePinList(lanyard, applicationSettings);
       setActivePinList(lanyard);
       updateFilterSelectionFromLanyard(lanyard);
 
       return Promise.resolve();
     } else {
-      const newList: PinSelectionList = newSelectionList();
+      const newList: PinSelectionList = newSelectionList(applicationSettings.localUserId);
       const randomAnimal: string = await generateRandomName();
       newList.name = randomAnimal;
       selectionListUpdated(newList);
@@ -190,7 +190,12 @@ const App = (): JSX.Element => {
           <>
             <PinAppDrawerSet
               appSettingsPanel={
-                <AppSettingsPanel settings={applicationSettings} updateSettings={setApplicationSettings} />
+                <AppSettingsPanel settings={applicationSettings} updateSettings={(settings) => {
+                  if (settings.userDisplayName?.trim() === '') {
+                    settings.userDisplayName = undefined;
+                  }
+                  setApplicationSettings(settings);
+                }} />
               }
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
@@ -215,6 +220,7 @@ const App = (): JSX.Element => {
                   }}
                   activeLanyard={activePinList}
                   lanyardSelected={lanyardSelected}
+                  currentUserId={applicationSettings.localUserId}
                 />
               }
             />
@@ -246,6 +252,7 @@ const App = (): JSX.Element => {
                 pins={pins}
                 pinSets={pinSets}
                 setPinSet={selectionListUpdated}
+                currentUserId={applicationSettings.localUserId}
               />
             )}
           </>

@@ -1,3 +1,6 @@
+type uuid = string;
+export type UserId = uuid;
+
 export type Pin = {
   id: number;
   name: string;
@@ -30,7 +33,7 @@ export type PinSelectionList = {
   availableIds: number[];
   wantedIds: number[];
   revision: number;
-  editable: boolean;
+  ownerId: UserId;
 };
 
 export type PinListFilter = {

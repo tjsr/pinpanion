@@ -24,11 +24,12 @@ export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = fals
     generateCompressedStringWithHeader(safeWantedIds, wantedSkipRanges) :
     numberArrayToEncodedString(safeWantedIds);
 
-  console.log(`Creating list with skipped values: A: ${availableSkipRanges} W: ${wantedSkipRanges}`);
+  console.debug(`Creating list with skipped values: A: ${availableSkipRanges} W: ${wantedSkipRanges}`);
 
   const params: any = {
     'id': psl.id,
     'n': psl.name,
+    'o': psl.ownerId,
     'r': psl.revision.toString(),
   };
 

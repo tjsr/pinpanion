@@ -1,25 +1,28 @@
 /**
  * @jest-environment jsdom
  */
+
 import '@testing-library/jest-dom';
 
 import { PinSelectionEditor, PinSelectionListEditor } from './PinSelectionFilter';
-/* eslint-disable comma-dangle */
+import { PinSelectionList, UserId } from '../types';
 import {
   alternativeLanyard2,
   newlyCreatedEmpty,
   nonEditableList,
   storedLanyardList,
-  activeLanyard as testLanyard,
+  activeLanyard as testLanyard
 } from './__test/lanyards.testdata';
-// For some reason, prettier keeps inserting a dangling comma here, even without the alias.
-/* eslint-enable comma-dangle */
 import { render, screen } from '@testing-library/react';
 
-import { PinSelectionList } from '../types';
 import React from 'react';
 import { isEmptyList } from '../utils';
 import { switchToLanyard } from './__test/lanyards.utils';
+
+/* eslint-disable comma-dangle */
+
+// For some reason, prettier keeps inserting a dangling comma here, even without the alias.
+/* eslint-enable comma-dangle */
 
 const verifySelectedOnlySwitchStatus = (showSeparateDisabled: boolean): void => {
   const selectedLabel: HTMLInputElement = screen.getByLabelText(/Show selected pins only/i) as HTMLInputElement;
@@ -28,21 +31,25 @@ const verifySelectedOnlySwitchStatus = (showSeparateDisabled: boolean): void => 
 };
 
 describe('PinSelectionEditor', () => {
+  const userId: UserId = 'o123';
+
   type TestableEditorProps = {
     activeLanyard: PinSelectionList;
     onChange?: (updatedList: PinSelectionList) => void;
-    showSelectedOnlyToggleDisabled: (lanyard: PinSelectionList) => boolean;
+    showSelectedOnlyToggleDisabled: (lanyard: PinSelectionList, userId: UserId) => boolean;
+    currentUserId: UserId;
   };
 
   const showSelectedOnlyToggleDisabledWithExpectations = (
     lanyard: PinSelectionList,
     expectEmpty: boolean,
-    expectEditable: boolean
+    expectEditable: boolean,
+    currentUserId: UserId
   ) => {
     const isEmpty = isEmptyList(lanyard);
     expect(isEmpty).toBe(expectEmpty);
-    expect(lanyard.editable).toBe(expectEditable);
-    return isEmpty || !lanyard.editable;
+    expect(lanyard.ownerId === currentUserId).toBe(expectEditable);
+    return isEmpty || lanyard.ownerId !== currentUserId;
   };
 
   const TestablePinSelectionEditor = (props: TestableEditorProps): JSX.Element => {
@@ -52,29 +59,31 @@ describe('PinSelectionEditor', () => {
 
     return (
       <PinSelectionEditor
-        showSelectedOnlyToggleDisabled={() => props.showSelectedOnlyToggleDisabled(props.activeLanyard)}
+        showSelectedOnlyToggleDisabled={() => props.showSelectedOnlyToggleDisabled(
+          props.activeLanyard, props.currentUserId)}
         activeLanyard={props.activeLanyard}
         onChange={props.onChange || defaultOnChange}
         changeListDisplayed={function (): void {
           throw new Error('Function not implemented.');
         }}
         onlyShowSelectedPins={false}
+        currentUserId={props.currentUserId}
       />
     );
   };
 
-  const showSelectedOnlyToggleDisabled = (lanyard: PinSelectionList) => {
+  const showSelectedOnlyToggleDisabled = (lanyard: PinSelectionList, userId: UserId) => {
     /* eslint-disable indent */
     switch (lanyard.id) {
       case testLanyard.id:
-        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, false, true);
+        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, false, true, userId);
       case nonEditableList.id:
-        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, false, false);
+        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, false, false, userId);
       case newlyCreatedEmpty.id:
-        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, true, false);
+        return showSelectedOnlyToggleDisabledWithExpectations(lanyard, true, false, userId);
     }
     /* eslint-enable indent */
-    return showSelectedOnlyToggleDisabledWithExpectations(lanyard, true, true);
+    return showSelectedOnlyToggleDisabledWithExpectations(lanyard, true, true, userId);
   };
 
   it('A list with available/wanted might be but is not disabled.', async () => {
@@ -82,6 +91,7 @@ describe('PinSelectionEditor', () => {
       <TestablePinSelectionEditor
         showSelectedOnlyToggleDisabled={showSelectedOnlyToggleDisabled}
         activeLanyard={testLanyard}
+        currentUserId={userId}
       />
     );
     render(component);
@@ -89,11 +99,12 @@ describe('PinSelectionEditor', () => {
     verifySelectedOnlySwitchStatus(false);
   });
 
-  it('Test that lanyard can only show selected when list is set not editable.', async () => {
+  it('Test that lanyard can only show selected when user is not the owner.', async () => {
     const component = (
       <TestablePinSelectionEditor
         showSelectedOnlyToggleDisabled={showSelectedOnlyToggleDisabled}
         activeLanyard={nonEditableList}
+        currentUserId='o222'
       />
     );
     render(component);
@@ -107,6 +118,7 @@ describe('PinSelectionListEditor', () => {
     activeLanyard: PinSelectionList;
     lanyardList: PinSelectionList[];
     onChange?: (updatedList: PinSelectionList) => void;
+    userId: UserId;
   };
 
   const TestablePinSelectionListEditor = (props: TestableListProps): JSX.Element => {
@@ -137,12 +149,14 @@ describe('PinSelectionListEditor', () => {
           }
         }}
         onChange={props.onChange || defaultOnChange}
+        currentUserId={props.userId}
       />
     );
   };
 
   it('Renders with starting lanyard name', async () => {
-    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard} lanyardList={storedLanyardList} />;
+    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard}
+      lanyardList={storedLanyardList} userId='o123' />;
     const { getByLabelText } = render(component);
 
     const listName = getByLabelText(/List Name/i) as HTMLInputElement;
@@ -150,7 +164,8 @@ describe('PinSelectionListEditor', () => {
   });
 
   it('Test that lanyard name has been changed when new lanyard selected', async () => {
-    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard} lanyardList={storedLanyardList} />;
+    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard}
+      lanyardList={storedLanyardList} userId='o123' />;
     const { getByLabelText, queryByLabelText, getByRole } = render(component);
 
     await switchToLanyard('new', storedLanyardList, queryByLabelText, getByRole);
@@ -175,6 +190,7 @@ describe('PinSelectionListEditor', () => {
         activeLanyard={testLanyard}
         lanyardList={storedLanyardList}
         onChange={mockNewList}
+        userId='o123'
       />
     );
     const { queryByLabelText, getByRole } = render(component);
@@ -191,6 +207,7 @@ describe('PinSelectionListEditor', () => {
         activeLanyard={testLanyard}
         lanyardList={storedLanyardList}
         onChange={mockSelectedList}
+        userId='o123'
       />
     );
     const { queryByLabelText, getByRole } = render(component);
@@ -198,7 +215,8 @@ describe('PinSelectionListEditor', () => {
   });
 
   it('Test that lanyard cannot be set to selected only when list is empty.', async () => {
-    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard} lanyardList={storedLanyardList} />;
+    const component = <TestablePinSelectionListEditor activeLanyard={testLanyard}
+      lanyardList={storedLanyardList} userId='o123' />;
     const { queryByLabelText, getByRole } = render(component);
     await switchToLanyard('new', storedLanyardList, queryByLabelText, getByRole);
 
@@ -207,10 +225,10 @@ describe('PinSelectionListEditor', () => {
     verifySelectedOnlySwitchStatus(true);
   });
 
-  it('Test that lanyard can only show selected when list is set not editable.', async () => {
+  it('Test that lanyard can only show selected when not the current owner.', async () => {
     const mockSelectedList = (selected: PinSelectionList): void => {
       expect(selected.id).toBe(nonEditableList.id);
-      expect(selected.editable).toBe(false);
+      expect(selected.ownerId).toBe('o123');
       expect(selected.availableIds.length).toBe(1);
       expect(selected.wantedIds.length).toBe(1);
     };
@@ -220,6 +238,7 @@ describe('PinSelectionListEditor', () => {
         activeLanyard={testLanyard}
         onChange={mockSelectedList}
         lanyardList={storedLanyardList}
+        userId='o222'
       />
     );
     const { queryByLabelText, getByRole } = render(component);

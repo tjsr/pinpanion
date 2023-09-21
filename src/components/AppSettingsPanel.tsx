@@ -1,5 +1,6 @@
 import '../css/settings.css';
 
+import { SEARCH_CONTROL_WIDTH, TEXT_INPUT_WIDTH } from '../globals';
 import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
 
 import { ApplicationSettings } from '../settingsStorage';
@@ -7,9 +8,9 @@ import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import React from 'react';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
 import { SizesType } from '../types';
 import Switch from '@mui/material/Switch';
+import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
@@ -78,6 +79,11 @@ type NewestFirstSettingProps = {
   setDescendingAge: (enabled: boolean) => void;
 };
 
+type DisplayNameSettingProps = {
+  displayName: string|undefined;
+  setUserDisplayName: (name: string) => void;
+}
+
 const SplitActiveAndWantedSetting = ({
   splitActiveAndWanted,
   setSplitActiveAndWanted,
@@ -119,6 +125,26 @@ const NewestFirstSetting = ({ descendingAge, setDescendingAge }: NewestFirstSett
   );
 };
 
+const DisplayNameSetting = ({ displayName, setUserDisplayName }: DisplayNameSettingProps): JSX.Element => {
+  return (
+    <>
+      <FormControl sx={{ m: 1, minWidth: TEXT_INPUT_WIDTH }}>
+        <TextField
+          className="textField"
+          id="displayName"
+          label="Display Name"
+          variant="outlined"
+          value={displayName || ''}
+          onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+            setUserDisplayName(event.target.value);
+            return true;
+          }}
+        />
+      </FormControl>
+    </>
+  );
+};
+
 export const AppSettingsPanel = ({ settings, updateSettings }: AppSettingsPanelProps): JSX.Element => {
   return (
     <>
@@ -140,6 +166,11 @@ export const AppSettingsPanel = ({ settings, updateSettings }: AppSettingsPanelP
             descendingAge={settings.descendingAge}
             setDescendingAge={(descendingAge) => updateSettings({ ...settings, descendingAge })}
           />
+        </div>
+        <div className="settingItem">
+          <DisplayNameSetting
+            displayName={settings.userDisplayName}
+            setUserDisplayName={(userDisplayName) => updateSettings({ ...settings, userDisplayName })} />
         </div>
       </div>
     </>

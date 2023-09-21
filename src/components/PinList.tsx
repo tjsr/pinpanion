@@ -1,13 +1,15 @@
 import '../css/pins.css';
 
 import { InfoSize, PIN_INFO_PANE_SIZES } from '../utils/sizingHints';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType } from '../types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
 import { FixedSizeGrid as Grid } from 'react-window';
 import { MemoizedPinInfo } from './PinInfo';
 import { PinListButtons } from './PinButtons';
 import React from 'react';
+import { getUserId } from '../settingsStorage';
+import { isEditable } from '../utils';
 import { newSelectionList } from '../fixture';
 import { removeOrAddId } from '../listutils';
 import useWindowDimensions from '../utils/useWindowDimensions';
@@ -23,6 +25,7 @@ interface PinListPropTypes {
   pins: Pin[];
   pinSets?: PinSet[];
   setPinSet?: (list: PinSelectionList) => void;
+  currentUserId: UserId;
 }
 
 interface GridPinRendererProps {
@@ -77,6 +80,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     activePinSet,
     isPinFiltered,
     setPinSet,
+    currentUserId,
   } = props;
   let displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
   if (descendingAge) {
@@ -89,7 +93,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     console.log(`Toggling pin ${pinId} available`);
     const availableIds: number[] = removeOrAddId(activePinSet?.availableIds, pinId);
     if (setPinSet) {
-      const base: PinSelectionList = activePinSet || newSelectionList();
+      const base: PinSelectionList = activePinSet || newSelectionList(getUserId());
       setPinSet({
         ...base,
         availableIds,
@@ -102,7 +106,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     console.log(`Toggling pin ${pinId} wanted`);
     const wantedIds: number[] = removeOrAddId(activePinSet?.wantedIds, pinId);
     if (setPinSet) {
-      const base: PinSelectionList = activePinSet || newSelectionList();
+      const base: PinSelectionList = activePinSet || newSelectionList(getUserId());
       setPinSet({
         ...base,
         revision: ++base.revision,
@@ -144,7 +148,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     return (
       <div className="pinInfoPadding" style={style}>
         <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-          {activePinSet?.editable && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && (
             <PinListButtons
               availableCount={countPinAvailable(pin.id)}
               wantedCount={countPinWanted(pin.id)}
@@ -171,7 +175,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
       {pins && displayedPins && (
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
-          {activePinSet?.editable && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
               <button className="pinNotWanted">W</button> to add to 'Wanted' list.

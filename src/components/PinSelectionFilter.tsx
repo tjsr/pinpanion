@@ -1,8 +1,9 @@
+import { PinSelectionList, UserId } from '../types';
+
 import Alert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
-import { PinSelectionList } from '../types';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
@@ -15,6 +16,7 @@ type PinSelectionProps = {
   onlyShowSelectedPins: boolean;
   onChange: (updatedList: PinSelectionList) => void;
   showSelectedOnlyToggleDisabled?: () => boolean;
+  currentUserId: UserId
 };
 
 export type PinSelectionFilterProps = {
@@ -24,6 +26,7 @@ export type PinSelectionFilterProps = {
   lanyardSelected: (lanyardId: string) => void;
   onChange: (updatedList: PinSelectionList) => void;
   storedLanyardList?: PinSelectionList[];
+  currentUserId: UserId;
 };
 
 export const PinSelectionEditor = ({
@@ -32,10 +35,11 @@ export const PinSelectionEditor = ({
   onlyShowSelectedPins,
   onChange,
   showSelectedOnlyToggleDisabled,
+  currentUserId,
 }: PinSelectionProps): JSX.Element => {
   if (!showSelectedOnlyToggleDisabled) {
     showSelectedOnlyToggleDisabled = () => {
-      return isEmptyList(activeLanyard) || !activeLanyard.editable;
+      return isEmptyList(activeLanyard) || activeLanyard.ownerId !== currentUserId;
     };
   }
 
@@ -122,7 +126,7 @@ export const PinSelectionEditor = ({
               label="Show selected pins only"
             />
           </FormControl>
-          {!activeLanyard.editable && (
+          {activeLanyard.ownerId !== currentUserId && (
             <Alert severity="info">This lanyard is not editable, so only selected pins will be shown.</Alert>
           )}
         </div>
@@ -138,6 +142,7 @@ export const PinSelectionListEditor = ({
   enableFilter,
   changeListDisplayed,
   storedLanyardList,
+  currentUserId,
 }: PinSelectionFilterProps): JSX.Element => {
   return (
     <>
@@ -155,6 +160,7 @@ export const PinSelectionListEditor = ({
         changeListDisplayed={(display: boolean) => changeListDisplayed(activeLanyard.id, display)}
         onChange={onChange}
         activeLanyard={activeLanyard}
+        currentUserId={currentUserId}
       />
     </>
   );

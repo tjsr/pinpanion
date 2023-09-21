@@ -94,6 +94,10 @@ div.selectionFilterItem, div.settingItem {
   align-self: center;
 }
 
+div.selectionFilterItem, div.settingItem, div.textField {
+  float: center;
+}
+
 div.filterInfo, div.pinSelectionFilter, div.setSelection, div.settingFields, div.pinSelectionList {
   display: block;
   padding: 0.4em;

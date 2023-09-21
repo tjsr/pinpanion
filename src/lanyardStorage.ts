@@ -1,3 +1,5 @@
+import { ApplicationSettings, getUserId, loadSettings } from './settingsStorage';
+
 import { PinSelectionList } from './types';
 import { sanitizePinList } from './utils';
 
@@ -27,13 +29,13 @@ export const getStoredLanyards = (): PinSelectionList[] => {
   return lanyards;
 };
 
-export const getStoredLanyard = (lanyardId: string): PinSelectionList| undefined => {
+export const getStoredLanyard = (lanyardId: string, settings: ApplicationSettings): PinSelectionList| undefined => {
   const data: string | null = localStorage.getItem(`lanyard.${lanyardId}`);
   if (null === data) {
     return undefined;
   }
   const output: PinSelectionList = JSON.parse(data);
-  sanitizePinList(output);
+  sanitizePinList(output, settings);
   return output;
 };
 
@@ -45,6 +47,9 @@ export const saveListToLocal = (list: PinSelectionList): void => {
   }
   if (hasNewerVersionStored(list.id, list.revision)) {
     throw Error('Already have a newer version of this list stored.');
+  }
+  if (list.ownerId === undefined) {
+    list.ownerId = getUserId();
   }
   localStorage.setItem(`lanyard.${list.id}`, JSON.stringify(list));
   return;
@@ -64,7 +69,8 @@ export const getActiveLanyardId = ():string|undefined => {
 
 export const getActiveLanyard = (): PinSelectionList|undefined => {
   const id: string|undefined = getActiveLanyardId();
+  const settings: ApplicationSettings = loadSettings();
   if (id) {
-    return getStoredLanyard(id);
+    return getStoredLanyard(id, settings);
   }
 };

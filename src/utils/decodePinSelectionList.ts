@@ -49,6 +49,12 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
     throw new Error('An imported PinSelectionList must have a name');
   }
 
+  if (params.has('o')) {
+    outputSet.ownerId = params.get('o')!;
+  } else {
+    throw new Error('An imported PinSelectionList must have an owner');
+  }
+
   if (params.has('a')) {
     const availableValue: string = params.get('a')!;
     try {

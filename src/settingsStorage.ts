@@ -1,15 +1,34 @@
-import { SizesType } from './types';
+import { SizesType, UserId } from './types';
+
+import { generateUserId } from './fixture';
+
+let userId: UserId;
+
+export const setUserId = (id: UserId) => {
+  userId = id;
+};
+
+export const getUserId = (): UserId => {
+  if (userId === undefined) {
+    userId = generateUserId();
+  }
+  return userId;
+};
 
 export type ApplicationSettings = {
   splitActiveAndWanted: boolean;
   descendingAge: boolean;
   displaySize: SizesType;
+  userDisplayName: string|undefined;
+  localUserId: string,
 };
 
 const DEFAULT_SETTINGS: ApplicationSettings = {
   descendingAge: true,
   displaySize: 'normal',
+  localUserId: generateUserId(),
   splitActiveAndWanted: true,
+  userDisplayName: undefined,
 };
 // export const getDisplaySize = (): SizesType => {
 //   return (localStorage.getItem('displaySize') as SizesType) || 'normal';
@@ -35,7 +54,14 @@ const DEFAULT_SETTINGS: ApplicationSettings = {
 // };
 export const loadSettings = (): ApplicationSettings => {
   const existingSettingsString: string | null = localStorage.getItem('settings');
-  const existingSettings = existingSettingsString ? JSON.parse(existingSettingsString) : DEFAULT_SETTINGS;
+  const existingSettings: ApplicationSettings = existingSettingsString ?
+    JSON.parse(existingSettingsString) : DEFAULT_SETTINGS;
+  if (existingSettings.localUserId === undefined) {
+    existingSettings.localUserId = getUserId();
+  }
+  if (userId === undefined) {
+    setUserId(existingSettings.localUserId);
+  }
   return existingSettings;
 };
 

@@ -1,4 +1,6 @@
-import { Pin, PinListFilter, PinSelectionList, SizesType } from './types';
+import { Pin, PinListFilter, PinSelectionList, SizesType, UserId } from './types';
+
+import { ApplicationSettings } from './settingsStorage';
 
 export const isEmpty = (value: string | undefined): boolean => {
   return value === undefined || value.trim() == '';
@@ -59,7 +61,7 @@ export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => 
   return false;
 };
 
-export const sanitizePinList = (pinList: PinSelectionList): void => {
+export const sanitizePinList = (pinList: PinSelectionList, settings: ApplicationSettings): void => {
   if (pinList.availableIds === undefined) {
     console.trace('A pin list passed to be updated had no availableIds array so is being corrected');
     pinList.availableIds = [];
@@ -68,5 +70,12 @@ export const sanitizePinList = (pinList: PinSelectionList): void => {
     console.trace('A pin list passed to be updated had no wantedIds array so is being corrected');
     pinList.wantedIds = [];
   }
+
+  if (pinList.ownerId === undefined) {
+    pinList.ownerId = settings.localUserId;
+  }
 };
 
+export const isEditable = (userId: UserId, pinList: PinSelectionList): boolean => {
+  return pinList.ownerId === userId;
+};
