@@ -123,7 +123,7 @@ const App = (): JSX.Element => {
 
   const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {
     console.log(JSON.stringify(lanyard));
-    if (lanyard.ownerId === applicationSettings.localUserId) {
+    if (lanyard.ownerId !== applicationSettings.localUserId) {
       console.debug('Set selection filter enabled to true because list is not editable');
       setSelectionFilterEnabled(true);
     } else if (

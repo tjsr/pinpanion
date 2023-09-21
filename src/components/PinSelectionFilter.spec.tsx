@@ -28,6 +28,7 @@ const verifySelectedOnlySwitchStatus = (showSeparateDisabled: boolean): void => 
   const selectedLabel: HTMLInputElement = screen.getByLabelText(/Show selected pins only/i) as HTMLInputElement;
   expect(selectedLabel).toBeInTheDocument();
   expect(selectedLabel.disabled).toBe(showSeparateDisabled);
+  expect(selectedLabel.value).toBe(showSeparateDisabled ? 'on' : 'off');
 };
 
 describe('PinSelectionEditor', () => {
