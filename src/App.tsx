@@ -13,6 +13,7 @@ import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
 import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
+import { PinCollectionData } from './pinnypals/pinnypals2convertor';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { decodePinSelectionHash } from './utils/decodePinSelectionList';
@@ -81,12 +82,16 @@ const App = (): JSX.Element => {
         const response = await fetch(PINS_CACHE_DATA_FILE, {
           mode: 'cors',
         });
-        const data: any = await response.json();
+        const data: PinCollectionData = await response.json();
         console.log(`Loaded pins list from ${PINS_CACHE_DATA_FILE}`);
 
         setPins(data.pins);
         setPinSets(data.sets);
-        setPaxs(data.paxs);
+        if (!data.pax || data?.pax.length === 0) {
+          console.warn('PAX event data received from server was an empty set.');
+        } else {
+          setPaxs(data.pax);
+        }
       } catch (err) {
         console.warn(`Failed while trying to fetch  ${PINS_CACHE_DATA_FILE} file: ${err}`);
       }
@@ -175,6 +180,9 @@ const App = (): JSX.Element => {
   }
 
   console.log(`Rendering ${pins?.length} pins`);
+  if (!paxs) {
+    console.warn('Got no PAX set when rendering pins.');
+  }
   return (
     <div className="App">
       <>

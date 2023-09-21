@@ -6,17 +6,17 @@
   },
   {
     "id": 1,
-    "description": "West",
+    "description": "PAX West",
     "cssClass": "West"
   },
   {
     "id": 2,
-    "description": "East",
+    "description": "PAX East",
     "cssClass": "East"
   },
   {
     "id": 3,
-    "description": "Aus",
+    "description": "PAX Aus",
     "cssClass": "Aus"
   },
   {
@@ -41,12 +41,12 @@
   },
   {
     "id": 8,
-    "description": "South",
+    "description": "PAX South",
     "cssClass": "South"
   },
   {
     "id": 9,
-    "description": "Unplugged",
+    "description": "PAX Unplugged",
     "cssClass": "Unplugged"
   }
 ]

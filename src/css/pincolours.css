@@ -8,6 +8,9 @@
   --pax-colour-online: #000;
   --pax-colour-unplugged: #90479A;
   --pax-colour-south: #DD5C1B;
+
+  --pax-text-light: #e1e1e1;
+  --pax-text-dark: #1e1e1e;
 }
 
 .paxWest {
@@ -23,7 +26,8 @@
 }
 
 .paxOnline {
-  background-color: var(--pax-colour-online)
+  background-color: var(--pax-colour-online);
+  color: var(--pax-text-light);
 }
 
 .paxStaff {
@@ -80,4 +84,13 @@
 
 .pinSouth {
   border-color: var(--pax-colour-south)
+}
+
+.pax {
+  font-weight: bold;
+  font-size: 0.8rem;
+  height: 1rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  overflow: hidden;
 }
