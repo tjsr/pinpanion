@@ -73,6 +73,8 @@ const App = (): JSX.Element => {
     if (activePinList && !isEmptyList(activePinList)) {
       setActiveLanyardId(activePinList.id);
       saveListToLocal(activePinList);
+    } else {
+      setSelectionFilterEnabled(false);
     }
   }, [activePinList]);
 
@@ -99,8 +101,10 @@ const App = (): JSX.Element => {
     const loadDefaultLanyard = async () => {
       let activeLanyard: PinSelectionList | undefined = getActiveLanyard();
       if (!activeLanyard) {
-        activeLanyard = newSelectionList(applicationSettings.localUserId);
         setSelectionFilterEnabled(false);
+      }
+      if (!activeLanyard) {
+        activeLanyard = newSelectionList(applicationSettings.localUserId);
       }
 
       const randomAnimal: string = activeLanyard ? activeLanyard.name : await generateRandomName();
@@ -122,18 +126,15 @@ const App = (): JSX.Element => {
   }, []);
 
   const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {
-    console.log(JSON.stringify(lanyard));
-    if (lanyard.ownerId !== applicationSettings.localUserId) {
-      console.debug('Set selection filter enabled to true because list is not editable');
-      setSelectionFilterEnabled(true);
-    } else if (
-      lanyard.availableIds === undefined ||
-      lanyard.availableIds.length == 0 ||
-      lanyard.wantedIds === undefined ||
-      lanyard.wantedIds.length == 0
+    if (
+      lanyard.availableIds?.length === 0 &&
+      lanyard.wantedIds?.length === 0
     ) {
       console.debug('Set selection filter enabled to false because list is empty');
       setSelectionFilterEnabled(false);
+    } else if (lanyard.ownerId !== applicationSettings.localUserId) {
+      console.debug('Set selection filter enabled to true because list is not editable');
+      setSelectionFilterEnabled(true);
     }
   };
 
@@ -212,7 +213,7 @@ const App = (): JSX.Element => {
               qrCode={<FilterQRCode lanyard={activePinList} />}
               pinSelectionFilter={
                 <PinSelectionListEditor
-                  enableFilter={selectionFilterEnabled}
+                  onlyShowSelectedPins={selectionFilterEnabled}
                   onChange={selectionListUpdated}
                   changeListDisplayed={(id: string, display: boolean) => {
                     // When the switch checkbox is toggled, set the show only marked pins selection to match.

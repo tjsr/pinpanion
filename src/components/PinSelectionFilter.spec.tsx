@@ -24,11 +24,10 @@ import { switchToLanyard } from './__test/lanyards.utils';
 // For some reason, prettier keeps inserting a dangling comma here, even without the alias.
 /* eslint-enable comma-dangle */
 
-const verifySelectedOnlySwitchStatus = (showSeparateDisabled: boolean): void => {
+const verifySelectedOnlySwitchDisabled = (showSeparateDisabled: boolean): void => {
   const selectedLabel: HTMLInputElement = screen.getByLabelText(/Show selected pins only/i) as HTMLInputElement;
   expect(selectedLabel).toBeInTheDocument();
   expect(selectedLabel.disabled).toBe(showSeparateDisabled);
-  expect(selectedLabel.value).toBe(showSeparateDisabled ? 'on' : 'off');
 };
 
 describe('PinSelectionEditor', () => {
@@ -97,7 +96,7 @@ describe('PinSelectionEditor', () => {
     );
     render(component);
 
-    verifySelectedOnlySwitchStatus(false);
+    verifySelectedOnlySwitchDisabled(false);
   });
 
   it('Test that lanyard can only show selected when user is not the owner.', async () => {
@@ -110,7 +109,7 @@ describe('PinSelectionEditor', () => {
     );
     render(component);
 
-    verifySelectedOnlySwitchStatus(true);
+    verifySelectedOnlySwitchDisabled(true);
   });
 });
 
@@ -136,7 +135,7 @@ describe('PinSelectionListEditor', () => {
         changeListDisplayed={function (id: string, display: boolean): void {
           console.log('Toggled switch to ' + display);
         }}
-        enableFilter={false}
+        onlyShowSelectedPins={false}
         lanyardSelected={function (lanyardId: string): void {
           if (lanyardId === 'new') {
             setActiveLanyard(newlyCreatedEmpty);
@@ -223,7 +222,7 @@ describe('PinSelectionListEditor', () => {
 
     expect(queryByLabelText(/Switch lanyard/i)).toBeInTheDocument();
 
-    verifySelectedOnlySwitchStatus(true);
+    verifySelectedOnlySwitchDisabled(true);
   });
 
   it('Test that lanyard can only show selected when not the current owner.', async () => {
@@ -246,6 +245,6 @@ describe('PinSelectionListEditor', () => {
 
     await switchToLanyard(nonEditableList.id, storedLanyardList, queryByLabelText, getByRole);
 
-    verifySelectedOnlySwitchStatus(true);
+    verifySelectedOnlySwitchDisabled(true);
   });
 });

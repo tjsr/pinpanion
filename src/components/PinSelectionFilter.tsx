@@ -22,7 +22,7 @@ type PinSelectionProps = {
 export type PinSelectionFilterProps = {
   activeLanyard: PinSelectionList;
   changeListDisplayed: (id: string, display: boolean) => void;
-  enableFilter: boolean;
+  onlyShowSelectedPins: boolean;
   lanyardSelected: (lanyardId: string) => void;
   onChange: (updatedList: PinSelectionList) => void;
   storedLanyardList?: PinSelectionList[];
@@ -139,7 +139,7 @@ export const PinSelectionListEditor = ({
   activeLanyard,
   lanyardSelected,
   onChange,
-  enableFilter,
+  onlyShowSelectedPins,
   changeListDisplayed,
   storedLanyardList,
   currentUserId,
@@ -156,7 +156,7 @@ export const PinSelectionListEditor = ({
       </div>
       <PinSelectionEditor
         key={activeLanyard.id}
-        onlyShowSelectedPins={enableFilter}
+        onlyShowSelectedPins={onlyShowSelectedPins}
         changeListDisplayed={(display: boolean) => changeListDisplayed(activeLanyard.id, display)}
         onChange={onChange}
         activeLanyard={activeLanyard}
