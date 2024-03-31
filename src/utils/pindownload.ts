@@ -1,9 +1,9 @@
 import { ALL_PINS_URL1, PINNYPALS1_IMAGE_PREFIX } from '../defaults';
 import { ConfigType, Pin, PinnypalsPinsRequest } from '../types';
 import { PinCollectionData, requestToDataSet } from '../pinnypals/pinnypals2convertor';
+import fetch, { Response } from 'node-fetch';
 
 import { Pinnypals2PinsRequest } from '../pinnypals/pinnypals2types';
-import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
 
@@ -25,13 +25,18 @@ const downloadFile = async (url: string, outputPath: string): Promise<void> => {
     fs.mkdirSync(dirName);
   }
 
-  const res = await fetch(url);
-  const fileStream = fs.createWriteStream(outputPath);
-  return new Promise((resolve, reject) => {
-    res.body?.pipe(fileStream);
-    res.body?.on('error', reject);
-    fileStream.on('finish', resolve);
-  });
+  const res: Response = await fetch(url);
+  if (res.status >= 400) {
+    console.debug(`Failed to download ${url} - status ${res.status}`);
+    return Promise.reject(new Error(`Failed to download ${url} - status ${res.status}`));
+  } else {
+    const fileStream = fs.createWriteStream(outputPath);
+    return new Promise((resolve, reject) => {
+      res.body?.pipe(fileStream);
+      res.body?.on('error', reject);
+      fileStream.on('finish', resolve);
+    });
+  }
 };
 
 let destinationPath: string = config.imageCacheDir;
