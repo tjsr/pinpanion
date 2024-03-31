@@ -3,7 +3,7 @@ import { Pin, PinListFilter, PinSelectionList, SizesType, UserId } from './types
 import { ApplicationSettings } from './settingsStorage';
 
 export const isEmpty = (value: string | undefined): boolean => {
-  return value === undefined || value.trim() == '';
+  return !value || value.trim() == '';
 };
 
 export const isEmptyList = (lanyard: PinSelectionList): boolean => {
