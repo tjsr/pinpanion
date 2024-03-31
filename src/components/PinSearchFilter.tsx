@@ -201,8 +201,13 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
     return true;
   }
 
+  const fuzzyChecks = [pin.name];
+  if (pin.year != null && pin.year !== undefined && pin.year > 0) {
+    fuzzyChecks.push(pin.year.toString());
+  }
+
   if (!isEmpty(filter?.filterText)) {
-    return fuzzy.filter(filter.filterText!, [pin.name, pin.year]).length === 0;
+    return fuzzy.filter(filter.filterText!, fuzzyChecks).length === 0;
   }
 
   return false;
