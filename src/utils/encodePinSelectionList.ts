@@ -5,6 +5,12 @@ import { findShareGaps } from './shareUrl';
 
 const ENABLE_COMPRESSED_LISTS = true;
 
+const pushLoggedRanges = (parts: string[], prefix: string, ranges: [number, number][]) => {
+  if (ranges.length > 0) {
+    parts.push(`${prefix}: ${ranges}`);
+  }
+};
+
 export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = false): string => {
   if (psl.availableIds === undefined) {
     console.debug('Input lanyard provided an illegal undefined availableIds');
@@ -46,18 +52,10 @@ export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = fals
   const logParts: string[] = [
     'Creating list with skipped values:',
   ];
-  if (availableSkipRanges.length > 0) {
-    logParts.push(`A: ${availableSkipRanges}`);
-  }
-  if (wantedSkipRanges.length > 0) {
-    logParts.push(`W: ${wantedSkipRanges}`);
-  }
-  if (availableSetSkipRanges.length > 0) {
-    logParts.push(`AS: ${availableSetSkipRanges}`);
-  }
-  if (wantedSetSkipRanges.length > 0) {
-    logParts.push(`WS: ${wantedSetSkipRanges}`);
-  }
+  pushLoggedRanges(logParts, 'A', availableSkipRanges);
+  pushLoggedRanges(logParts, 'W', wantedSkipRanges);
+  pushLoggedRanges(logParts, 'AS', availableSetSkipRanges);
+  pushLoggedRanges(logParts, 'WS', wantedSetSkipRanges);
   const logString: string = logParts.join(' ');
   console.debug(logString);
 
