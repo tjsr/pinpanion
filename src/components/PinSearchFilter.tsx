@@ -75,7 +75,7 @@ export const PinSearchFilterDisplay = ({
             id="startYear"
             selectedYear={filter?.startYear}
             minYear={config.minYear}
-            maxYear={config.maxYear}
+            maxYear={config.maxYear || new Date().getFullYear()}
             label="Earliest release year"
             yearChanged={(startYear: number) => {
               const updatedFilter = {
@@ -95,7 +95,7 @@ export const PinSearchFilterDisplay = ({
             id="endYear"
             selectedYear={filter?.endYear}
             minYear={config.minYear}
-            maxYear={config.maxYear}
+            maxYear={config.maxYear || new Date().getFullYear()}
             label="Latest release year"
             yearChanged={(endYear: number) => {
               const updatedFilter = {

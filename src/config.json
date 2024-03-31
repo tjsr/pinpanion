@@ -8,6 +8,6 @@
   "imagePrefix": "imgs",
   "imageCacheDir": "images",
   "minYear": 2013,
-  "maxYear": 2023,
+  "maxYear": null,
   "reverseYears": true
 }
