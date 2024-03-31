@@ -4,9 +4,9 @@ import './css/pins.css';
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
-import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
+import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList, isPinOnLanyard, sanitizePinList } from './utils';
+import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -248,6 +248,14 @@ const App = (): JSX.Element => {
                     return !isOnLanyard;
                   }
                   return isPinFiltered(pin, filter);
+                }}
+                isPinSetFiltered={(pinSet: PinSet) => {
+                  if (selectionFilterEnabled) {
+                    const isOnLanyard: boolean = isPinSetOnLanyard(pinSet, activePinList);
+                    return !isOnLanyard;
+                  }
+                  const pinsInSet: Pin[] = pins.filter((pin) => pin.set_id === pinSet.id);
+                  return isPinSetFiltered(pinSet, pinsInSet, filter);
                 }}
                 paxs={paxs}
                 pins={pins}

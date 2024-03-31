@@ -212,3 +212,31 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
 
   return false;
 };
+
+export const isPinSetFiltered = (pinSet: PinSet, pinsInSet: Pin[], filter?: PinListFilter): boolean => {
+  if (!filter) {
+    return false;
+  }
+  if (filter.startYear && pinSet.year < filter.startYear) {
+    return true;
+  }
+  if (filter.endYear && pinSet.year > filter.endYear) {
+    return true;
+  }
+  const hasPinInFilteredPax = pinsInSet.some((pin: Pin) => pin.pax_id == filter.paxId);
+  if (filter.paxId && !hasPinInFilteredPax) {
+    return true;
+  }
+
+  const fuzzyChecks = [pinSet.name];
+  if (pinSet.year != null && pinSet.year !== undefined && pinSet.year > 0) {
+    fuzzyChecks.push(pinSet.year.toString());
+  }
+
+  if (!isEmpty(filter?.filterText)) {
+    return fuzzy.filter(filter.filterText!, fuzzyChecks).length === 0;
+  }
+
+  return false;
+};
+

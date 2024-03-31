@@ -3,6 +3,7 @@ type SetId = number;
 type PinId = number;
 type Year = number;
 type ImageLocation = string;
+type isReprint = number;
 export type Pinnpypals2SetAlternative = [SetId, Year];
 export type Pinnypals2PaxIdentifier = [PaxId, string, string];
 export type Pinnypals2PinIdentifier = [
@@ -31,7 +32,7 @@ export type Pinnypals2SetIdentifier = [
   SetId,
   string,
   Year,
-  number,
+  isReprint,
   Pinnpypals2SetAlternative[],
   number,
   ImageLocation,

@@ -1,4 +1,4 @@
-import { Pin, PinListFilter, PinSelectionList, SizesType, UserId } from './types';
+import { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from './types';
 
 import { ApplicationSettings } from './settingsStorage';
 
@@ -40,6 +40,13 @@ export const getPinClassForSize = (size: SizesType): string => {
   return `pin pin-${size}`;
 };
 
+export const getPinSetClassForSize = (size: SizesType): string => {
+  if (['tiny', 'sm', 'normal', 'large'].indexOf(size as string) < 0) {
+    return 'pinSet set-normal';
+  }
+  return `pinSet set-${size}`;
+};
+
 export const getMin = (input: number[]): number => {
   return input.reduce((prev, current) => {
     return prev != undefined && prev < current ? prev : current;
@@ -56,6 +63,16 @@ export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => 
     return true;
   }
   if (lanyard.wantedIds !== undefined && lanyard.wantedIds.includes(+pin.id)) {
+    return true;
+  }
+  return false;
+};
+
+export const isPinSetOnLanyard = (pinSet: PinSet, lanyard: PinSelectionList): boolean => {
+  if (lanyard.availableSetIds !== undefined && lanyard.availableSetIds.includes(+pinSet.id)) {
+    return true;
+  }
+  if (lanyard.wantedSetIds !== undefined && lanyard.wantedSetIds.includes(+pinSet.id)) {
     return true;
   }
   return false;

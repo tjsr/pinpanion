@@ -15,11 +15,13 @@ export const generateUserId = (): string => {
 
 const EMPTY_SELECTION_LIST: PinSelectionList = {
   availableIds: [],
+  availableSetIds: [],
   id: generateListId(),
   name: 'New list',
   ownerId: generateUserId(),
   revision: 0,
   wantedIds: [],
+  wantedSetIds: [],
 };
 
 export const newSelectionList = (ownerId: UserId): PinSelectionList => {

@@ -6,8 +6,9 @@ type PinListButtonsProps = {
   availableCount: number;
   wantedCount: number;
   pinId: number;
-  setPinWanted: (pinId: number) => void;
-  setPinAvailable: (pinId: number) => void;
+  isPinSet: boolean;
+  setPinWanted: (pinId: number, isPinSet: boolean) => void;
+  setPinAvailable: (pinId: number, isPinSet: boolean) => void;
 };
 
 export class PinListButtons extends React.Component<PinListButtonsProps> {
@@ -27,32 +28,34 @@ export class PinListButtons extends React.Component<PinListButtonsProps> {
   }
 
   render() {
-    const { availableCount, wantedCount, pinId, setPinWanted, setPinAvailable } = this.props;
+    const { availableCount, wantedCount, pinId, isPinSet, setPinWanted, setPinAvailable } = this.props;
 
     const isAvailable: boolean = availableCount > 0;
     const availableClasses: string = isAvailable ? 'availableButton' : 'availableButton pinNotAvailable';
 
     const isWanted: boolean = wantedCount > 0;
     const wantedClasses: string = isWanted ? 'wantedButton' : 'wantedButton pinNotWanted';
+    const availableButtonId = 'available' + (isPinSet ? '_set_' : '_') + pinId;
+    const wantedButtonId = 'wanted' + (isPinSet ? '_set_' : '_') + pinId;
 
     return (
       <div className="listButtons">
         <button
           className={availableClasses}
-          id={`available_${pinId}`}
+          id={availableButtonId}
           value={pinId}
           onClick={() => {
-            setPinAvailable(pinId);
+            setPinAvailable(pinId, isPinSet);
           }}
         >
           A
         </button>
         <button
           className={wantedClasses}
-          id={`wanted_${pinId}`}
+          id={wantedButtonId}
           value={pinId}
           onClick={() => {
-            setPinWanted(pinId);
+            setPinWanted(pinId, isPinSet);
           }}
         >
           W

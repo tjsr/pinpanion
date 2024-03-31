@@ -65,3 +65,4 @@ export const PinInfo = ({
 };
 
 export const MemoizedPinInfo: React.NamedExoticComponent<PinInfoPropTypes> = React.memo<PinInfoPropTypes>(PinInfo);
+

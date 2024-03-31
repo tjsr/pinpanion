@@ -1,0 +1,43 @@
+div.setpin {
+  display: inline-table;
+  /* height: 4em; */
+  width: 5.0em;
+}
+
+div.setpin img.pinImage {
+  max-height: 70px;
+  max-width: 70px;
+  /* padding: 0.2em; */
+  /* display: inline-block; */
+}
+
+div.pinSet h3 {
+  margin-top: 0.2em;
+  /* height: 2.5rem; */
+  overflow: hidden;
+  font-size: 0.8em;
+  margin-block-end: 0em;
+}
+
+.pinSet {
+  display: inline-table;
+  margin: 2px;
+  background-color: #d0d0d0;
+  border: 2px solid;
+}
+
+.set-tiny {
+  width: 12rem;
+}
+
+.set-sm {
+  width: 16rem;
+}
+
+.set-normal {
+  width: 24rem;
+}
+
+.set-large {
+  width: 28rem;
+}
