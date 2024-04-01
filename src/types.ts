@@ -1,6 +1,6 @@
 type uuid = string;
 export type UserId = uuid;
-type PAXId = number;
+export type PAXId = number;
 type PublishYear = number;
 type PinSetId = number;
 type PinId = number;

@@ -240,6 +240,7 @@ const App = (): JSX.Element => {
             />
             {applicationSettings.splitActiveAndWanted && selectionFilterEnabled ? (
               <LanyardPinList
+                allPins={pins}
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 heading={`Lanyard for ${activePinList.name}`}
@@ -249,6 +250,8 @@ const App = (): JSX.Element => {
                 pinSets={pinSets}
                 showInSets={showInSets}
                 setShowInSets={setShowInSets}
+                availableSets={pinSets.filter((ps) => activePinList.availableSetIds?.includes(+ps.id))}
+                wantedSets={pinSets.filter((ps) => activePinList.wantedSetIds?.includes(+ps.id))}
               />
             ) : (
               <PinList

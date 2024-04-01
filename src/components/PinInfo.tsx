@@ -16,7 +16,7 @@ type PinInfoPropTypes = {
   style?: any;
 };
 
-const getPaxCssClass = (prefix: string, paxId: number): string => {
+export const getPaxCssClass = (prefix: string, paxId: number): string => {
   return prefix + eventnames[paxId].cssClass;
 };
 

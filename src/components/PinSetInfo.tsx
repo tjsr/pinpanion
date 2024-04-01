@@ -1,10 +1,11 @@
 import '../css/pinSetInfo.css';
 
-import { PAX, Pin, PinSet, SizesType } from '../types';
+import { PAX, PAXId, Pin, PinSet, SizesType } from '../types';
+import { PinInfo, getPaxCssClass } from './PinInfo';
 
-import { PinInfo } from './PinInfo';
 import React from 'react';
 import config from '../config.json';
+import eventnames from '../eventnames.json';
 import { getPinSetClassForSize } from '../utils';
 
 type PinSetInfoPropTypes = {
@@ -32,7 +33,27 @@ export const PinSetInfo = ({
   for (let i = 0;i < pinSetPins.length;i += rowSize) {
     chunkedPinSets.push(pinSetPins.slice(i, i + rowSize));
   }
-  return <><div className={setClasses}><h3>{pinSet.name}</h3>
+
+  // let pinClasses = getPinSetClassForSize(displaySize);
+  let paxCssClass = 'pax';
+  // let setCssClass = 'set';
+
+  const getPaxIdFromPinsInSet = (pinsInSet: Pin[]): PAXId => {
+    return pinsInSet[0].pax_id;
+  };
+
+  const paxId = getPaxIdFromPinsInSet(pinSetPins) || 0;
+
+  if (paxId > 0) {
+    // pinClasses = pinClasses + ' ' + getPaxCssClass('pin', paxId);
+    paxCssClass = paxCssClass + ' ' + getPaxCssClass('pax', paxId);
+    // setCssClass = setCssClass + ' ' + getPaxCssClass('pax', paxId);
+  }
+
+  return <><div className={setClasses}>
+    <h3>{pinSet.name}</h3>
+    <div className={paxCssClass}>{eventnames[paxId].description} {pinSet.year}</div>
+
     <div className='setpins'>
       {chunkedPinSets.map((rowinSetPins: Pin[], index: number) => {
         return (
