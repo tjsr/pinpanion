@@ -112,6 +112,49 @@ export const PinSelectionEditor = ({
         </div>
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <TextField
+              id="selectedSets"
+              label="Wanted Sets"
+              variant="outlined"
+              value={activeLanyard.wantedSetIds}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const wantedSetIds: number[] = filterStringToIds(event.target.value);
+
+                const updatedList: PinSelectionList = {
+                  ...activeLanyard,
+                  availableSetIds: activeLanyard.availableSetIds === undefined ? [] : activeLanyard.availableSetIds,
+                  revision: activeLanyard.revision + 1,
+                  wantedSetIds: wantedSetIds === undefined ? [] : wantedSetIds,
+                };
+                onChange(updatedList);
+                return true;
+              }}
+            />
+          </FormControl>
+        </div>
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
+            <TextField
+              id="selectedSets"
+              label="Available Sets"
+              variant="outlined"
+              value={activeLanyard.availableSetIds}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                const availableSetIds: number[] = filterStringToIds(event.target.value);
+                const updatedList: PinSelectionList = {
+                  ...activeLanyard,
+                  availableSetIds: availableSetIds,
+                  revision: activeLanyard.revision + 1,
+                  wantedSetIds: activeLanyard.wantedSetIds === undefined ? [] : activeLanyard.wantedSetIds,
+                };
+                onChange(updatedList);
+                return true;
+              }}
+            />
+          </FormControl>
+        </div>
+        <div className="selectionFilterItem">
+          <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <FormControlLabel
               control={
                 <Switch
