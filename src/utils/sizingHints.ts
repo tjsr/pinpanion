@@ -17,3 +17,9 @@ SET_INFO_PANE_SIZES.set('tiny', { bottomPaddingPixels: 4, heightPx: 164, widthEm
 SET_INFO_PANE_SIZES.set('sm', { bottomPaddingPixels: 4, heightPx: 204, widthEm: 9.6 });
 SET_INFO_PANE_SIZES.set('normal', { bottomPaddingPixels: 4, heightPx: 284, widthEm: 14 });
 SET_INFO_PANE_SIZES.set('large', { bottomPaddingPixels: 4, heightPx: 344, widthEm: 20 });
+
+export const BUTTON_SIZES = new Map<string, number>();
+BUTTON_SIZES.set('tiny', 32);
+BUTTON_SIZES.set('sm', 32);
+BUTTON_SIZES.set('normal', 48);
+BUTTON_SIZES.set('large', 64);

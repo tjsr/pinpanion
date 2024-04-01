@@ -1,6 +1,6 @@
 import '../css/pins.css';
 
-import { InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
+import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
@@ -118,6 +118,8 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
 
+  const [hideCollectionButtons, setHideCollectionButtons] = React.useState<boolean>(false);
+
   const togglePinAvailable = (pinId: number, isPinSet: boolean): void => {
     console.log(`Toggling ${isPinSet ? 'set' : 'pin'} ${pinId} available`);
     const availableIds: number[] = removeOrAddId(
@@ -184,7 +186,8 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const requestedWidth = columnWidth * COLUMN_COUNT;
 
   const rowHeight = getPinInfoRowHeight(displaySize);
-  const setRowHeight = getPinSetInfoRowHeight(displaySize);
+  const setRowHeight = getPinSetInfoRowHeight(displaySize) -
+    (hideCollectionButtons ? (BUTTON_SIZES.get(displaySize) || 32) : 0);
 
   const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
   const SET_ROW_COUNT = Math.round(displayedPinSets.length / COLUMN_COUNT) + 1;
@@ -200,7 +203,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     return (
       <div className="pinInfoPadding" style={style}>
         <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-          {activePinSet && isEditable(currentUserId, activePinSet) && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
             <PinListButtons
               availableCount={countPinAvailable(pin.id)}
               wantedCount={countPinWanted(pin.id)}
@@ -234,7 +237,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
           pinSets={pinSets}
           pinSet={pinSet}
           pinSetPins={setPins}>
-          {activePinSet && isEditable(currentUserId, activePinSet) && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
             <PinListButtons
               availableCount={countPinAvailable(pinSet.id, true)}
               wantedCount={countPinWanted(pinSet.id, true)}
@@ -264,12 +267,14 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
           { showInSets ? <div className="totalPins">Total sets: {displayedPinSets.length}</div> : <></> }
-          {activePinSet && isEditable(currentUserId, activePinSet) && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
               <button className="pinNotWanted">W</button> to add to 'Wanted' list.
+              [<a onClick={() => setHideCollectionButtons(true)}>Hide buttons</a>]
             </div>
           )}
+          { hideCollectionButtons && <a onClick={() => setHideCollectionButtons(false)}>Show buttons</a> }
           { showInSets ?
             <Grid
               columnCount={SET_COLUMN_COUNT}
