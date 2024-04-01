@@ -29,6 +29,7 @@ interface PinListPropTypes {
   setPinSet?: (list: PinSelectionList) => void;
   currentUserId: UserId;
   showInSets?: boolean;
+  setShowInSets: (showInSets: boolean) => void;
 }
 
 interface GridPinRendererProps {
@@ -105,6 +106,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     setPinSet,
     currentUserId,
     showInSets = true,
+    setShowInSets,
   } = props;
   let displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
   let displayedPinSets: PinSet[] = pinSets?.filter((pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) &&
@@ -252,6 +254,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   return (
     <>
       <h2>{heading}</h2>
+      <a onClick={() => setShowInSets(!showInSets)}>Switch to {showInSets ? 'pins' : 'sets'}</a>
       {activePinSet && (
         <div className="printqr">
           <FilterQRCode lanyard={activePinSet} />
@@ -260,6 +263,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
       {pins && displayedPins && (
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
+          { showInSets ? <div className="totalPins">Total sets: {displayedPinSets.length}</div> : <></> }
           {activePinSet && isEditable(currentUserId, activePinSet) && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}

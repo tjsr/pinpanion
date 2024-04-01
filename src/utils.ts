@@ -13,7 +13,7 @@ export const isEmptyList = (lanyard: PinSelectionList): boolean => {
   );
 };
 
-export const countFilters = (filter: PinListFilter): number => {
+export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): number => {
   let filters = 0;
   if (filter.endYear) {
     filters++;
@@ -24,10 +24,10 @@ export const countFilters = (filter: PinListFilter): number => {
   if (!isEmpty(filter.filterText)) {
     filters++;
   }
-  if (filter?.paxId !== undefined && filter?.paxId > 0) {
+  if (!filteredSetsOnly && filter?.paxId !== undefined && filter?.paxId > 0) {
     filters++;
   }
-  if (filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
+  if (filteredSetsOnly && filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
     filters++;
   }
   return filters;

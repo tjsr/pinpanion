@@ -28,6 +28,8 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
+  const [showInSets, setShowInSets] = useState<boolean>(false);
+
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hash, setHash] = React.useState(() => window.location.hash);
@@ -158,6 +160,16 @@ const App = (): JSX.Element => {
     }
   };
 
+  const getSetListHeading = (): string => {
+    if (selectionFilterEnabled) {
+      return 'Selected sets';
+    } else if (countFilters(filter, showInSets)) {
+      return 'Filtered sets';
+    } else {
+      return 'Pin Set list';
+    }
+  };
+
   const lanyardSelected = async (lanyardId: string): Promise<void> => {
     console.log('Lanyard: ', lanyardId);
     const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId, applicationSettings);
@@ -184,6 +196,7 @@ const App = (): JSX.Element => {
   if (!paxs) {
     console.warn('Got no PAX set when rendering pins.');
   }
+
   return (
     <div className="App">
       <>
@@ -234,6 +247,8 @@ const App = (): JSX.Element => {
                 wantedPins={pins.filter((p) => activePinList.wantedIds?.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets}
+                showInSets={showInSets}
+                setShowInSets={setShowInSets}
               />
             ) : (
               <PinList
@@ -241,7 +256,7 @@ const App = (): JSX.Element => {
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 filter={filter}
-                heading={getPinListHeading()}
+                heading={showInSets ? getSetListHeading() : getPinListHeading()}
                 isPinFiltered={(pin: Pin) => {
                   if (selectionFilterEnabled) {
                     const isOnLanyard: boolean = isPinOnLanyard(pin, activePinList);
@@ -262,6 +277,8 @@ const App = (): JSX.Element => {
                 pinSets={pinSets}
                 setPinSet={selectionListUpdated}
                 currentUserId={applicationSettings.localUserId}
+                showInSets={showInSets}
+                setShowInSets={setShowInSets}
               />
             )}
           </>
