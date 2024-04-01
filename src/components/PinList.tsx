@@ -167,14 +167,22 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   const countPinAvailable = (pinId: number, isPinSet?: boolean): number => {
     if (activePinSet) {
-      return (isPinSet ? activePinSet?.availableSetIds : activePinSet.availableIds).filter((n) => +n === +pinId).length;
+      let safePinSet = (isPinSet ? activePinSet?.availableSetIds : activePinSet.availableIds);
+      if (safePinSet === undefined) {
+        safePinSet = [];
+      }
+      return safePinSet.filter((n) => +n === +pinId).length;
     }
     return 0;
   };
 
   const countPinWanted = (pinId: number, isPinSet?: boolean): number => {
     if (activePinSet) {
-      return (isPinSet ? activePinSet?.wantedSetIds : activePinSet?.wantedIds).filter((n) => +n === +pinId).length;
+      let safePinSet = (isPinSet ? activePinSet?.wantedSetIds : activePinSet?.wantedIds);
+      if (safePinSet === undefined) {
+        safePinSet = [];
+      }
+      return safePinSet.filter((n) => +n === +pinId).length;
     }
     return 0;
   };
