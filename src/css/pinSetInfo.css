@@ -57,17 +57,18 @@ div.pinSet {
   margin-bottom: 0.5em
 }
 
-div.pinSet > h3 {
+div.pinSet h3 {
   margin-top: 0.2em;
   /* height: 2.5rem; */
   overflow: hidden;
   font-size: 0.8em;
-  margin-block-end: 0em;
+  margin-block-end: 0.2rem;
+  max-height: 1rem;
 }
 
-/* div.pinSet div.set-tiny > h3 {
-  scale: 0.6;
-} */
+div.pinSet.set-tiny h3 {
+  overflow: hidden;
+}
 
 .pinSet div.listButtons {
   bottom: 0;
@@ -92,20 +93,21 @@ div.pinSet > h3 {
 
 .set-sm {
   max-width: 10rem;
-  min-height: 6em;
-  max-height: 12em;
+  min-height: 6.2em;
+  max-height: 12.5em;
   /* scale: 0.8; */
 }
 
 .set-normal {
-  min-height: 2em;
-  max-height: 16em;
+  min-height: 8.5em;
+  max-height: 17.5em;
   max-width: 16rem;
   /* scale: 1.0; */
 }
 
 .set-large {
-  max-height: 20rem;
+  min-height: 12rem;
+  max-height: 21.2rem;
   max-width: 24rem;
   /* scale: 1.25; */
 }

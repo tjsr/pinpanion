@@ -14,6 +14,6 @@ PIN_INFO_PANE_SIZES.set('large', { heightPx: 400, widthEm: 14 });
 export const SET_INFO_PANE_SIZES = new Map<string, InfoSize>();
 
 SET_INFO_PANE_SIZES.set('tiny', { bottomPaddingPixels: 4, heightPx: 164, widthEm: 7.5 });
-SET_INFO_PANE_SIZES.set('sm', { bottomPaddingPixels: 4, heightPx: 198, widthEm: 9.6 });
-SET_INFO_PANE_SIZES.set('normal', { bottomPaddingPixels: 4, heightPx: 260, widthEm: 14 });
-SET_INFO_PANE_SIZES.set('large', { bottomPaddingPixels: 4, heightPx: 326, widthEm: 20 });
+SET_INFO_PANE_SIZES.set('sm', { bottomPaddingPixels: 4, heightPx: 204, widthEm: 9.6 });
+SET_INFO_PANE_SIZES.set('normal', { bottomPaddingPixels: 4, heightPx: 284, widthEm: 14 });
+SET_INFO_PANE_SIZES.set('large', { bottomPaddingPixels: 4, heightPx: 344, widthEm: 20 });
