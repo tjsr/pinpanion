@@ -3,7 +3,7 @@
 } */
 
 div.set-tiny div.setpins {
-  max-width: 7em;
+  /* max-width: 7em; */
   display: inline-block;
 }
 
@@ -53,6 +53,10 @@ div.setpins img.pinImage {
   /* display: inline-block; */
 }
 
+div.pinSet {
+  margin-bottom: 0.5em
+}
+
 div.pinSet > h3 {
   margin-top: 0.2em;
   /* height: 2.5rem; */
@@ -61,9 +65,9 @@ div.pinSet > h3 {
   margin-block-end: 0em;
 }
 
-div.pinSet div.set-tiny > h3 {
+/* div.pinSet div.set-tiny > h3 {
   scale: 0.6;
-}
+} */
 
 .pinSet div.listButtons {
   bottom: 0;
@@ -79,22 +83,33 @@ div.pinSet div.set-tiny > h3 {
   height: 100%;
 }
 
-h1.set-tiny {
-  width: 12rem;
+.set-tiny {
+  max-width: 8rem;
+  min-height: 6em;
+  max-height: 10em;
   /* scale: 0.6; */
 }
 
-h1.set-sm {
-  width: 16rem;
+.set-sm {
+  max-width: 10rem;
+  min-height: 6em;
+  max-height: 12em;
   /* scale: 0.8; */
 }
 
-h1.set-normal {
-  width: 24rem;
+.set-normal {
+  min-height: 2em;
+  max-height: 16em;
+  max-width: 16rem;
   /* scale: 1.0; */
 }
 
-h1.set-large {
-  width: 28rem;
+.set-large {
+  max-height: 20rem;
+  max-width: 24rem;
   /* scale: 1.25; */
+}
+
+div.availableSets div.pinSet {
+  display: inline-block;
 }

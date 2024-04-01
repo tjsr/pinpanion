@@ -80,7 +80,7 @@ const getPinInfoRowHeight = (displaySize: SizesType): number => {
   if (!sizeInfo) {
     sizeInfo = { heightPx: 120, widthEm: 10 };
   }
-  return sizeInfo.heightPx;
+  return sizeInfo.heightPx + (sizeInfo.bottomPaddingPixels || 0);
 };
 
 const getPinSetInfoRowHeight = (displaySize: SizesType): number => {
@@ -88,7 +88,7 @@ const getPinSetInfoRowHeight = (displaySize: SizesType): number => {
   if (!sizeInfo) {
     sizeInfo = { heightPx: 240, widthEm: 20 };
   }
-  return sizeInfo.heightPx;
+  return sizeInfo.heightPx + (sizeInfo.bottomPaddingPixels || 0);
 };
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {
