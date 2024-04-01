@@ -113,6 +113,6 @@ div.pinSet.set-tiny h3 {
   /* scale: 1.25; */
 }
 
-div.availableSets div.pinSet {
+div.availableSets div.pinSet, div.wantedSets div.pinSet {
   display: inline-block;
 }
