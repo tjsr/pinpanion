@@ -5,6 +5,12 @@ import { findShareGaps } from './shareUrl';
 
 const ENABLE_COMPRESSED_LISTS = true;
 
+const pushLoggedIds = (parts: string[], prefix: string, ids: number[]) => {
+  if (ids.length > 0) {
+    parts.push(`${prefix}: ${ids}`);
+  }
+};
+
 const pushLoggedRanges = (parts: string[], prefix: string, ranges: [number, number][]) => {
   if (ranges.length > 0) {
     parts.push(`${prefix}: ${ranges}`);
@@ -44,15 +50,23 @@ export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = fals
   const safeWantedSetIds: number[] = safeOrEmptyList(psl.wantedSetIds);
   const wantedSetSkipRanges:[number, number][] = findShareGaps(safeWantedSetIds);
 
-  const logParts: string[] = [
+  const listLogParts: string[] = [
     'Creating list with skipped values:',
   ];
-  pushLoggedRanges(logParts, 'A', availableSkipRanges);
-  pushLoggedRanges(logParts, 'W', wantedSkipRanges);
-  pushLoggedRanges(logParts, 'AS', availableSetSkipRanges);
-  pushLoggedRanges(logParts, 'WS', wantedSetSkipRanges);
-  const logString: string = logParts.join(' ');
-  if (logParts.length > 1) {
+  pushLoggedIds(listLogParts, 'a', safeAvailableIds);
+  pushLoggedIds(listLogParts, 'w', safeWantedIds);
+  pushLoggedIds(listLogParts, 'as', safeAvailableSetIds);
+  pushLoggedIds(listLogParts, 'ws', safeWantedSetIds);
+
+  const skippedLogParts: string[] = [
+    'Creating list with skipped values:',
+  ];
+  pushLoggedRanges(skippedLogParts, 'A', availableSkipRanges);
+  pushLoggedRanges(skippedLogParts, 'W', wantedSkipRanges);
+  pushLoggedRanges(skippedLogParts, 'AS', availableSetSkipRanges);
+  pushLoggedRanges(skippedLogParts, 'WS', wantedSetSkipRanges);
+  const logString: string = skippedLogParts.join(' ');
+  if (skippedLogParts.length > 1) {
     console.debug(logString);
   }
 
@@ -72,7 +86,6 @@ export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = fals
       params.a = availableString;
     }
     if (safeWantedIds.length > 0) {
-      console.trace(safeWantedIds);
       const wantedString: string = ENABLE_COMPRESSED_LISTS && wantedSkipRanges.length > 0 ?
         generateCompressedStringWithHeader(safeWantedIds, wantedSkipRanges) :
         numberArrayToEncodedString(safeWantedIds);

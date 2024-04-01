@@ -70,6 +70,21 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
     outputSet.availableIds = [];
   }
 
+  if (params.has('as')) {
+    const availableValue: string = params.get('as')!;
+    try {
+      const decodedAvailable: number[] = ENABLE_COMPRESSED_LISTS ?
+        extractCompressedBitstring(availableValue) :
+        stringToNumberArray(availableValue);
+      outputSet.availableSetIds = decodedAvailable;
+    } catch (err) {
+      console.error(`Failed while decoding available set lanyard data "${availableValue}"`, err);
+      throw err;
+    }
+  } else {
+    outputSet.availableSetIds = [];
+  }
+
   if (params.has('w')) {
     const wantedValue: string = params.get('w')!;
     try {
@@ -83,6 +98,21 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
     }
   } else {
     outputSet.wantedIds = [];
+  }
+
+  if (params.has('ws')) {
+    const wantedValue: string = params.get('w')!;
+    try {
+      const decodedWanted: number[] = ENABLE_COMPRESSED_LISTS ?
+        extractCompressedBitstring(wantedValue) :
+        stringToNumberArray(wantedValue);
+      outputSet.wantedSetIds = decodedWanted;
+    } catch (err) {
+      console.error(`Failed while decoding wanted set lanyard data "${wantedValue}"`, err);
+      throw err;
+    }
+  } else {
+    outputSet.wantedSetIds = [];
   }
 
   return outputSet;
