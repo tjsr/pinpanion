@@ -21,12 +21,10 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
   const [clipboardCopyDisplayed, setClipboardCopyDisplayed] = useState<boolean>(false);
 
   const AUTOHIDE_DURATION = 5000;
-  const generateQrCode = (): string => {
-    return createShareUrl(lanyard, true);
-  };
+  const generatedQrCode:string = createShareUrl(lanyard, true);
 
   const copyLinkToClipboard = (): void => {
-    navigator.clipboard.writeText(generateQrCode());
+    navigator.clipboard.writeText(generatedQrCode);
     setClipboardCopyDisplayed(true);
   };
 
@@ -49,7 +47,7 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
           <QRCode
             size={QR_CODE_SIZE}
             className="selectionQrCode"
-            value={generateQrCode()}
+            value={generatedQrCode}
             level="H"
             viewBox={`0 0 ${QR_CODE_SIZE} ${QR_CODE_SIZE}`}
           />
@@ -71,7 +69,7 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
             variant="filled"
             name="shareUrl"
             id="shareUrl"
-            defaultValue={generateQrCode()}
+            defaultValue={generatedQrCode}
           />
         </div>
         <div className="shareUrlCopyIcon">
