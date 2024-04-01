@@ -4,9 +4,9 @@ import './css/pins.css';
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
-import { PinSearchFilterDisplay, isPinFiltered } from './components/PinSearchFilter';
+import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList, isPinOnLanyard, sanitizePinList } from './utils';
+import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -28,6 +28,8 @@ const App = (): JSX.Element => {
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
+  const [showInSets, setShowInSets] = useState<boolean>(false);
+
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [hash, setHash] = React.useState(() => window.location.hash);
@@ -158,6 +160,16 @@ const App = (): JSX.Element => {
     }
   };
 
+  const getSetListHeading = (): string => {
+    if (selectionFilterEnabled) {
+      return 'Selected sets';
+    } else if (countFilters(filter, showInSets)) {
+      return 'Filtered sets';
+    } else {
+      return 'Pin Set list';
+    }
+  };
+
   const lanyardSelected = async (lanyardId: string): Promise<void> => {
     console.log('Lanyard: ', lanyardId);
     const lanyard: PinSelectionList | undefined = getStoredLanyard(lanyardId, applicationSettings);
@@ -184,6 +196,7 @@ const App = (): JSX.Element => {
   if (!paxs) {
     console.warn('Got no PAX set when rendering pins.');
   }
+
   return (
     <div className="App">
       <>
@@ -234,6 +247,8 @@ const App = (): JSX.Element => {
                 wantedPins={pins.filter((p) => activePinList.wantedIds?.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets}
+                showInSets={showInSets}
+                setShowInSets={setShowInSets}
               />
             ) : (
               <PinList
@@ -241,7 +256,7 @@ const App = (): JSX.Element => {
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 filter={filter}
-                heading={getPinListHeading()}
+                heading={showInSets ? getSetListHeading() : getPinListHeading()}
                 isPinFiltered={(pin: Pin) => {
                   if (selectionFilterEnabled) {
                     const isOnLanyard: boolean = isPinOnLanyard(pin, activePinList);
@@ -249,11 +264,21 @@ const App = (): JSX.Element => {
                   }
                   return isPinFiltered(pin, filter);
                 }}
+                isPinSetFiltered={(pinSet: PinSet) => {
+                  if (selectionFilterEnabled) {
+                    const isOnLanyard: boolean = isPinSetOnLanyard(pinSet, activePinList);
+                    return !isOnLanyard;
+                  }
+                  const pinsInSet: Pin[] = pins.filter((pin) => pin.set_id === pinSet.id);
+                  return isPinSetFiltered(pinSet, pinsInSet, filter);
+                }}
                 paxs={paxs}
                 pins={pins}
                 pinSets={pinSets}
                 setPinSet={selectionListUpdated}
                 currentUserId={applicationSettings.localUserId}
+                showInSets={showInSets}
+                setShowInSets={setShowInSets}
               />
             )}
           </>

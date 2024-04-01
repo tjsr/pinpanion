@@ -12,6 +12,8 @@ type LanyardPinListPropTypes = {
   wantedPins: Pin[];
   paxs: PAX[];
   pinSets: PinSet[];
+  showInSets: boolean;
+  setShowInSets: (showInSets: boolean) => void;
 };
 
 export const LanyardPinList = ({
@@ -22,6 +24,8 @@ export const LanyardPinList = ({
   paxs,
   pinSets,
   wantedPins,
+  showInSets,
+  setShowInSets,
 }: LanyardPinListPropTypes): JSX.Element => {
   const displayedAvailable: Pin[] = descendingAge
     ? availablePins.sort((a: Pin, b: Pin) => b.id - a.id)

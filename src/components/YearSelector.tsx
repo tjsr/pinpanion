@@ -8,7 +8,7 @@ import config from '../config.json';
 
 type YearSelectorProps = {
   minYear: number;
-  maxYear?: number;
+  maxYear?: number | null;
   selectedYear?: number;
   yearChanged: (year: number) => void;
   id?: string;

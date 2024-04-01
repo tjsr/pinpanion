@@ -1,11 +1,12 @@
 import '../css/pins.css';
 
-import { InfoSize, PIN_INFO_PANE_SIZES } from '../utils/sizingHints';
+import { InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from '../types';
 
 import { FilterQRCode } from './FilterQRCode';
 import { FixedSizeGrid as Grid } from 'react-window';
 import { MemoizedPinInfo } from './PinInfo';
+import { MemoizedPinSetInfo } from './PinSetInfo';
 import { PinListButtons } from './PinButtons';
 import React from 'react';
 import { getUserId } from '../settingsStorage';
@@ -21,11 +22,14 @@ interface PinListPropTypes {
   filter?: PinListFilter;
   heading: string;
   isPinFiltered: (pin: Pin, filter?: PinListFilter) => boolean;
+  isPinSetFiltered: (pinSet: PinSet, filter?: PinListFilter) => boolean;
   paxs?: PAX[];
   pins: Pin[];
   pinSets?: PinSet[];
   setPinSet?: (list: PinSelectionList) => void;
   currentUserId: UserId;
+  showInSets?: boolean;
+  setShowInSets: (showInSets: boolean) => void;
 }
 
 interface GridPinRendererProps {
@@ -60,10 +64,29 @@ const getPinInfoColumnWidth = (displaySize: SizesType): number => {
   return columnWidth;
 };
 
+const getPinSetInfoColumnWidth = (displaySize: SizesType): number => {
+  const columnPadding = 8;
+  let sizeInfo: InfoSize | undefined = SET_INFO_PANE_SIZES.get(displaySize);
+  if (!sizeInfo) {
+    sizeInfo = { heightPx: 240, widthEm: 20 };
+  }
+  const emsize = getEmSize(document.getElementById('root'));
+  const columnWidth = emsize * sizeInfo.widthEm + (columnPadding*2);
+  return columnWidth;
+};
+
 const getPinInfoRowHeight = (displaySize: SizesType): number => {
   let sizeInfo: InfoSize | undefined = PIN_INFO_PANE_SIZES.get(displaySize);
   if (!sizeInfo) {
     sizeInfo = { heightPx: 120, widthEm: 10 };
+  }
+  return sizeInfo.heightPx;
+};
+
+const getPinSetInfoRowHeight = (displaySize: SizesType): number => {
+  let sizeInfo: InfoSize | undefined = SET_INFO_PANE_SIZES.get(displaySize);
+  if (!sizeInfo) {
+    sizeInfo = { heightPx: 240, widthEm: 20 };
   }
   return sizeInfo.heightPx;
 };
@@ -79,63 +102,92 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     filter,
     activePinSet,
     isPinFiltered,
+    isPinSetFiltered,
     setPinSet,
     currentUserId,
+    showInSets = true,
+    setShowInSets,
   } = props;
   let displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
+  let displayedPinSets: PinSet[] = pinSets?.filter((pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) &&
+  pinSet.isPackagedSet) || [];
   if (descendingAge) {
     displayedPins = displayedPins.reverse();
+    displayedPinSets = displayedPinSets.reverse();
   }
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
 
-  const togglePinAvailable = (pinId: number): void => {
-    console.log(`Toggling pin ${pinId} available`);
-    const availableIds: number[] = removeOrAddId(activePinSet?.availableIds, pinId);
+  const togglePinAvailable = (pinId: number, isPinSet: boolean): void => {
+    console.log(`Toggling ${isPinSet ? 'set' : 'pin'} ${pinId} available`);
+    const availableIds: number[] = removeOrAddId(
+      !isPinSet ? activePinSet?.availableIds : activePinSet?.availableSetIds,
+      pinId);
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList(getUserId());
-      setPinSet({
+      const updatedAvailableList = {
         ...base,
-        availableIds,
         revision: ++base.revision,
-      });
+      };
+      if (isPinSet) {
+        updatedAvailableList.availableSetIds = availableIds;
+      } else {
+        updatedAvailableList.availableIds = availableIds;
+      }
+
+      setPinSet(updatedAvailableList);
+    } else {
+      console.warn('Couldn\'t update available list as setPinSet is not defined.');
     }
   };
 
-  const togglePinWanted = (pinId: number): void => {
-    console.log(`Toggling pin ${pinId} wanted`);
-    const wantedIds: number[] = removeOrAddId(activePinSet?.wantedIds, pinId);
+  const togglePinWanted = (pinId: number, isPinSet: boolean): void => {
+    console.log(`Toggling ${isPinSet ? 'set' : 'pin'} ${pinId} wanted`);
+    const wantedIds: number[] = removeOrAddId(
+      !isPinSet ? activePinSet?.wantedIds : activePinSet?.wantedSetIds,
+      pinId);
     if (setPinSet) {
       const base: PinSelectionList = activePinSet || newSelectionList(getUserId());
-      setPinSet({
+      const updatedWantedList = {
         ...base,
         revision: ++base.revision,
-        wantedIds,
-      });
+      };
+      if (isPinSet) {
+        updatedWantedList.wantedSetIds = wantedIds;
+      } else {
+        updatedWantedList.wantedIds = wantedIds;
+      }
+      setPinSet(updatedWantedList);
+    } else {
+      console.warn('Couldn\'t update wanted list as setPinSet is not defined.');
     }
   };
 
-  const countPinAvailable = (pinId: number): number => {
+  const countPinAvailable = (pinId: number, isPinSet?: boolean): number => {
     if (activePinSet) {
-      return activePinSet?.availableIds.filter((n) => +n === +pinId).length;
+      return (isPinSet ? activePinSet?.availableSetIds : activePinSet.availableIds).filter((n) => +n === +pinId).length;
     }
     return 0;
   };
 
-  const countPinWanted = (pinId: number): number => {
+  const countPinWanted = (pinId: number, isPinSet?: boolean): number => {
     if (activePinSet) {
-      return activePinSet?.wantedIds.filter((n) => +n === +pinId).length;
+      return (isPinSet ? activePinSet?.wantedSetIds : activePinSet?.wantedIds).filter((n) => +n === +pinId).length;
     }
     return 0;
   };
 
   const columnWidth = getPinInfoColumnWidth(displaySize);
+  const setColumnWidth = getPinSetInfoColumnWidth(displaySize);
   const COLUMN_COUNT = Math.round((width - scrollbarAllowance) / columnWidth - 0.5);
+  const SET_COLUMN_COUNT = Math.round((width - scrollbarAllowance) / setColumnWidth - 0.5);
   const requestedWidth = columnWidth * COLUMN_COUNT;
 
   const rowHeight = getPinInfoRowHeight(displaySize);
+  const setRowHeight = getPinSetInfoRowHeight(displaySize);
 
   const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
+  const SET_ROW_COUNT = Math.round(displayedPinSets.length / COLUMN_COUNT) + 1;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
@@ -153,6 +205,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
               availableCount={countPinAvailable(pin.id)}
               wantedCount={countPinWanted(pin.id)}
               pinId={pin.id}
+              isPinSet={false}
               setPinAvailable={togglePinAvailable}
               setPinWanted={togglePinWanted}
             />
@@ -162,11 +215,46 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     );
   };
 
+  const GridPinSetRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
+    const index = rowIndex * COLUMN_COUNT + columnIndex;
+    if (index >= displayedPinSets.length) {
+      return <></>;
+    } else {
+    }
+    const pinSet: PinSet = displayedPinSets[index];
+    const setPins: Pin[] = pins.filter((pin: Pin) => pinSet.isPackagedSet == true &&
+    (pin.set_id === pinSet.id || pin.sub_set_id === pinSet.id));
+
+    return (
+      <div className="pinInfoPadding" style={style}>
+        <MemoizedPinSetInfo
+          displaySize={displaySize}
+          key={pinSet.id}
+          paxs={paxs}
+          pinSets={pinSets}
+          pinSet={pinSet}
+          pinSetPins={setPins}>
+          {activePinSet && isEditable(currentUserId, activePinSet) && (
+            <PinListButtons
+              availableCount={countPinAvailable(pinSet.id, true)}
+              wantedCount={countPinWanted(pinSet.id, true)}
+              pinId={pinSet.id}
+              isPinSet={true}
+              setPinAvailable={togglePinAvailable}
+              setPinWanted={togglePinWanted}
+            />
+          )}
+        </MemoizedPinSetInfo>
+      </div>
+    );
+  };
+
   const listCentreOffset = (width - requestedWidth - scrollbarAllowance) / 2;
 
   return (
     <>
       <h2>{heading}</h2>
+      <a onClick={() => setShowInSets(!showInSets)}>Switch to {showInSets ? 'pins' : 'sets'}</a>
       {activePinSet && (
         <div className="printqr">
           <FilterQRCode lanyard={activePinSet} />
@@ -175,23 +263,37 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
       {pins && displayedPins && (
         <>
           <div className="totalPins">Total pins: {displayedPins.length}</div>
+          { showInSets ? <div className="totalPins">Total sets: {displayedPinSets.length}</div> : <></> }
           {activePinSet && isEditable(currentUserId, activePinSet) && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
               <button className="pinNotWanted">W</button> to add to 'Wanted' list.
             </div>
           )}
-          <Grid
-            columnCount={COLUMN_COUNT}
-            columnWidth={columnWidth}
-            height={height - 185}
-            rowCount={ROW_COUNT}
-            rowHeight={rowHeight}
-            width={requestedWidth + scrollbarAllowance}
-            style={{ left: listCentreOffset, position: 'absolute' }}
-          >
-            {GridPinRenderer}
-          </Grid>
+          { showInSets ?
+            <Grid
+              columnCount={SET_COLUMN_COUNT}
+              columnWidth={setColumnWidth}
+              height={height - 185}
+              rowCount={SET_ROW_COUNT}
+              rowHeight={setRowHeight}
+              width={requestedWidth + scrollbarAllowance}
+              style={{ left: listCentreOffset }}
+            >
+              {GridPinSetRenderer}
+            </Grid> :
+            <Grid
+              columnCount={COLUMN_COUNT}
+              columnWidth={columnWidth}
+              height={height - 185}
+              rowCount={ROW_COUNT}
+              rowHeight={rowHeight}
+              width={requestedWidth + scrollbarAllowance}
+              style={{ left: listCentreOffset, position: 'absolute' }}
+            >
+              {GridPinRenderer}
+            </Grid>
+          }
         </>
       )}
     </>

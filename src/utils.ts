@@ -1,4 +1,4 @@
-import { Pin, PinListFilter, PinSelectionList, SizesType, UserId } from './types';
+import { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from './types';
 
 import { ApplicationSettings } from './settingsStorage';
 
@@ -13,7 +13,7 @@ export const isEmptyList = (lanyard: PinSelectionList): boolean => {
   );
 };
 
-export const countFilters = (filter: PinListFilter): number => {
+export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): number => {
   let filters = 0;
   if (filter.endYear) {
     filters++;
@@ -24,10 +24,10 @@ export const countFilters = (filter: PinListFilter): number => {
   if (!isEmpty(filter.filterText)) {
     filters++;
   }
-  if (filter?.paxId !== undefined && filter?.paxId > 0) {
+  if (!filteredSetsOnly && filter?.paxId !== undefined && filter?.paxId > 0) {
     filters++;
   }
-  if (filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
+  if (filteredSetsOnly && filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
     filters++;
   }
   return filters;
@@ -38,6 +38,13 @@ export const getPinClassForSize = (size: SizesType): string => {
     return 'pin pin-normal';
   }
   return `pin pin-${size}`;
+};
+
+export const getPinSetClassForSize = (size: SizesType): string => {
+  if (['tiny', 'sm', 'normal', 'large'].indexOf(size as string) < 0) {
+    return 'pinSet set-normal';
+  }
+  return `pinSet set-${size}`;
 };
 
 export const getMin = (input: number[]): number => {
@@ -56,6 +63,16 @@ export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => 
     return true;
   }
   if (lanyard.wantedIds !== undefined && lanyard.wantedIds.includes(+pin.id)) {
+    return true;
+  }
+  return false;
+};
+
+export const isPinSetOnLanyard = (pinSet: PinSet, lanyard: PinSelectionList): boolean => {
+  if (lanyard.availableSetIds !== undefined && lanyard.availableSetIds.includes(+pinSet.id)) {
+    return true;
+  }
+  if (lanyard.wantedSetIds !== undefined && lanyard.wantedSetIds.includes(+pinSet.id)) {
     return true;
   }
   return false;

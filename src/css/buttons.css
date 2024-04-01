@@ -9,19 +9,19 @@ div.listButtons button.addButton, div.listButtons button.availableButton, div.bu
   background-color: rgb(90, 180, 90);
 }
 
-.pin-tiny div.listButtons button {
+.pin-tiny div.listButtons button, .set-tiny div.listButtons button {
   font-size: 16pt;
   width: 32px;
   height: 32px;
 }
 
-.pin-sm div.listButtons button, div.buttonKey button {
+.pin-sm div.listButtons button, .set-sm div.listButtons button, div.buttonKey button {
   font-size: 24pt;
   width: 48px;
   height: 48px;
 }
 
-.pin-normal div.listButtons button, .pin-large div.listButtons button {
+.pin-normal div.listButtons button, .set-normal div.listButtons button, .pin-large div.listButtons button, .set-large div.listButtons button {
   font-size: 36pt;
   width: 64px;
   height: 64px;

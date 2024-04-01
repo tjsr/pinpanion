@@ -1,13 +1,17 @@
 type uuid = string;
 export type UserId = uuid;
+type PAXId = number;
+type PublishYear = number;
+type PinSetId = number;
+type PinId = number;
 
 export type Pin = {
-  id: number;
+  id: PinId;
   name: string;
-  set_id: number | null;
+  set_id: PinSetId | null;
   sub_set_id: number | null;
-  year: number;
-  pax_id: number;
+  year: PublishYear;
+  pax_id: PAXId;
   alternate: string;
   image_name: string;
 };
@@ -30,32 +34,40 @@ export type PinnypalsPinsRequest = {
 export type PinSelectionList = {
   name: string;
   id: string;
-  availableIds: number[];
-  wantedIds: number[];
+  availableIds: PinId[];
+  wantedIds: PinId[];
   revision: number;
   ownerId: UserId;
+  availableSetIds: PinSetId[];
+  wantedSetIds: PinSetId[];
 };
 
 export type PinListFilter = {
-  startYear?: number;
-  endYear?: number;
+  startYear?: PublishYear;
+  endYear?: PublishYear;
   setPinsOnly?: boolean;
   selectedPinsOnly?: boolean;
-  paxId?: number;
-  pinSetId?: number;
+  paxId?: PAXId;
+  pinSetId?: PinSetId;
   filterText?: string;
 };
 
 export type PAX = {
-  id: number;
+  id: PAXId;
   name: string;
   shortName?: string;
 };
+type PinSetVariant = [PinSetId, PublishYear];
 
 export type PinSet = {
-  id: number;
+  id: PinSetId;
+  isReprint: boolean,
   name: string;
-  year: number;
+  year: PublishYear;
+  isPackagedSet: boolean;
+  sub_set_id?: PinSetId;
+  image_name: string;
+  variants: PinSetVariant[]
 };
 
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
