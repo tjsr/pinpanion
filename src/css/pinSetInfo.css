@@ -26,6 +26,29 @@ div.setpins .pinRow-3 {
   /* width: 5.0em; */
 }
 
+div.pinSet.set-tiny div.pinRow-3.emptyRow {
+  min-height: 30px;
+}
+
+div.pinSet.set-sm div.pinRow-3.emptyRow {
+  min-height: 40px;
+}
+
+div.pinSet.set-normal div.pinRow-3.emptyRow {
+  min-height: 70px;
+}
+
+div.pinSet.set-large div.pinRow-3.emptyRow {
+  min-height: 100px;
+}
+
+div.pinRow-3.emptyRow {
+  min-width: 3em;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 0.2em;
+}
+
 .set-tiny div.setpins img.pinImage {
   max-height: 30px;
   max-width: 30px;
@@ -59,11 +82,10 @@ div.pinSet {
 
 div.pinSet h3 {
   margin-top: 0.2em;
-  /* height: 2.5rem; */
   overflow: hidden;
   font-size: 0.8em;
-  margin-block-end: 0.2rem;
   max-height: 1rem;
+  margin-block-end: 0.2rem;
 }
 
 div.pinSet.set-tiny h3 {
@@ -115,4 +137,12 @@ div.pinSet.set-tiny h3 {
 
 div.availableSets div.pinSet, div.wantedSets div.pinSet {
   display: inline-block;
+}
+
+div.pinSet div.pax {
+  color: var(--pax-text-light);
+}
+
+div.pinSet div.pax.paxAus {
+  color: var(--pax-text-dark);
 }

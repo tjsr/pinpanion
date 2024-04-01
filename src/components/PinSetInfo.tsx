@@ -34,9 +34,7 @@ export const PinSetInfo = ({
     chunkedPinSets.push(pinSetPins.slice(i, i + rowSize));
   }
 
-  // let pinClasses = getPinSetClassForSize(displaySize);
   let paxCssClass = 'pax';
-  // let setCssClass = 'set';
 
   const getPaxIdFromPinsInSet = (pinsInSet: Pin[]): PAXId => {
     return pinsInSet[0].pax_id;
@@ -45,9 +43,7 @@ export const PinSetInfo = ({
   const paxId = getPaxIdFromPinsInSet(pinSetPins) || 0;
 
   if (paxId > 0) {
-    // pinClasses = pinClasses + ' ' + getPaxCssClass('pin', paxId);
     paxCssClass = paxCssClass + ' ' + getPaxCssClass('pax', paxId);
-    // setCssClass = setCssClass + ' ' + getPaxCssClass('pax', paxId);
   }
 
   return <><div className={setClasses}>
@@ -57,18 +53,21 @@ export const PinSetInfo = ({
     <div className='setpins'>
       {chunkedPinSets.map((rowinSetPins: Pin[], index: number) => {
         return (
-          <div key={`set_${pinSet.id}_row${index}`} className={`pinRow-${rowSize}`}>
-            {rowinSetPins.map(
-              (pin: Pin) => {
-                const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
-                return (
-                  <img key={`set_${pinSet.id}_pin_${pin.id}`} className="pinImage" alt={pin.name} src={url} />
-                );
-              }
-              // <PinInfo displaySize={'tiny'} pin={pin} />
-            )}
-          </div>);
+          <>
+            <div key={`set_${pinSet.id}_row${index}`} className={`pinRow-${rowSize}`}>
+              {rowinSetPins.map(
+                (pin: Pin) => {
+                  const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
+                  return (
+                    <img key={`set_${pinSet.id}_pin_${pin.id}`} className="pinImage" alt={pin.name} src={url} />
+                  );
+                }
+              )}
+            </div>
+          </>
+        );
       })}
+      { pinSetPins.length <= rowSize && <div className={`pinRow-${rowSize} emptyRow`}>&nbsp;</div> }
     </div>
     {children}
   </div>

@@ -12,10 +12,10 @@ div.pinInfoPadding {
 
 div.pinInfo h3 {
   margin-top: 0.2em;
-  height: 2.5em;
   overflow: hidden;
-  font-size: 1em;
-  margin-block-end: 0em;
+  font-size: 0.8em;
+  max-height: 1rem;
+  margin-block-end: 0.2em;
 }
 
 .pin-tiny {
