@@ -1,3 +1,5 @@
+import { YearAndIdComparable } from './types';
+
 export const addIdToList = (data: string, id: number): string => {
   const existingIds: number[] = data
     .split(',')
@@ -43,3 +45,11 @@ export const removeOrAddId = (
   }
   return updatedIds;
 };
+
+export const compareYearThenId = (a: YearAndIdComparable, b: YearAndIdComparable, descending = false) => {
+  if (a.year === b.year) {
+    return descending ? b.id - a.id : a.id - b.id;
+  }
+  return descending ? b.year - a.year : a.year - b.year;
+};
+

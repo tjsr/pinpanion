@@ -5,7 +5,12 @@ type PublishYear = number;
 type PinSetId = number;
 type PinId = number;
 
-export type Pin = {
+export interface YearAndIdComparable {
+  id: number;
+  year: PublishYear;
+}
+
+export interface Pin extends YearAndIdComparable {
   id: PinId;
   name: string;
   set_id: PinSetId | null;
@@ -14,7 +19,7 @@ export type Pin = {
   pax_id: PAXId;
   alternate: string;
   image_name: string;
-};
+}
 
 export type Collection = {
   wanted: PinRequest[];
@@ -59,7 +64,7 @@ export type PAX = {
 };
 type PinSetVariant = [PinSetId, PublishYear];
 
-export type PinSet = {
+export interface PinSet extends YearAndIdComparable {
   id: PinSetId;
   isReprint: boolean,
   name: string;

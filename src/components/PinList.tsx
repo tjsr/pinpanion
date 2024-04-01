@@ -1,7 +1,8 @@
 import '../css/pins.css';
 
 import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from '../types';
+import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId, YearAndIdComparable } from '../types';
+import { compareYearThenId, removeOrAddId } from '../listutils';
 
 import { FilterQRCode } from './FilterQRCode';
 import { FixedSizeGrid as Grid } from 'react-window';
@@ -12,7 +13,6 @@ import React from 'react';
 import { getUserId } from '../settingsStorage';
 import { isEditable } from '../utils';
 import { newSelectionList } from '../fixture';
-import { removeOrAddId } from '../listutils';
 import useWindowDimensions from '../utils/useWindowDimensions';
 
 interface PinListPropTypes {
@@ -108,13 +108,13 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     showInSets = true,
     setShowInSets,
   } = props;
-  let displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter));
-  let displayedPinSets: PinSet[] = pinSets?.filter((pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) &&
-  pinSet.isPackagedSet) || [];
-  if (descendingAge) {
-    displayedPins = displayedPins.reverse();
-    displayedPinSets = displayedPinSets.reverse();
-  }
+  const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter)).sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  const displayedPinSets: PinSet[] = (pinSets?.filter(
+    (pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) &&
+      pinSet.isPackagedSet) || []).sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
 

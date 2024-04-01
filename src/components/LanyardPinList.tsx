@@ -1,9 +1,10 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, Pin, PinSet, SizesType } from '../types';
+import { PAX, Pin, PinSet, SizesType, YearAndIdComparable } from '../types';
 
 import { PinInfo } from './PinInfo';
 import { PinSetInfo } from './PinSetInfo';
+import { compareYearThenId } from '../listutils';
 
 type LanyardPinListPropTypes = {
   allPins: Pin[];
@@ -34,18 +35,15 @@ export const LanyardPinList = ({
   showInSets,
   setShowInSets,
 }: LanyardPinListPropTypes): JSX.Element => {
-  const displayedAvailable: Pin[] = descendingAge
-    ? availablePins.sort((a: Pin, b: Pin) => b.id - a.id)
-    : availablePins.sort((a: Pin, b: Pin) => a.id - b.id);
-  const displayedWanted: Pin[] = descendingAge
-    ? wantedPins.sort((a: Pin, b: Pin) => b.id - a.id)
-    : wantedPins.sort((a: Pin, b: Pin) => a.id - b.id);
-  const displayedAvailableSets: PinSet[] = descendingAge
-    ? availableSets.sort((a: PinSet, b: PinSet) => b.id - a.id)
-    : availableSets.sort((a: PinSet, b: PinSet) => a.id - b.id);
-  const displayedWantedSets: PinSet[] = descendingAge
-    ? wantedSets.sort((a: PinSet, b: PinSet) => b.id - a.id)
-    : wantedSets.sort((a: PinSet, b: PinSet) => a.id - b.id);
+  const displayedAvailable: Pin[] = availablePins.sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  const displayedWanted: Pin[] = wantedPins.sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  const displayedAvailableSets: PinSet[] = availableSets.sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  const displayedWantedSets: PinSet[] = wantedSets.sort(
+    (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+
   return (
     <>
       <h2>{heading}</h2>
