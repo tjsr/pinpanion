@@ -70,7 +70,7 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
-              id="selectedPins"
+              id="wantedPins"
               label="Wanted"
               variant="outlined"
               value={activeLanyard.wantedIds}
@@ -92,7 +92,7 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
-              id="selectedPins"
+              id="availablePins"
               label="Available"
               variant="outlined"
               value={activeLanyard.availableIds}
@@ -113,7 +113,7 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
-              id="selectedSets"
+              id="wantedSets"
               label="Wanted Sets"
               variant="outlined"
               value={activeLanyard.wantedSetIds}
@@ -135,7 +135,7 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
-              id="selectedSets"
+              id="availableSets"
               label="Available Sets"
               variant="outlined"
               value={activeLanyard.availableSetIds}
