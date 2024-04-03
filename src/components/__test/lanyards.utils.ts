@@ -19,7 +19,7 @@ export const switchToLanyard = async (
 ): Promise<void> => {
   expect(queryByLabelText('Switch lanyard')).toBeInTheDocument();
 
-  fireEvent.mouseDown(getByRole('button'));
+  fireEvent.mouseDown(getByRole('combobox'));
   expect(getByRole('listbox')).not.toEqual(null);
 
   const listbox = within(getByRole('listbox'));
