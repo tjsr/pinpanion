@@ -1,11 +1,11 @@
 import '../css/pinSetInfo.css';
 
 import { PAX, PAXId, Pin, PinSet, SizesType } from '../types';
-import { PinInfo, getPaxCssClass } from './PinInfo';
 
 import React from 'react';
 import config from '../config.json';
 import eventnames from '../eventnames.json';
+import { getPaxCssClass } from './PinInfo';
 import { getPinSetClassForSize } from '../utils';
 
 type PinSetInfoPropTypes = {

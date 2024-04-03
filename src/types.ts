@@ -73,7 +73,7 @@ export interface PinSet extends YearAndIdComparable {
   sub_set_id?: PinSetId;
   image_name: string;
   variants: PinSetVariant[]
-};
+}
 
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
 
