@@ -26,16 +26,16 @@ const safeOrEmptyList = (ids: number[] | undefined): number[] => {
 
 export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = false): string => {
   if (psl.availableIds === undefined) {
-    console.debug('Input lanyard provided an illegal undefined availableIds');
+    console.trace('Input lanyard provided an illegal undefined availableIds');
   }
   if (psl.wantedIds === undefined) {
-    console.debug('Input lanyard provided an illegal undefined wantedIds');
+    console.trace('Input lanyard provided an illegal undefined wantedIds');
   }
   if (psl.availableSetIds === undefined) {
-    console.debug('Input lanyard provided an illegal undefined availableSetIds');
+    console.trace('Input lanyard provided an illegal undefined availableSetIds');
   }
   if (psl.wantedSetIds === undefined) {
-    console.debug('Input lanyard provided an illegal undefined wantedSetIds');
+    console.trace('Input lanyard provided an illegal undefined wantedSetIds');
   }
 
   const safeAvailableIds = safeOrEmptyList(psl.availableIds);

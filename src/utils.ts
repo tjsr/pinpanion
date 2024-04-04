@@ -2,15 +2,15 @@ import { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from 
 
 import { ApplicationSettings } from './settingsStorage';
 
+type PinSetKey = 'availableIds'|'wantedIds'|'availableSetIds'|'wantedSetIds';
+const PinSetKeys = ['availableIds', 'wantedIds', 'availableSetIds', 'wantedSetIds'] as const;
+
 export const isEmpty = (value: string | undefined): boolean => {
   return !value || value.trim() == '';
 };
 
 export const isEmptyList = (lanyard: PinSelectionList): boolean => {
-  return (
-    (lanyard.availableIds === undefined || lanyard.availableIds?.length === 0) &&
-    (lanyard.wantedIds === undefined || lanyard.wantedIds?.length === 0)
-  );
+  return PinSetKeys.every((key: PinSetKey) => lanyard[key] === undefined || lanyard[key]?.length === 0);
 };
 
 export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): number => {
@@ -78,15 +78,15 @@ export const isPinSetOnLanyard = (pinSet: PinSet, lanyard: PinSelectionList): bo
   return false;
 };
 
+export const sanitizeListElement = (pinList: PinSelectionList, key: PinSetKey): void => {
+  if (pinList !== undefined && pinList[key] === undefined) {
+    console.trace(`A pin list passed to be updated had no ${key} array so is being corrected`);
+    pinList[key] = [];
+  }
+};
+
 export const sanitizePinList = (pinList: PinSelectionList, settings: ApplicationSettings): void => {
-  if (pinList.availableIds === undefined) {
-    console.trace('A pin list passed to be updated had no availableIds array so is being corrected');
-    pinList.availableIds = [];
-  }
-  if (pinList.wantedIds === undefined) {
-    console.trace('A pin list passed to be updated had no wantedIds array so is being corrected');
-    pinList.wantedIds = [];
-  }
+  PinSetKeys.forEach((setKey: PinSetKey) => sanitizeListElement(pinList, setKey));
 
   if (pinList.ownerId === undefined) {
     pinList.ownerId = settings.localUserId;

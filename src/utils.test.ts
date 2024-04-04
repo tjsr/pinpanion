@@ -2,8 +2,14 @@ import { Pin, PinSelectionList } from './types';
 import {
   compressArray,
   getMin,
-  isPinOnLanyard
+  isEmpty,
+  isEmptyList,
+  isPinOnLanyard,
+  sanitizeListElement,
+  sanitizePinList
 } from './utils';
+
+import { ApplicationSettings } from './settingsStorage';
 
 describe('getMin', () => {
   test('Should get only element in array', () => {
@@ -86,5 +92,84 @@ describe('isPinOnLanyard', () => {
     } as PinSelectionList;
 
     expect(isPinOnLanyard(needlePin, dodgyHaystackLanyard)).toBe(false);
+  });
+});
+
+describe('isEmptyList', () => {
+  test('Should return true if no lists are present.', () => {
+    const emptyLanyard: PinSelectionList = {
+
+    } as PinSelectionList;
+    expect(isEmptyList(emptyLanyard)).toBe(true);
+  });
+
+  test('Should return true if some lists are undefined and others are empty.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: [],
+      availableSetIds: [],
+      wantedIds: undefined,
+      wantedSetIds: undefined,
+    } as any as PinSelectionList;
+    expect(isEmptyList(emptyLanyard)).toBe(true);
+  });
+
+  test('Should return false if some lists have items.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: undefined,
+      availableSetIds: undefined,
+      wantedIds: [1, 4, 7, 9],
+      wantedSetIds: [],
+    } as any as PinSelectionList;
+    expect(isEmptyList(emptyLanyard)).toBe(false);
+  });
+
+  test('Should return false if all lists have items.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+      availableSetIds: [5, 8, 22],
+      wantedIds: [1, 4, 7, 9],
+      wantedSetIds: [77, 42, 12, 21],
+    } as any as PinSelectionList;
+    expect(isEmptyList(emptyLanyard)).toBe(false);
+  });
+});
+
+describe('sanitizeListElement', () => {
+  test('Should add an empty array if the key is missing.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: undefined,
+      availableSetIds: [5, 8, 22],
+      wantedIds: [1, 4, 7, 9],
+      wantedSetIds: [77, 42, 12, 21],
+    } as any as PinSelectionList;
+    sanitizeListElement(emptyLanyard, 'availableIds');
+    expect(emptyLanyard.availableIds).toEqual([]);
+  });
+
+  test('Should not overwrite an index where values already exist.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: undefined,
+      availableSetIds: [5, 8, 22],
+      wantedIds: [1, 4, 7, 9],
+      wantedSetIds: [77, 42, 12, 21],
+    } as any as PinSelectionList;
+    sanitizeListElement(emptyLanyard, 'wantedIds');
+    expect(emptyLanyard.wantedIds).toEqual([1, 4, 7, 9]);
+  });
+});
+
+describe('sanitizePinList', () => {
+  test('Should add an empty array if the key is missing.', () => {
+    const emptyLanyard: PinSelectionList = {
+      availableIds: undefined,
+      availableSetIds: [5, 8, 22],
+      wantedIds: [1, 4, 7, 9],
+      wantedSetIds: [77, 42, 12, 21],
+    } as any as PinSelectionList;
+    sanitizePinList(emptyLanyard, { localUserId: 'o123' } as any as ApplicationSettings);
+    expect(emptyLanyard.availableIds).toEqual([]);
+    expect(emptyLanyard.availableSetIds).toEqual([5, 8, 22]);
+    expect(emptyLanyard.wantedIds).toEqual([1, 4, 7, 9]);
+    expect(emptyLanyard.wantedSetIds).toEqual([77, 42, 12, 21]);
   });
 });
