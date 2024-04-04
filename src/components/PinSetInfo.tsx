@@ -37,7 +37,7 @@ export const PinSetInfo = ({
   let paxCssClass = 'pax';
 
   const getPaxIdFromPinsInSet = (pinsInSet: Pin[]): PAXId => {
-    return pinsInSet[0].pax_id;
+    return pinsInSet[0]?.pax_id || 0;
   };
 
   const paxId = getPaxIdFromPinsInSet(pinSetPins) || 0;

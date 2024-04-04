@@ -71,7 +71,7 @@ const getPinSetInfoColumnWidth = (displaySize: SizesType): number => {
     sizeInfo = { heightPx: 240, widthEm: 20 };
   }
   const emsize = getEmSize(document.getElementById('root'));
-  const columnWidth = emsize * sizeInfo.widthEm + (columnPadding*2);
+  const columnWidth = emsize * sizeInfo.widthEm + (columnPadding);
   return columnWidth;
 };
 
@@ -115,10 +115,11 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   } = props;
   const displayedPins: Pin[] = pins.filter((pin: Pin) => !isPinFiltered(pin, filter)).sort(
     (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  // TODO: isPackagedSets might not be what we thought?
   const displayedPinSets: PinSet[] = (pinSets?.filter(
-    (pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) &&
-      pinSet.isPackagedSet) || []).sort(
+    (pinSet: PinSet) => !isPinSetFiltered(pinSet, filter) && pinSet.isPackagedSet) || []).sort(
     (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));
+  const pinsInDisplayedSets: Pin[] = displayedPinSets.flatMap((pinSet: PinSet) => getPinsInSet(pinSet, pins));
 
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
@@ -196,14 +197,18 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const setColumnWidth = getPinSetInfoColumnWidth(displaySize);
   const COLUMN_COUNT = Math.round((width - scrollbarAllowance) / columnWidth - 0.5);
   const SET_COLUMN_COUNT = Math.round((width - scrollbarAllowance) / setColumnWidth - 0.5);
-  const requestedWidth = columnWidth * COLUMN_COUNT;
+  const requestedWidth = showInSets ? setColumnWidth * SET_COLUMN_COUNT : columnWidth * COLUMN_COUNT;
 
-  const rowHeight = getPinInfoRowHeight(displaySize);
+  const rowHeight = getPinInfoRowHeight(displaySize) -
+    (hideCollectionButtons ? (BUTTON_SIZES.get(displaySize) || 32) +
+    (PIN_INFO_PANE_SIZES.get(displaySize)?.bottomPaddingPixels || 8) : 0);
   const setRowHeight = getPinSetInfoRowHeight(displaySize) -
-    (hideCollectionButtons ? (BUTTON_SIZES.get(displaySize) || 32) : 0);
+    (hideCollectionButtons ? (BUTTON_SIZES.get(displaySize) || 32) +
+    (SET_INFO_PANE_SIZES.get(displaySize)?.bottomPaddingPixels || 8) : 0);
 
   const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
-  const SET_ROW_COUNT = Math.round(displayedPinSets.length / COLUMN_COUNT) + 1;
+  const SET_ROW_COUNT = Math.round(displayedPinSets.length / SET_COLUMN_COUNT) + 1;
+  const TOP_SECTION_HEIGHT_ALLOWANCE = 185;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
@@ -232,7 +237,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   };
 
   const GridPinSetRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
-    const index = rowIndex * COLUMN_COUNT + columnIndex;
+    const index = rowIndex * SET_COLUMN_COUNT + columnIndex;
     if (index >= displayedPinSets.length) {
       return <></>;
     } else {
@@ -277,8 +282,10 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
       )}
       {pins && displayedPins && (
         <>
-          <div className="totalPins">Total pins: {displayedPins.length}</div>
-          { showInSets ? <div className="totalPins">Total sets: {displayedPinSets.length}</div> : <></> }
+          { showInSets ? <>
+            <div className="totalPins">Total pins in sets: {pinsInDisplayedSets.length}</div>
+            <div className="totalPins">Total sets: {displayedPinSets.length}</div></> :
+            <div className="totalPins">Total pins: {displayedPins.length}</div> }
           {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
@@ -291,7 +298,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
             <Grid
               columnCount={SET_COLUMN_COUNT}
               columnWidth={setColumnWidth}
-              height={height - 185}
+              height={height - TOP_SECTION_HEIGHT_ALLOWANCE}
               rowCount={SET_ROW_COUNT}
               rowHeight={setRowHeight}
               width={requestedWidth + scrollbarAllowance}
@@ -302,7 +309,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
             <Grid
               columnCount={COLUMN_COUNT}
               columnWidth={columnWidth}
-              height={height - 185}
+              height={height - TOP_SECTION_HEIGHT_ALLOWANCE}
               rowCount={ROW_COUNT}
               rowHeight={rowHeight}
               width={requestedWidth + scrollbarAllowance}
