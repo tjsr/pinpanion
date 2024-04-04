@@ -91,6 +91,11 @@ const getPinSetInfoRowHeight = (displaySize: SizesType): number => {
   return sizeInfo.heightPx + (sizeInfo.bottomPaddingPixels || 0);
 };
 
+const getPinsInSet = (pinSet: PinSet, allPins: Pin[]): Pin[] => {
+  return allPins.filter((pin: Pin) => pinSet.isPackagedSet == true &&
+    (pin.set_id === pinSet.id || pin.sub_set_id === pinSet.id));
+};
+
 export const PinList = (props: PinListPropTypes): JSX.Element => {
   const {
     descendingAge,
@@ -233,8 +238,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     } else {
     }
     const pinSet: PinSet = displayedPinSets[index];
-    const setPins: Pin[] = pins.filter((pin: Pin) => pinSet.isPackagedSet == true &&
-    (pin.set_id === pinSet.id || pin.sub_set_id === pinSet.id));
+    const setPins: Pin[] = getPinsInSet(pinSet, pins);
 
     return (
       <div className="pinInfoPadding" style={style}>
