@@ -98,23 +98,19 @@ div.pinSet.set-tiny h3 {
 }
 
 .pinSet {
-  /* display: inline-table; */
-  /* column-count: 2; */
   margin: 2px;
   background-color: #d0d0d0;
   border: 2px solid;
-  /* height: 100%; */
 }
 
 .set-tiny {
   max-width: 8rem;
   min-height: 7.8em;
   max-height: 10em;
-  /* scale: 0.6; */
 }
 
 .set-sm {
-  max-width: 10rem;
+  max-width: 9rem;
   min-height: 9em;
   max-height: 12.5em;
   margin-bottom: 8;
@@ -136,7 +132,7 @@ div.pinSet.set-tiny h3 {
 }
 
 div.availableSets div.pinSet, div.wantedSets div.pinSet {
-  display: inline-block;
+  display: inline-table;
 }
 
 div.pinSet div.pax {
