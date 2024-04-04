@@ -2,8 +2,8 @@ import { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from 
 
 import { ApplicationSettings } from './settingsStorage';
 
-type PinSetKey = 'availableIds'|'wantedIds'|'availableSetIds'|'wantedSetIds';
-const PinSetKeys = ['availableIds', 'wantedIds', 'availableSetIds', 'wantedSetIds'] as const;
+export type PinSetKey = 'availableIds'|'wantedIds'|'availableSetIds'|'wantedSetIds';
+export const PinSetKeys = ['availableIds', 'wantedIds', 'availableSetIds', 'wantedSetIds'] as const;
 
 export const isEmpty = (value: string | undefined): boolean => {
   return !value || value.trim() == '';

@@ -1,3 +1,4 @@
+import { PinSetKey, PinSetKeys } from '../utils';
 import { extractCompressedBitstring, stringToNumberArray } from 'sparse-bit-string';
 
 import { PinSelectionList } from '../types';
@@ -16,6 +17,13 @@ const urlParamsToMap = (hashString: string): Map<string, string> => {
       params.set(pairArr[0], decodeQueryParam(decodeURIComponent(pairArr[1])));
     } );
   return params;
+};
+
+const paramKeys = {
+  availableIds: 'a',
+  availableSetIds: 'as',
+  wantedIds: 'w',
+  wantedSetIds: 'ws',
 };
 
 export const decodePinSelectionHash = (hashString: string): PinSelectionList => {
@@ -37,83 +45,38 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
     }
   }
 
-  if (params.has('id')) {
-    outputSet.id = params.get('id')!;
-  } else {
-    throw new Error('An imported PinSelectionList must have an id');
-  }
+  const setOutputProperty = (urlParam: string, listKey: 'id' | 'name' | 'ownerId'): void => {
+    if (params.has(urlParam)) {
+      outputSet[listKey] = params.get(urlParam)!;
+    } else {
+      throw new Error(`An imported PinSelectionList must have a ${listKey}`);
+    }
+  };
 
-  if (params.has('n')) {
-    outputSet.name = params.get('n')!;
-  } else {
-    throw new Error('An imported PinSelectionList must have a name');
-  }
+  setOutputProperty('id', 'id');
+  setOutputProperty('n', 'name');
+  setOutputProperty('o', 'ownerId');
 
-  if (params.has('o')) {
-    outputSet.ownerId = params.get('o')!;
-  } else {
-    throw new Error('An imported PinSelectionList must have an owner');
-  }
-
-  if (params.has('a')) {
-    const availableValue: string = params.get('a')!;
+  PinSetKeys.forEach((key: PinSetKey) => {
+    const paramKey: string = paramKeys[key];
+    let value: string|undefined = undefined;
     try {
-      const decodedAvailable: number[] = ENABLE_COMPRESSED_LISTS ?
-        extractCompressedBitstring(availableValue) :
-        stringToNumberArray(availableValue);
-      outputSet.availableIds = decodedAvailable;
+      if (params.has(paramKey.toUpperCase())) {
+        value = params.get(paramKey.toUpperCase())!;
+        const decodedList: number[] = extractCompressedBitstring(value);
+        outputSet[key] = decodedList;
+      } else if (params.has(paramKey)) {
+        value = params.get(paramKey)!;
+        const decodedList: number[] = stringToNumberArray(value);
+        outputSet[key] = decodedList;
+      } else {
+        outputSet[key] = [];
+      }
     } catch (err) {
-      console.error(`Failed while decoding available lanyard data "${availableValue}"`, err);
+      console.error(`Failed while decoding ${key} lanyard data "${value}"`, err);
       throw err;
     }
-  } else {
-    outputSet.availableIds = [];
-  }
-
-  if (params.has('as')) {
-    const availableValue: string = params.get('as')!;
-    try {
-      const decodedAvailable: number[] = ENABLE_COMPRESSED_LISTS ?
-        extractCompressedBitstring(availableValue) :
-        stringToNumberArray(availableValue);
-      outputSet.availableSetIds = decodedAvailable;
-    } catch (err) {
-      console.error(`Failed while decoding available set lanyard data "${availableValue}"`, err);
-      throw err;
-    }
-  } else {
-    outputSet.availableSetIds = [];
-  }
-
-  if (params.has('w')) {
-    const wantedValue: string = params.get('w')!;
-    try {
-      const decodedWanted: number[] = ENABLE_COMPRESSED_LISTS ?
-        extractCompressedBitstring(wantedValue) :
-        stringToNumberArray(wantedValue);
-      outputSet.wantedIds = decodedWanted;
-    } catch (err) {
-      console.error(`Failed while decoding wanted lanyard data "${wantedValue}"`, err);
-      throw err;
-    }
-  } else {
-    outputSet.wantedIds = [];
-  }
-
-  if (params.has('ws')) {
-    const wantedValue: string = params.get('w')!;
-    try {
-      const decodedWanted: number[] = ENABLE_COMPRESSED_LISTS ?
-        extractCompressedBitstring(wantedValue) :
-        stringToNumberArray(wantedValue);
-      outputSet.wantedSetIds = decodedWanted;
-    } catch (err) {
-      console.error(`Failed while decoding wanted set lanyard data "${wantedValue}"`, err);
-      throw err;
-    }
-  } else {
-    outputSet.wantedSetIds = [];
-  }
+  });
 
   return outputSet;
 };
