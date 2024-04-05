@@ -6,7 +6,7 @@ import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
+import { countFilters, isEmpty, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';
@@ -129,8 +129,7 @@ const App = (): JSX.Element => {
 
   const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {
     if (
-      lanyard.availableIds?.length === 0 &&
-      lanyard.wantedIds?.length === 0
+      isEmptyList(lanyard)
     ) {
       console.debug('Set selection filter enabled to false because list is empty');
       setSelectionFilterEnabled(false);
