@@ -208,7 +208,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
   const ROW_COUNT = Math.round(displayedPins.length / COLUMN_COUNT) + 1;
   const SET_ROW_COUNT = Math.round(displayedPinSets.length / SET_COLUMN_COUNT) + 1;
-  const TOP_SECTION_HEIGHT_ALLOWANCE = 185;
+  const TOP_SECTION_HEIGHT_ALLOWANCE = 207;
 
   const GridPinRenderer = ({ columnIndex, rowIndex, style }: GridPinRendererProps): JSX.Element => {
     const index = rowIndex * COLUMN_COUNT + columnIndex;
