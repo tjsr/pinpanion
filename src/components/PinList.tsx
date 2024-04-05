@@ -2,6 +2,7 @@ import '../css/pins.css';
 
 import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId, YearAndIdComparable } from '../types';
+import React, { useEffect } from 'react';
 import { compareYearThenId, removeOrAddId } from '../listutils';
 
 import { FilterQRCode } from './FilterQRCode';
@@ -9,7 +10,6 @@ import { FixedSizeGrid as Grid } from 'react-window';
 import { MemoizedPinInfo } from './PinInfo';
 import { MemoizedPinSetInfo } from './PinSetInfo';
 import { PinListButtons } from './PinButtons';
-import React from 'react';
 import { getUserId } from '../settingsStorage';
 import { isEditable } from '../utils';
 import { newSelectionList } from '../fixture';
@@ -124,7 +124,13 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const { height, width } = useWindowDimensions();
   const scrollbarAllowance = 32;
 
-  const [hideCollectionButtons, setHideCollectionButtons] = React.useState<boolean>(false);
+  const [hideCollectionButtonsSelected, setHideCollectionButtonsSelected] = React.useState<boolean>(false);
+  const [hideCollectionButtons, setHideCollectionButtons] = React.useState<boolean>(activePinSet
+    && !isEditable(currentUserId, activePinSet) || hideCollectionButtonsSelected);
+
+  useEffect(() => {
+    setHideCollectionButtons(activePinSet && !isEditable(currentUserId, activePinSet) || hideCollectionButtonsSelected);
+  }, [hideCollectionButtonsSelected, activePinSet]);
 
   const togglePinAvailable = (pinId: number, isPinSet: boolean): void => {
     console.log(`Toggling ${isPinSet ? 'set' : 'pin'} ${pinId} available`);
@@ -221,7 +227,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     return (
       <div className="pinInfoPadding" style={style}>
         <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
-          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtonsSelected && (
             <PinListButtons
               availableCount={countPinAvailable(pin.id)}
               wantedCount={countPinWanted(pin.id)}
@@ -254,7 +260,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
           pinSets={pinSets}
           pinSet={pinSet}
           pinSetPins={setPins}>
-          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtonsSelected && (
             <PinListButtons
               availableCount={countPinAvailable(pinSet.id, true)}
               wantedCount={countPinWanted(pinSet.id, true)}
@@ -286,14 +292,14 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
             <div className="totalPins">Total pins in sets: {pinsInDisplayedSets.length}</div>
             <div className="totalPins">Total sets: {displayedPinSets.length}</div></> :
             <div className="totalPins">Total pins: {displayedPins.length}</div> }
-          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtons && (
+          {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtonsSelected && (
             <div className="buttonKey">
               Click <button className="pinNotAvailable">A</button> to toggle from 'Available' list, or{' '}
               <button className="pinNotWanted">W</button> to add to 'Wanted' list.
-              [<a onClick={() => setHideCollectionButtons(true)}>Hide buttons</a>]
+              [<a onClick={() => setHideCollectionButtonsSelected(true)}>Hide buttons</a>]
             </div>
           )}
-          { hideCollectionButtons && <a onClick={() => setHideCollectionButtons(false)}>Show buttons</a> }
+          { hideCollectionButtonsSelected && <a onClick={() => setHideCollectionButtonsSelected(false)}>Show buttons</a> }
           { showInSets ?
             <Grid
               columnCount={SET_COLUMN_COUNT}
