@@ -1,9 +1,11 @@
+import { PinSelectionList, UserId } from '../types';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import FormControl from '@mui/material/FormControl';
+import { InputAdornment } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
+import LockPerson from '@mui/icons-material/LockPerson'
 import MenuItem from '@mui/material/MenuItem';
-import { PinSelectionList } from '../types';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import { getStoredLanyards } from '../lanyardStorage';
 import { isEmptyList } from '../utils';
@@ -13,6 +15,7 @@ type LanyardSelectionDropdownProps = {
   activeLanyard: PinSelectionList;
   id: string;
   storedLanyardList?: PinSelectionList[];
+  currentUserId: UserId
 };
 
 const hasLanyardData = (lanyard: PinSelectionList): boolean => {
@@ -47,6 +50,7 @@ export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): 
           return (
             <MenuItem key={l.id} value={l.id}>
               {l.id == props.activeLanyard.id ? <strong>{l.name}</strong> : l.name}
+              {l.ownerId !== props.currentUserId && <InputAdornment position="end"><LockPerson /></InputAdornment>}
             </MenuItem>
           );
         })}

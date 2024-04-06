@@ -43,6 +43,8 @@ export const PinSelectionEditor = ({
     };
   }
 
+  const isEditable = currentUserId === activeLanyard.ownerId || activeLanyard.ownerId === undefined;
+
   return (
     <>
       <div className="pinSelectionFilter">
@@ -70,11 +72,15 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
+              disabled={!isEditable}
               id="wantedPins"
               label="Wanted"
               variant="outlined"
               value={activeLanyard.wantedIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (!isEditable) {
+                  return false;
+                }
                 const wantedIds: number[] = filterStringToIds(event.target.value);
 
                 const updatedList: PinSelectionList = {
@@ -92,11 +98,15 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
+              disabled={!isEditable}
               id="availablePins"
               label="Available"
               variant="outlined"
               value={activeLanyard.availableIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (!isEditable) {
+                  return false;
+                }
                 const availableIds: number[] = filterStringToIds(event.target.value);
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
@@ -113,11 +123,15 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
+              disabled={!isEditable}
               id="wantedSets"
               label="Wanted Sets"
               variant="outlined"
               value={activeLanyard.wantedSetIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (!isEditable) {
+                  return false;
+                }
                 const wantedSetIds: number[] = filterStringToIds(event.target.value);
 
                 const updatedList: PinSelectionList = {
@@ -135,11 +149,15 @@ export const PinSelectionEditor = ({
         <div className="selectionFilterItem">
           <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
             <TextField
+              disabled={!isEditable}
               id="availableSets"
               label="Available Sets"
               variant="outlined"
               value={activeLanyard.availableSetIds}
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                if (!isEditable) {
+                  return false;
+                }
                 const availableSetIds: number[] = filterStringToIds(event.target.value);
                 const updatedList: PinSelectionList = {
                   ...activeLanyard,
@@ -169,7 +187,7 @@ export const PinSelectionEditor = ({
               label="Show selected pins only"
             />
           </FormControl>
-          {activeLanyard.ownerId !== currentUserId && (
+          {!isEditable && (
             <Alert severity="info">This lanyard is not editable, so only selected pins will be shown.</Alert>
           )}
         </div>
@@ -195,6 +213,7 @@ export const PinSelectionListEditor = ({
           lanyardSelected={lanyardSelected}
           activeLanyard={activeLanyard}
           id="lanyardSelect"
+          currentUserId={currentUserId}
         />
       </div>
       <PinSelectionEditor
