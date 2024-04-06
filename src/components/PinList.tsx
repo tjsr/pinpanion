@@ -311,7 +311,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
       const buttonDivPosition = buttonKey.current.getBoundingClientRect();
       setButtonDivBottom(buttonDivPosition.bottom);
     }
-  }, [showInSets, hideCollectionButtons]);
+  }, [showInSets, hideCollectionButtons, activePinSet]);
 
   return (
     <>
