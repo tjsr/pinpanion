@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
-    "start": "cross-env BROWSER='chrome',BROWSER_ARGS='--remote-debugging-port=9222',PORT=3006,GENERATE_SOURCEMAP=false vite dev",
+    "start": "cross-env BROWSER='chrome',BROWSER_ARGS='--remote-debugging-port=9222',PORT=5173,GENERATE_SOURCEMAP=false vite dev",
     "chrome-remote-debug": "chrome --remote-debugging-port=9222'",
     "build": "npm run download -- public/imgs && npm run build:vite",
     "build:vite": "vite build",

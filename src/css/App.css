@@ -51,6 +51,14 @@ div.feedback, div.searchHint {
 }
 
 @media screen {
+  div#root {
+    width: 100vw;
+  }
+
+  div.drawers {
+    width: 100%;
+  }
+
   div.printqr {
     display: none;
   }

@@ -53,7 +53,7 @@ export const PinSetInfo = ({
     <div className='setpins'>
       {chunkedPinSets.map((rowinSetPins: Pin[], index: number) => {
         return (
-          <div key={`set_${pinSet.id}_row${index}`} className={`pinRow-${rowSize}`}>
+          <div key={`set_${pinSet.id}_row${index}`} className={`pinRow pinRow-${rowSize}`}>
             {rowinSetPins.map(
               (pin: Pin) => {
                 const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
@@ -65,7 +65,7 @@ export const PinSetInfo = ({
           </div>
         );
       })}
-      { pinSetPins.length <= rowSize && <div className={`pinRow-${rowSize} emptyRow`}>&nbsp;</div> }
+      { pinSetPins.length <= rowSize && <div className={`pinRow pinRow-${rowSize} emptyRow`}>&nbsp;</div> }
     </div>
     {children}
   </div>

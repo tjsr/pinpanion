@@ -7,46 +7,48 @@ div.set-tiny div.setpins {
   display: inline-block;
 }
 
-div.setpins .pinRow-1 {
+div.setpins .pinRow {
   display: inline-table;
+}
+
+div.setpins .pinRow-1 {
   column-count: 1;
+  /* height: 3em; */
 }
 
 div.setpins .pinRow-2 {
-  display: inline-table;
   column-count: 2;
-  /* height: 4em; */
+  /* height: 2.5em; */
   /* width: 5.0em; */
 }
 
 div.setpins .pinRow-3 {
-  display: inline-table;
   column-count: 3;
-  /* height: 4em; */
+  /* height: 2.5em; */
   /* width: 5.0em; */
 }
 
-div.pinSet.set-tiny div.pinRow-3.emptyRow {
-  min-height: 30px;
+/* div.pinSet.set-tiny div.pinRow-3.emptyRow {
+  height: 32px;
 }
 
 div.pinSet.set-sm div.pinRow-3.emptyRow {
-  min-height: 40px;
+  height: 45px;
 }
 
 div.pinSet.set-normal div.pinRow-3.emptyRow {
-  min-height: 70px;
+  height: 70px;
 }
 
 div.pinSet.set-large div.pinRow-3.emptyRow {
-  min-height: 100px;
-}
+  height: 100px;
+} */
 
 div.pinRow-3.emptyRow {
   min-width: 3em;
-  margin-top: 2px;
+  /* margin-top: 2px;
   margin-bottom: 2px;
-  padding: 0.2em;
+  padding: 0.2em; */
 }
 
 .set-tiny div.setpins img.pinImage {
@@ -54,9 +56,25 @@ div.pinRow-3.emptyRow {
   max-width: 30px;
 }
 
+div.set-tiny div.setpins div.pinRow {
+  height: 2.5em;
+}
+
+.set-tiny div.setpins div.pinRow-3 img.pinImage {
+  max-width: 28px;
+}
+
 .set-sm div.setpins img.pinImage {
   max-height: 40px;
   max-width: 40px;
+}
+
+div.set-sm div.setpins div.pinRow {
+  height: 3.2em;
+}
+
+.set-sm div.setpins div.pinRow-3 img.pinImage {
+  max-width: 35px;
 }
 
 .set-normal div.setpins img.pinImage {
@@ -64,9 +82,25 @@ div.pinRow-3.emptyRow {
   max-width: 70px;
 }
 
+div.set-normal div.setpins div.pinRow {
+  height: 5.1em;
+}
+
+.set-normal div.setpins div.pinRow-3 img.pinImage {
+  max-width: 55px;
+}
+
 .set-large div.setpins img.pinImage {
   max-height: 100px;
   max-width: 100px;
+}
+
+div.set-large div.setpins div.pinRow {
+  height:6.9em;
+}
+
+.set-large div.setpins div.pinRow-3 img.pinImage {
+  max-width: 75px;
 }
 
 div.setpins img.pinImage {
