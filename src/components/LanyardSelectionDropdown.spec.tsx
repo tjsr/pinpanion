@@ -12,9 +12,16 @@ import { switchToLanyard } from './__test/lanyards.utils';
 
 describe('LanyardSelctionDropdown', () => {
   let mockCallback: jest.Mock<any, any, any>;
+  let tmpConsoleError = (): void => {};
 
   beforeEach(() => {
+    tmpConsoleError = console.error;
+    console.error = jest.fn();
     mockCallback = jest.fn();
+  });
+
+  afterEach(() => {
+    console.error = tmpConsoleError;
   });
 
   const callMockOnNew = (id: string): void => {

@@ -135,6 +135,18 @@ describe('isEmptyList', () => {
 });
 
 describe('sanitizeListElement', () => {
+  let tmpConsoleError = ():void => {};
+  beforeEach(() => {
+    // Capture console.err output
+    tmpConsoleError = console.error;
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    // Restore console.err
+    console.error = tmpConsoleError;
+  });
+
   test('Should add an empty array if the key is missing.', () => {
     const emptyLanyard: PinSelectionList = {
       availableIds: undefined,
@@ -144,6 +156,7 @@ describe('sanitizeListElement', () => {
     } as any as PinSelectionList;
     sanitizeListElement(emptyLanyard, 'availableIds');
     expect(emptyLanyard.availableIds).toEqual([]);
+    console.error = tmpConsoleError;
   });
 
   test('Should not overwrite an index where values already exist.', () => {
@@ -159,6 +172,18 @@ describe('sanitizeListElement', () => {
 });
 
 describe('sanitizePinList', () => {
+  let tmpConsoleError = ():void => {};
+  beforeEach(() => {
+    // Capture console.err output
+    tmpConsoleError = console.error;
+    console.error = jest.fn();
+  });
+
+  afterEach(() => {
+    // Restore console.err
+    console.error = tmpConsoleError;
+  });
+
   test('Should add an empty array if the key is missing.', () => {
     const emptyLanyard: PinSelectionList = {
       availableIds: undefined,
