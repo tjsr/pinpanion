@@ -6,8 +6,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    - name: Use Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    
     - name: Check out repository code
       uses: actions/checkout@v3
+
+    - run: npm ci
+
+    - name: Run lint
+      if: github.ref == 'refs/head/main' || github.ref == 'refs/head/prod'
+      run: npm run lint
 
     - name: Images Primes
       id: cache-images
@@ -22,12 +33,6 @@ jobs:
         mkdir -p cached-images
         touch cached-images/empty.txt
 
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-    
-    - run: npm ci
     - run: |
         mkdir -p cached-images
         touch cached-images/empty.txt
@@ -36,3 +41,8 @@ jobs:
         cp -Rf cached-images/* public/imgs || true
     - run: npm run build
     - run: npm run test
+
+    - name: Run lint at end on all other branches
+      if: github.ref != 'refs/head/main'
+      run: npm run lint
+
