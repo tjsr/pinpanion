@@ -39,7 +39,7 @@ jobs:
         npm run download -- cached-images
         mkdir public/imgs
         cp -Rf cached-images/* public/imgs || true
-    - run: npm run build
+    - run: npm run build:vite
     - run: npm run test
 
     - name: Run lint at end on all other branches
