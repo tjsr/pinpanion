@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+
 import '@testing-library/jest-dom';
 
 import { activeLanyard, storedLanyardList } from './__test/lanyards.testdata';
@@ -29,6 +30,7 @@ describe('LanyardSelctionDropdown', () => {
         activeLanyard={activeLanyard}
         id="testDropdownId"
         storedLanyardList={storedLanyardList}
+        currentUserId={'o123'}
       />
     );
 
