@@ -173,3 +173,21 @@ describe('sanitizePinList', () => {
     expect(emptyLanyard.wantedSetIds).toEqual([77, 42, 12, 21]);
   });
 });
+
+describe('isEmpty', () => {
+  test('Should return true if a string is blank', () => {
+    expect(isEmpty('')).toBe(true);
+  });
+
+  test('Should return true if a string is null', () => {
+    expect(isEmpty(undefined)).toBe(true);
+  });
+
+  test('Should return true if a string only contains spaces', () => {
+    expect(isEmpty('   ')).toBe(true);
+  });
+
+  test('Should return false if a string contains a word', () => {
+    expect(isEmpty('blahhh')).toBe(false);
+  });
+});

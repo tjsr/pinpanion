@@ -4,7 +4,7 @@ import Select, { SelectChangeEvent } from '@mui/material/Select';
 import FormControl from '@mui/material/FormControl';
 import { InputAdornment } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
-import LockPerson from '@mui/icons-material/LockPerson'
+import LockPerson from '@mui/icons-material/LockPerson';
 import MenuItem from '@mui/material/MenuItem';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
 import { getStoredLanyards } from '../lanyardStorage';

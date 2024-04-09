@@ -6,7 +6,7 @@ import { EMPTY_FILTER, newSelectionList } from './fixture';
 import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmpty, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
+import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel';

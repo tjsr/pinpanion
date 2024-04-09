@@ -32,8 +32,6 @@ export const LanyardPinList = ({
   pinSets,
   wantedPins,
   wantedSets,
-  showInSets,
-  setShowInSets,
 }: LanyardPinListPropTypes): JSX.Element => {
   const displayedAvailable: Pin[] = availablePins.sort(
     (a: YearAndIdComparable, b: YearAndIdComparable) => compareYearThenId(a, b, descendingAge));

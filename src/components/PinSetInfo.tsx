@@ -22,10 +22,7 @@ export const PinSetInfo = ({
   displaySize = 'normal',
   pinSet,
   pinSetPins,
-  paxs,
-  pinSets,
   children,
-  style,
 }: PinSetInfoPropTypes): JSX.Element => {
   const setClasses = getPinSetClassForSize(displaySize);
   const chunkedPinSets:Pin[][] = [];

@@ -3,8 +3,6 @@ import { extractCompressedBitstring, stringToNumberArray } from 'sparse-bit-stri
 
 import { PinSelectionList } from '../types';
 
-const ENABLE_COMPRESSED_LISTS = true;
-
 const decodeQueryParam = (p: string): string => {
   return decodeURIComponent(p.replace(/\+/g, ' '));
 };

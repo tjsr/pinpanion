@@ -6,7 +6,7 @@ export const PinSetKeys = ['availableIds', 'wantedIds', 'availableSetIds', 'want
 export type PinSetKey = typeof PinSetKeys[number];
 
 export const isEmpty = (value: string | undefined): boolean => {
-  return !value || value.trim() == '';
+  return value === undefined || value.trim() == '';
 };
 
 export const isEmptyList = (lanyard: PinSelectionList): boolean => {

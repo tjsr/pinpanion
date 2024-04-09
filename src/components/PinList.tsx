@@ -113,8 +113,8 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
 
   const [hideCollectionButtonsSelected, setHideCollectionButtonsSelected] = React.useState<boolean>(false);
-  const [hideCollectionButtons, setHideCollectionButtons] = React.useState<boolean>(activePinSet
-    && !isEditable(currentUserId, activePinSet) || hideCollectionButtonsSelected);
+  const [hideCollectionButtons, setHideCollectionButtons] = React.useState<boolean>(activePinSet &&
+    !isEditable(currentUserId, activePinSet) || hideCollectionButtonsSelected);
 
   useEffect(() => {
     setHideCollectionButtons(activePinSet && !isEditable(currentUserId, activePinSet) || hideCollectionButtonsSelected);
@@ -198,27 +198,30 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
   const getScrollbarWidth = (): number => {
     // Create a new div element
     const div = document.createElement('div');
-  
+
     // Make the div have an overflow of scroll
     div.style.overflow = 'scroll';
-  
+
     // Append the div to the body
     document.body.appendChild(div);
-  
+
     // The difference between the div's offsetWidth and its clientWidth
     // is the scrollbar width
     const scrollbarWidth = div.offsetWidth - div.clientWidth;
-  
+
     // Remove the div from the body
     document.body.removeChild(div);
-  
+
     // Return the scrollbar width
     return scrollbarWidth;
-  }
+  };
 
   const scrollbarWidth = getScrollbarWidth();
 
-  const getElementTargetWidth = (displaySize: SizesType, usableScreenWidth: number): { columns: number, celWidth: number } => {
+  const getElementTargetWidth = (
+    displaySize: SizesType,
+    usableScreenWidth: number
+  ): { columns: number, celWidth: number } => {
     const minColumns = MINIMUM_ELEMENT_COLUMNS.get(displaySize) || DEFAULT_MIN_COLUMNS;
     const minDesiredWidth = getPinInfoColumnWidth(displaySize);
     let targetColumns = Math.round((usableScreenWidth / minDesiredWidth) - 0.5);
@@ -227,11 +230,14 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     }
     const targetPixelWidth = usableScreenWidth / targetColumns;
 
-    return { columns: targetColumns, celWidth: targetPixelWidth };
+    return { celWidth: targetPixelWidth, columns: targetColumns };
   };
 
   const gridInternalWidth = windowWidth - scrollbarWidth - 4;
-  const { columns: targetColumnCount, celWidth: targetGridCelWidth } = getElementTargetWidth(displaySize, gridInternalWidth);
+  const {
+    columns: targetColumnCount,
+    celWidth: targetGridCelWidth,
+  } = getElementTargetWidth(displaySize, gridInternalWidth);
 
   const rowHeight = getPinInfoRowHeight(displaySize) -
     (hideCollectionButtons ? (BUTTON_SIZES.get(displaySize) || 32) +
@@ -335,7 +341,11 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
               [<a onClick={() => setHideCollectionButtonsSelected(true)}>Hide buttons</a>]
             </div>
           )}
-          { hideCollectionButtonsSelected && <div ref={buttonKey} className="buttonKey"><a onClick={() => setHideCollectionButtonsSelected(false)}>Show buttons</a></div> }
+          { hideCollectionButtonsSelected &&
+            <div ref={buttonKey} className="buttonKey">
+              <a onClick={() => setHideCollectionButtonsSelected(false)}>Show buttons</a>
+            </div>
+          }
           { showInSets ?
             <Grid
               columnCount={targetColumnCount}
