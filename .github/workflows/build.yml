@@ -7,12 +7,12 @@ jobs:
 
     steps:
     - name: Use Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@main
       with:
         node-version: 18
     
     - name: Check out repository code
-      uses: actions/checkout@v3
+      uses: actions/checkout@main
 
     - run: npm ci
 
@@ -22,7 +22,7 @@ jobs:
 
     - name: Images Primes
       id: cache-images
-      uses: actions/cache@v3
+      uses: actions/cache@main
       with:
         path: cached-images
         key: ${{ runner.os }}-images
