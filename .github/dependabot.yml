@@ -1,6 +1,25 @@
 version: 2
 updates:
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      linter:
+        applies-to: version-updates
+        patterns:
+        - "@typescript-eslint/*"
+        update-types:
+        - "minor"
+        - "patch"
+
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'daily'
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
