@@ -7,7 +7,7 @@
     "@babel/plugin-transform-modules-commonjs": "^7.22.15",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
-    "@mui/icons-material": "^5.15.14",
+    "@mui/icons-material": "^5.15.17",
     "@mui/material": "^5.15.17",
     "cross-env": "^7.0.3",
     "express": "^4.19.2",
