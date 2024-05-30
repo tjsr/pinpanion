@@ -1,8 +1,34 @@
 version: 2
 updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    groups:
+      linter:
+        applies-to: version-updates
+        patterns:
+        - "@typescript-eslint/*"
+        - "eslint-*"
+        - "@tjsr/eslint-config"
+      mui:
+        applies-to: version-updates
+        patterns:
+        - "@mui/*"
+      react:
+        applies-to: version-updates
+        patterns:
+        - "@types/react"
+        - "@types/react-dom"
+        - "react"
+        - "react-dom"
+
   - package-ecosystem: 'npm'
     directory: '/'
     schedule:
       interval: 'daily'
-    assignees:
-    - 'tjsr'
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
