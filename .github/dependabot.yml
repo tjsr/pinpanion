@@ -3,7 +3,7 @@ updates:
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "daily"
     groups:
       linter:
         applies-to: version-updates
@@ -22,11 +22,6 @@ updates:
         - "@types/react-dom"
         - "react"
         - "react-dom"
-
-  - package-ecosystem: 'npm'
-    directory: '/'
-    schedule:
-      interval: 'daily'
 
   - package-ecosystem: "github-actions"
     directory: "/"
