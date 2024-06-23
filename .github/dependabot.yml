@@ -11,10 +11,12 @@ updates:
         - "@typescript-eslint/*"
         - "eslint-*"
         - "@tjsr/eslint-config"
+        target-branch: "dependabot/eslint"
       mui:
         applies-to: version-updates
         patterns:
         - "@mui/*"
+        target-branch: "dependabot/mui"
       react:
         applies-to: version-updates
         patterns:
@@ -22,6 +24,7 @@ updates:
         - "@types/react-dom"
         - "react"
         - "react-dom"
+        target-branch: "dependabot/react"
 
   - package-ecosystem: 'npm'
     directory: '/'
