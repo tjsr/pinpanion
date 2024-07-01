@@ -1,7 +1,7 @@
-import { ALL_PINS_URL1, ALL_PINS_URL2 } from './defaults';
+import { ALL_PINS_URL1, ALL_PINS_URL2 } from './defaults.js';
 
 import Express from 'express';
-import { PinnypalsPinsRequest } from './types';
+import { PinnypalsPinsRequest } from './types.js';
 import fetch from 'node-fetch';
 
 // eslint-disable-next-line new-cap
