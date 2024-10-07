@@ -26,8 +26,8 @@ export class InvalidPathError extends Error {
 
 export const isValidNixPath = (outputPath: string): boolean => !/[<>:"|?*]/.test(outputPath);
 
-export const isValidWin32Path = (outputPath: string): boolean => (/:/.test(outputPath) &&
-  !/[<>:"|?*]/.test(outputPath.substring(outputPath.indexOf(':') + 1))) ||
+export const isValidWin32Path = (outputPath: string): boolean => outputPath.indexOf(':') == 1 &&
+  !/[<>:"|?*]/.test(outputPath.substring(outputPath.indexOf(':') + 1)) ||
   !/[<>:"|?*]/.test(outputPath);
 
 export const validateOutputPath = (outputPath: string, win32: boolean|undefined = undefined): void => {
