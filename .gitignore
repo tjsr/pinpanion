@@ -27,3 +27,4 @@ images/
 amplify/
 public/imgs/pins/
 sampledata/
+public/imgs/*

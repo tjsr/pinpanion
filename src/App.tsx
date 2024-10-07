@@ -19,6 +19,8 @@ import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { decodePinSelectionHash } from './utils/decodePinSelectionList';
 import { generateRandomName } from './namegenerator';
 
+// import { PinCollectionData } from './pinnypals/pinnypals3convertor';
+
 const PINS_CACHE_DATA_FILE = 'pins.json';
 
 const App = (): JSX.Element => {

@@ -1,23 +1,20 @@
-/**
- * @jest-environment jsdom
- */
-
 import '@testing-library/jest-dom';
 
 import { activeLanyard, storedLanyardList } from './__test/lanyards.testdata';
 
 import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
+import { Mock } from 'vitest';
 import { render } from '@testing-library/react';
 import { switchToLanyard } from './__test/lanyards.utils';
 
 describe('LanyardSelctionDropdown', () => {
-  let mockCallback: jest.Mock<any, any, any>;
+  let mockCallback: Mock;
   let tmpConsoleError = (): void => {};
 
   beforeEach(() => {
     tmpConsoleError = console.error;
-    console.error = jest.fn();
-    mockCallback = jest.fn();
+    console.error = vitest.fn();
+    mockCallback = vitest.fn();
   });
 
   afterEach(() => {

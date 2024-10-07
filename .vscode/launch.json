@@ -8,9 +8,24 @@
       "name": "Attach to Chrome",
       "port": 9222,
       "request": "attach",
-      "type": "pwa-chrome",
+      "type": "chrome",
       "urlFilter": "http://localhost:5173/*", // use urlFilter instead of url!
       "webRoot": "${workspaceFolder}"
+    },
+    {
+      "name": "Test debug download image assets",
+      "request": "launch",
+      "type": "node",
+      "args": [
+        "--loader",
+        "ts-node/esm",
+        "${workspaceFolder}/src/utils/pindownload.ts"
+      ],
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "internalConsoleOptions": "openOnSessionStart",
+      "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**"]
     },
     {
       "name": "Debug download image assets",

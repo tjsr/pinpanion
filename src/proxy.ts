@@ -1,4 +1,4 @@
-import { ALL_PINS_URL1, ALL_PINS_URL2 } from './defaults.js';
+import { ALL_PINS_URL1, ALL_PINS_URL2, ALL_PINS_URL3 } from './defaults.js';
 
 import Express from 'express';
 import { PinnypalsPinsRequest } from './types.js';
@@ -7,7 +7,9 @@ import fetch from 'node-fetch';
 // eslint-disable-next-line new-cap
 const app = Express();
 
-const pinUrl: string = process.env.PINNYPALS_VERSION === '1' ? ALL_PINS_URL1 : ALL_PINS_URL2;
+const pinUrl: string = process.env.PINNYPALS_VERSION === '1' ?
+  ALL_PINS_URL1 : process.env.PINNYPALS_VERSION === '2' ?
+    ALL_PINS_URL2 : ALL_PINS_URL3;
 
 let ALL_PINS: PinnypalsPinsRequest | undefined = undefined;
 

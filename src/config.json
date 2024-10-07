@@ -1,10 +1,12 @@
 {
   "pinnypals1": "https://pinnypals.com/scripts/queryPins.php",
   "pinnypals2": "https://pinnypals.com/api/item-data?format=transfer",
-  "pinpanionImagePrefix": "https://pinpanion.com/imgs",
+  "pinnypals3": "https://api.pinnypals.com/api/item-data",
+  "pinpanionImagePrefix": "https://pinpanion.com/imgs/pins",
   "proxy": "http://localhost:8080/pins",
   "pinnypals1ImagePrefix": "https://pinnypals.com/imgs",
   "pinnypals2ImagePrefix": "https://d3smst7texv2dk.cloudfront.net",
+  "pinnypals3ImagePrefix": "https://d3smst7texv2dk.cloudfront.net/pins",
   "imagePrefix": "imgs",
   "imageCacheDir": "images",
   "minYear": 2013,

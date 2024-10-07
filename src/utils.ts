@@ -96,3 +96,12 @@ export const sanitizePinList = (pinList: PinSelectionList, settings: Application
 export const isEditable = (userId: UserId, pinList: PinSelectionList): boolean => {
   return pinList.ownerId === userId;
 };
+export const stripPathFromImageLocation = (inputLocation: string): string => {
+  const pathParts: string[] = inputLocation.split('/');
+  let workingPath = pathParts[pathParts.length - 1];
+
+  if (workingPath.includes('?')) {
+    workingPath = workingPath.split('?')[0];
+  }
+  return workingPath;
+};
