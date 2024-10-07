@@ -1,9 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
-import '@testing-library/jest-dom';
-
 import { PinSelectionEditor, PinSelectionListEditor } from './PinSelectionFilter';
 import { PinSelectionList, UserId } from '../types';
 import {

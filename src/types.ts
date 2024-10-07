@@ -1,13 +1,16 @@
 type uuid = string;
 export type UserId = uuid;
 export type PAXId = number;
-type PublishYear = number;
-type PinSetId = number;
+export type PAXEventId = number;
+export type PublishYear = number;
+export type PinSetId = number;
+export type HexColourCode = string;
+export type ISO8601Date = string;
 type PinId = number;
 
 export interface YearAndIdComparable {
   id: number;
-  year: PublishYear;
+  year: PublishYear | undefined;
 }
 
 export interface Pin extends YearAndIdComparable {
@@ -17,7 +20,7 @@ export interface Pin extends YearAndIdComparable {
   sub_set_id: number | null;
   year: PublishYear;
   pax_id: PAXId;
-  alternate: string;
+  alternate?: string | null | undefined;
   image_name: string;
 }
 
@@ -61,14 +64,26 @@ export type PAX = {
   id: PAXId;
   name: string;
   shortName?: string;
+  styleName?: string;
 };
+
+export type PAXEvent = {
+  id: PAXEventId;
+  name: string;
+  paxId: PAXId;
+  colour: HexColourCode;
+  year: PublishYear;
+  startDate: ISO8601Date;
+  endDate: ISO8601Date;
+}
+
 type PinSetVariant = [PinSetId, PublishYear];
 
 export interface PinSet extends YearAndIdComparable {
   id: PinSetId;
   isReprint: boolean,
   name: string;
-  year: PublishYear;
+  year: PublishYear | undefined;
   isPackagedSet: boolean;
   sub_set_id?: PinSetId;
   image_name: string;
@@ -81,10 +96,12 @@ export type SizesType = 'tiny' | 'sm' | 'normal' | 'large';
 
 export interface ConfigType {
   pinnypals1?: string;
-  pinnypals2: string;
+  pinnypals2?: string;
+  pinnypals3: string;
   proxy: string;
   pinnypals1ImagePrefix?: string;
-  pinnypals2ImagePrefix: string;
+  pinnypals2ImagePrefix?: string;
+  pinnypals3ImagePrefix: string;
   pinpanionImagePrefix: string;
   imagePrefix: string;
   imageCacheDir: string;

@@ -139,7 +139,7 @@ describe('sanitizeListElement', () => {
   beforeEach(() => {
     // Capture console.err output
     tmpConsoleError = console.error;
-    console.error = jest.fn();
+    console.error = vitest.fn();
   });
 
   afterEach(() => {
@@ -176,7 +176,7 @@ describe('sanitizePinList', () => {
   beforeEach(() => {
     // Capture console.err output
     tmpConsoleError = console.error;
-    console.error = jest.fn();
+    console.error = vitest.fn();
   });
 
   afterEach(() => {

@@ -19,10 +19,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
+    "sourceMap": true,
   },
   "include": [
-    "src"
+    "src",
+    "test",
+    "test/vitest.setup.ts"
   ],
-  "exclude": ["node_modules", "test", "dist"]
+  "exclude": ["node_modules", "dist"]
 }
