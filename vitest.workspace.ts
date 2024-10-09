@@ -3,7 +3,7 @@ import * as config from './vitest.config.ts';
 import { defineWorkspace } from 'vitest/config';
 import path from 'node:path';
 
-// process.env.PROJECT_ROOT = 'h:/dev/workspaces/pinny/pinnysets/';
+process.env.PROJECT_ROOT = 'h:/dev/workspaces/pinny/pinnysets/';
 
 export default defineWorkspace([
   { ...config.default,
