@@ -1,7 +1,17 @@
 import '../css/pins.css';
 
 import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId, YearAndIdComparable } from '../types';
+import {
+  PAX,
+  Pin,
+  PinGroup,
+  PinListFilter,
+  PinSelectionList,
+  PinSet,
+  SizesType,
+  UserId,
+  YearAndIdComparable
+} from '../types';
 import React, { useEffect, useRef } from 'react';
 import { compareYearThenId, removeOrAddId } from '../listutils';
 
@@ -23,9 +33,10 @@ interface PinListPropTypes {
   heading: string;
   isPinFiltered: (pin: Pin, filter?: PinListFilter) => boolean;
   isPinSetFiltered: (pinSet: PinSet, filter?: PinListFilter) => boolean;
-  paxs?: PAX[];
+  paxs: PAX[];
   pins: Pin[];
-  pinSets?: PinSet[];
+  pinSets: PinSet[];
+  groups: PinGroup[];
   setPinSet?: (list: PinSelectionList) => void;
   currentUserId: UserId;
   showInSets?: boolean;
@@ -93,6 +104,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     pins,
     paxs,
     pinSets,
+    groups,
     filter,
     activePinSet,
     isPinFiltered,
@@ -259,7 +271,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
     return (
       <div className="pinInfoPadding" style={style}>
-        <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin}>
+        <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} groups={groups}>
           {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtonsSelected && (
             <PinListButtons
               availableCount={countPinAvailable(pin.id)}

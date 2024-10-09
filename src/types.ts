@@ -4,6 +4,7 @@ export type PAXId = number;
 export type PAXEventId = number;
 export type PublishYear = number;
 export type PinSetId = number;
+export type PinGroupId = number;
 export type HexColourCode = string;
 export type ISO8601Date = string;
 type PinId = number;
@@ -13,15 +14,32 @@ export interface YearAndIdComparable {
   year: PublishYear | undefined;
 }
 
+export enum GroupTypes {
+  STAFF = 'STAFF',
+  SHOW = 'SHOW',
+  BLINDBOX = 'BLINDBOX',
+  OTHER = 'OTHER',
+}
+
+export interface PinGroup {
+  id: PinGroupId;
+  name: string;
+  type?: GroupTypes;
+  notes?: string;
+  imageUrl?: string;
+};
+
 export interface Pin extends YearAndIdComparable {
   id: PinId;
   name: string;
   set_id: PinSetId | null;
   sub_set_id: number | null;
   year: PublishYear;
-  pax_id: PAXId;
+  group_id?: PinGroupId;
+  pax_id?: PAXId;
+  pax_event_id?: PAXEventId;
   alternate?: string | null | undefined;
-  image_name: string;
+  image_name: string | null;
 }
 
 export type Collection = {
@@ -109,3 +127,5 @@ export interface ConfigType {
   maxYear: number;
   reverseYears: boolean;
 }
+
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

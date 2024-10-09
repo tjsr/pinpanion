@@ -1,6 +1,6 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, Pin, PinSet, SizesType, YearAndIdComparable } from '../types';
+import { PAX, Pin, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types';
 
 import { PinInfo } from './PinInfo';
 import { PinSetInfo } from './PinSetInfo';
@@ -17,6 +17,7 @@ type LanyardPinListPropTypes = {
   wantedSets: PinSet[];
   paxs: PAX[];
   pinSets: PinSet[];
+  groups: PinGroup[];
   showInSets: boolean;
   setShowInSets: (showInSets: boolean) => void;
 };
@@ -30,6 +31,7 @@ export const LanyardPinList = ({
   heading,
   paxs,
   pinSets,
+  groups,
   wantedPins,
   wantedSets,
 }: LanyardPinListPropTypes): JSX.Element => {
@@ -62,7 +64,14 @@ export const LanyardPinList = ({
             {displayedAvailable.length > 0 && (
               <div className="availablePins">
                 {displayedAvailable.map((pin: Pin) => {
-                  return <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />;
+                  return <PinInfo
+                    displaySize={displaySize}
+                    key={pin.id}
+                    paxs={paxs}
+                    pinSets={pinSets}
+                    pin={pin}
+                    groups={groups}
+                  />;
                 })}
               </div>
             )}
@@ -84,7 +93,13 @@ export const LanyardPinList = ({
             <div className="wantedPins">
               {displayedWanted.length > 0 && (
                 displayedWanted.map((pin: Pin) => {
-                  return <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />;
+                  return <PinInfo
+                    displaySize={displaySize}
+                    key={pin.id}
+                    paxs={paxs}
+                    pinSets={pinSets}
+                    pin={pin}
+                    groups={groups} />;
                 })
               )}
             </div>

@@ -3,7 +3,7 @@ import './css/pins.css';
 
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, Pin, PinListFilter, PinSelectionList, PinSet } from './types';
+import { PAX, Pin, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
@@ -13,7 +13,7 @@ import { AppSettingsPanel } from './components/AppSettingsPanel';
 import { FilterQRCode } from './components/FilterQRCode';
 import { LanyardPinList } from './components/LanyardPinList';
 import { PinAppDrawerSet } from './components/PinAppDrawerSet';
-import { PinCollectionData } from './pinnypals/pinnypals2convertor';
+import { PinCollectionData } from './pinnypals/pinnypals3convertor';
 import { PinList } from './components/PinList';
 import { PinSelectionListEditor } from './components/PinSelectionFilter';
 import { decodePinSelectionHash } from './utils/decodePinSelectionList';
@@ -26,6 +26,7 @@ const PINS_CACHE_DATA_FILE = 'pins.json';
 const App = (): JSX.Element => {
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
+  const [pinGroups, setPinGroups] = useState<PinGroup[]>([]);
   const [paxs, setPaxs] = useState<PAX[]>([]);
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
@@ -93,6 +94,7 @@ const App = (): JSX.Element => {
 
         setPins(data.pins);
         setPinSets(data.sets);
+        setPinGroups(data.groups);
         if (!data.pax || data?.pax.length === 0) {
           console.warn('PAX event data received from server was an empty set.');
         } else {
@@ -249,6 +251,7 @@ const App = (): JSX.Element => {
                 wantedPins={pins.filter((p) => activePinList.wantedIds?.includes(+p.id))}
                 paxs={paxs}
                 pinSets={pinSets}
+                groups={pinGroups}
                 showInSets={showInSets}
                 setShowInSets={setShowInSets}
                 availableSets={pinSets.filter((ps) => activePinList.availableSetIds?.includes(+ps.id))}
@@ -279,6 +282,7 @@ const App = (): JSX.Element => {
                 paxs={paxs}
                 pins={pins}
                 pinSets={pinSets}
+                groups={pinGroups}
                 setPinSet={selectionListUpdated}
                 currentUserId={applicationSettings.localUserId}
                 showInSets={showInSets}

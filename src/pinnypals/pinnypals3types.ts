@@ -1,5 +1,5 @@
-type PaxId = number;
 type SetId = number;
+type PaxEventId = number;
 type PinId = number;
 type CategoryId = number;
 type Year = number;
@@ -13,7 +13,7 @@ export interface Pinnypals3PinData {
   name: string;
   year: number;
   setId?: SetId;
-  eventId: PaxId;
+  eventId?: PaxEventId;
   variantYears: Year[];
   categoryIds: CategoryId[];
   imageUrl: ImageLocation;
@@ -32,7 +32,7 @@ export interface Pinnypals3Category {
 }
 
 export interface Pinnypals3Event {
-  id: PaxId;
+  id: PaxEventId;
   name: string;
   type: string;
   subType: string;
@@ -48,7 +48,7 @@ export interface Pinnypals3Group {
   type: string;
 }
 
-export interface Pinnypals3ItemDataRequest {
+export interface Pinnypals3ItemDataRequestOld {
   pins: Pinnypals3PinData[];
   sets: Pinnypals3PinSet[];
   categories: Pinnypals3Category[];
@@ -56,3 +56,13 @@ export interface Pinnypals3ItemDataRequest {
   groups: Pinnypals3Group[];
 }
 
+import { paths } from './pp3schema';
+
+export type Pinnypals3ItemDataRequest = paths['/item-data']['get']['responses'][200]['content']['application/json'];
+export type Pinnypals3SetCollectionRequest = paths['/sets']['get']['responses'][200]['content']['application/json'];
+export type Pinnypals3ItemDataEvent = Pinnypals3ItemDataRequest['events'][0];
+export type Pinnypals3ItemDataPin = Pinnypals3ItemDataRequest['pins'][0];
+export type Pinnypals3ItemDataSet = Pinnypals3ItemDataRequest['sets'][0];
+export type Pinnypals3ItemDataGroup = Pinnypals3ItemDataRequest['groups'][0];
+
+export type Pinnypals3Set = paths['/sets']['get']['responses'][200]['content']['application/json'][0];

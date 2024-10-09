@@ -19,6 +19,8 @@ const DOWNLOAD_ALL = true;
 const TEST_MODE = process.env.TEST_MODE == 'true' || process.env.NODE_ENV === 'test';
 const DEFAULT_IMAGE_LIMIT = TEST_MODE ? 10 : -1;
 const LIMIT_IMAGE_DOWNLOADS = TEST_MODE && !DOWNLOAD_ALL ? DEFAULT_IMAGE_LIMIT : -1;
+
+const printSkipMessages = process.env.PRINT_SKIPPED_IMAGES == 'true';
 // const LIMIT_PINNYPALS_DOWNLOADS = 10;
 
 const configFile = 'src/config.json';
@@ -171,6 +173,9 @@ const downloadImageForPin = async (
   destinationPath: string,
   pin: Pin
 ): Promise<DownloadSource> => {
+  if (!pin.image_name) {
+    throw new Error(`Can't download image for Pin ${pin.id} (${pin.name}) which has no image value.`);
+  }
   const pinImageFilename: string = stripPathFromImageLocation(pin.image_name);
 
   const outputFilePath: string = path.resolve(path.join(destinationPath, pinImageFilename));
@@ -184,7 +189,9 @@ const downloadImageForPin = async (
   }
 
   if (fs.existsSync(outputFilePath)) {
-    console.log(`Skipped downloading ${pinImageFilename} because ${outputFilePath} exists.`);
+    if (printSkipMessages) {
+      console.log(`Skipped downloading ${pinImageFilename} because ${outputFilePath} exists.`);
+    }
     return Promise.resolve('cache');
   }
 
@@ -212,7 +219,7 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
     throw new Error(`Failed creating destination directory ${globalDestinationPath}`);
   }
 
-  const promises: Promise<DownloadSource>[] = pinsToDownload.map((p) =>
+  const promises: Promise<DownloadSource>[] = pinsToDownload.filter((pin) => pin.image_name).map((p) =>
     downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
 
   return Promise.allSettled(promises).then((results: PromiseSettledResult<DownloadSource>[]) => {
