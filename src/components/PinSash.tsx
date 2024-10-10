@@ -1,4 +1,4 @@
-import { PAXId, Pin, PinGroup, PinGroupId, PinSet, PinSetId } from '../types.js';
+import { PAXEvent, PAXEventId, PAXId, Pin, PinGroup, PinGroupId, PinSet, PinSetId } from '../types.js';
 import { getGroupCssClass, getPaxCssClass } from './PinInfo.js';
 
 import eventnames from '../eventnames.json';
@@ -15,45 +15,53 @@ interface PinSashPropTypes {
   pin: Pin;
   sets: PinSet[];
   groups: PinGroup[];
+  events: PAXEvent[];
 }
 
-export const PinSash = ({ pin, sets, groups }: PinSashPropTypes): React.ReactNode => {
-  if (pin.group_id) {
-    return <PinGroupSash groups={groups} pinGroupId={pin.group_id} />;
+export const PinSash = ({ pin, sets, groups, events }: PinSashPropTypes): React.ReactNode => {
+  const group: PinGroup | undefined = groups.find((g) => g.id === pin.group_id);
+  if (group) {
+    return <PinGroupSash group={group} />;
   }
 
-  const setId = pin.set_id || pin.sub_set_id;
+  const event: PAXEvent|undefined = events.find((e) => e.id === pin.pax_event_id);
+  if (event) {
+    return <PaxEventSash event={event} />;
+  }
 
-  if (setId) {
-    return <PinSetSash pinSetId={setId} paxId={pin.pax_id!} sets={sets} />;
+  if (pin.set_id) {
+    return <PinSetSash pinSetId={pin.set_id} eventId={pin.pax_event_id!} sets={sets} />;
   }
 
   const paxCssClass = 'pax ' + getPaxCssClass('pax', pin.pax_id!);
 
   const pinPaxEvent = eventnames[pin.pax_id!];
   if (!pinPaxEvent) {
-    console.warn(`No event name known for PAX with Id ${pin.pax_id}`);
+    console.warn(`No event name known for PAX with Id ${pin.pax_id}`, pin);
     return <div className={paxCssClass}>Unknown PAX event {pin.year}</div>;
   }
 
   return (<div className={paxCssClass}>{pinPaxEvent.description} {pin.year}</div>);
 };
 
-const PinGroupSash = ({ pinGroupId, groups } : { pinGroupId: PinGroupId, groups: PinGroup[] }) => {
-  const group = getGroupById(pinGroupId, groups);
-  const groupCssClass = 'group' + ' ' + getGroupCssClass(group);
-  return <div>
-    <div className={groupCssClass} data-pin-group-id={group.id}>{group.name}</div>
-  </div>;
+const PaxEventSash = ({ event } : { event: PAXEvent }) => {
+  const eventCssClass = 'event ' + getEventCssClass(event);
+  return <div className={eventCssClass} data-pin-event-id={event.id}>{event.name}</div>
+  event.
+};
+
+const PinGroupSash = ({ group } : { group: PinGroup }) => {
+  const groupCssClass = 'group  ' + getGroupCssClass(group);
+  return <div className={groupCssClass} data-pin-group-id={group.id}>{group.name}</div>;
 };
 
 interface PinSetSashPropTypes {
   pinSetId: PinSetId;
-  paxId: PAXId;
+  paxEventId: PAXEventId;
   sets: PinSet[];
 }
 
-const PinSetSash = ({ pinSetId, paxId, sets } : PinSetSashPropTypes) => {
+const PinSetSash = ({ pinSetId, paxEventId, sets } : PinSetSashPropTypes) => {
   const pinSet: PinSet | undefined = sets?.find((set: PinSet) => set?.id == pinSetId);
   if (!pinSet) {
     return <></>;

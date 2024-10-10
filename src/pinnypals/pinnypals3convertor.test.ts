@@ -45,6 +45,10 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
   test('V3 - Find all pins in the West 18 show set', () => {
     expect(data.pins.filter((p: Pin) => p.set_id === 73).length).toBe(4);
   });
+
+  it('Should not have any pins that lack set, event or group IDs', () => {
+    expect(data.pins.filter((p: Pin) => !p.set_id && !p.pax_event_id && !p.group_id).length).toBe(0);
+  });
 });
 
 describe('convertPinnypals3PinDataToPin', () => {

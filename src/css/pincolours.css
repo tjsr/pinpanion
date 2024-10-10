@@ -19,6 +19,7 @@
 
 .paxAus {
   background-color: var(--pax-colour-aus);
+  color: var(--pax-text-dark);
 }
 
 .paxGaming {

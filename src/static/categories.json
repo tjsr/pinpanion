@@ -1,0 +1,22 @@
+[
+  {
+      "id": 4,
+      "name": "PAX",
+      "colour": "#389431"
+  },
+  {
+      "id": 5,
+      "name": "Online",
+      "colour": "#e6abab"
+  },
+  {
+      "id": 6,
+      "name": "Limited",
+      "colour": "#000000"
+  },
+  {
+      "id": 7,
+      "name": "Gaming",
+      "colour": "#000080"
+  }
+]

@@ -19,6 +19,9 @@ type PinInfoPropTypes = {
 };
 
 export const getPaxCssClass = (prefix: string, paxId: number): string|undefined => {
+  if (!categories[categoryId]) {
+
+  }
   if (!eventnames[paxId]) {
     console.warn(`No event name known for PAX with Id ${paxId}`);
     return undefined;
@@ -43,7 +46,7 @@ export const PinInfo = ({
   style,
 }: PinInfoPropTypes): JSX.Element => {
   const url = pin.image_name ? `${config.imagePrefix}/${pin.image_name.split('?')[0]}` : undefined;
-  const pinPax: PAX | undefined = paxs?.find((pax: PAX) => pax.id == pin.pax_id);
+  // const pinPax: PAX | undefined = paxs?.find((pax: PAX) => pax.id == pin.pax_id);
 
   let pinClasses = getPinClassForSize(displaySize);
 

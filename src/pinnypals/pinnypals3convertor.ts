@@ -132,6 +132,7 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
     groups.find((g) => g.id === pin.groupId);
     const outputPin: Pin = {
       alternate: undefined,
+      category_ids: pin.categoryIds,
       group_id: pin.groupId,
       id: pin.id,
       image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
@@ -144,6 +145,9 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
     };
     if (pin.eventId === undefined) {
       console.warn(`Pin ${pin.id} (${pin.name}) has no EventID`);
+    }
+    if (!pin.eventId && !pin.groupId && !pin.setId && (!pin.categoryIds || pin.categoryIds.length === 0)) {
+      throw new Error(`Pin has no EventID, GroupID, SetID or CategoryID: ${JSON.stringify(pin)}`);
     }
     if (pin.variantYears.filter((y) => y != pin.year).length > 1) {
       console.warn(`Pin ${pin.id} has multiple years: ${pin.variantYears.join(', ')}`);

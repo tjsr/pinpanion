@@ -1,4 +1,4 @@
-import { PAX, Pin, PinSet } from '../types.js';
+import { PAX, PAXId, Pin, PinSet, PinSetId } from '../types.js';
 import {
   Pinnypals2EventsArray,
   Pinnypals2PaxIdentifier,
@@ -42,10 +42,16 @@ const extractPAXs = (paxArray: Pinnypals2EventsArray): PAX[] =>
 //   0
 // ]
 
+interface Pinnypals2PinData {
+  pax_id: PAXId;
+  sub_set_id: PinSetId|null;
+}
+
 const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
   pinArray.map((pin: Pinnypals2PinIdentifier) => {
-    const outputPin: Pin = {
+    const outputPin: Pin & Pinnypals2PinData = {
       alternate: '',
+      category_ids: [],
       id: pin[0],
       image_name: pin[2],
       name: pin[1],
@@ -54,7 +60,7 @@ const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
       sub_set_id: null,
       year: pin[3],
     };
-    return outputPin;
+    return outputPin as Pin;
   });
 
 const extractPinSets = (pinSetArray: Pinnypals2SetsArray): PinSet[] =>
