@@ -1,4 +1,4 @@
-import { GroupTypes, PAX, PAXEvent, PAXId, Pin, PinGroup, PinSet, PublishYear } from '../types.js';
+import { GroupTypes, PAX, PAXEvent, PAXEventId, PAXId, Pin, PinGroup, PinSet, PublishYear } from '../types.js';
 import {
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
@@ -93,7 +93,7 @@ const getPinnypals3SetById = (sets: Pinnypals3PinSet[], setId: number): Pinnypal
   return set;
 };
 
-const paxIdFromEventId = (eventId: PAXId|undefined, events: PAXEvent[]): PAXId|undefined => {
+const paxIdFromEventId = (eventId: PAXEventId|undefined, events: PAXEvent[]): PAXId|undefined => {
   if (eventId === undefined) {
     return undefined;
   }
@@ -137,15 +137,11 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
       id: pin.id,
       image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
       name: pin.name,
+      paxId: paxIdFromEventId(pin.eventId, events) ?? 0,
       pax_event_id: pin.eventId,
-      pax_id: paxIdFromEventId(pin.eventId, events),
       set_id: pin.setId ?? null,
-      sub_set_id: null,
       year: pin.year,
     };
-    if (pin.eventId === undefined) {
-      console.warn(`Pin ${pin.id} (${pin.name}) has no EventID`);
-    }
     if (!pin.eventId && !pin.groupId && !pin.setId && (!pin.categoryIds || pin.categoryIds.length === 0)) {
       throw new Error(`Pin has no EventID, GroupID, SetID or CategoryID: ${JSON.stringify(pin)}`);
     }

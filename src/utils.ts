@@ -105,3 +105,8 @@ export const stripPathFromImageLocation = (inputLocation: string): string => {
   }
   return workingPath;
 };
+
+export const toProperCase = (str: string): string =>
+  str.replace(/\w\S*/g, (txt) =>
+    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  );

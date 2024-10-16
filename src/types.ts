@@ -37,6 +37,7 @@ export interface Pin extends YearAndIdComparable {
   year: PublishYear;
   group_id?: PinGroupId;
   category_ids: PinCategoryId[];
+  paxId: PAXId;
   pax_event_id?: PAXEventId;
   alternate?: string | null | undefined;
   image_name: string | null;
@@ -84,6 +85,12 @@ export type PAX = {
   shortName?: string;
   styleName?: string;
 };
+
+export type PAXEventDisplayTypes = {
+  id: PAXId;
+  description: string;
+  cssClass: string;
+}
 
 export type PAXEvent = {
   id: PAXEventId;

@@ -3,7 +3,7 @@ import './css/pins.css';
 
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, Pin, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
+import { PAX, PAXEvent, Pin, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
@@ -28,6 +28,7 @@ const App = (): JSX.Element => {
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
   const [pinGroups, setPinGroups] = useState<PinGroup[]>([]);
   const [paxs, setPaxs] = useState<PAX[]>([]);
+  const [events, setEvents] = useState<PAXEvent[]>([]);
   const [filter, setFilter] = useState<PinListFilter>({
     ...EMPTY_FILTER,
   });
@@ -95,6 +96,7 @@ const App = (): JSX.Element => {
         setPins(data.pins);
         setPinSets(data.sets);
         setPinGroups(data.groups);
+        setEvents(data.events);
         if (!data.pax || data?.pax.length === 0) {
           console.warn('PAX event data received from server was an empty set.');
         } else {
@@ -250,6 +252,7 @@ const App = (): JSX.Element => {
                 availablePins={pins.filter((p) => activePinList.availableIds?.includes(+p.id))}
                 wantedPins={pins.filter((p) => activePinList.wantedIds?.includes(+p.id))}
                 paxs={paxs}
+                events={events}
                 pinSets={pinSets}
                 groups={pinGroups}
                 showInSets={showInSets}
@@ -281,6 +284,7 @@ const App = (): JSX.Element => {
                 }}
                 paxs={paxs}
                 pins={pins}
+                events={events}
                 pinSets={pinSets}
                 groups={pinGroups}
                 setPinSet={selectionListUpdated}

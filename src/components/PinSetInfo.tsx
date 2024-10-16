@@ -1,12 +1,12 @@
 import '../css/pinSetInfo.css';
 
-import { PAX, PAXId, Pin, PinSet, SizesType } from '../types';
+import { PAX, PAXId, Pin, PinSet, SizesType } from '../types.js';
 
 import React from 'react';
 import config from '../config.json';
-import eventnames from '../eventnames.json';
-import { getPaxCssClass } from './PinInfo';
-import { getPinSetClassForSize } from '../utils';
+import eventnames from '../static/eventDisplayTypes.json';
+import { getPaxCssClass } from '../css/cssClasses.js';
+import { getPinSetClassForSize } from '../utils.js';
 
 type PinSetInfoPropTypes = {
   displaySize: SizesType;
@@ -34,7 +34,7 @@ export const PinSetInfo = ({
   let paxCssClass = 'pax';
 
   const getPaxIdFromPinsInSet = (pinsInSet: Pin[]): PAXId => {
-    return pinsInSet[0]?.pax_id || 0;
+    return pinsInSet[0]?.paxId || 0;
   };
 
   const paxId = getPaxIdFromPinsInSet(pinSetPins) || 0;
@@ -53,7 +53,10 @@ export const PinSetInfo = ({
           <div key={`set_${pinSet.id}_row${index}`} className={`pinRow pinRow-${rowSize}`}>
             {rowinSetPins.map(
               (pin: Pin) => {
-                const url = `${config.imagePrefix}/${pin.image_name.split('?')[0]}`;
+                const url = pin.image_name ? `${config.imagePrefix}/${pin.image_name.split('?')[0]}` : 'unknown image';
+                if (!pin.image_name) {
+                  console.warn(`No image for pin ${pin.id}`, pin);
+                }
                 return (
                   <img key={`set_${pinSet.id}_pin_${pin.id}`} className="pinImage" alt={pin.name} src={url} />
                 );

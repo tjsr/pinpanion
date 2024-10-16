@@ -1,10 +1,10 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, Pin, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types';
+import { PAX, PAXEvent, Pin, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.js';
 
-import { PinInfo } from './PinInfo';
-import { PinSetInfo } from './PinSetInfo';
-import { compareYearThenId } from '../listutils';
+import { PinInfo } from './PinInfo.js';
+import { PinSetInfo } from './PinSetInfo.js';
+import { compareYearThenId } from '../listutils.js';
 
 type LanyardPinListPropTypes = {
   allPins: Pin[];
@@ -16,6 +16,7 @@ type LanyardPinListPropTypes = {
   availableSets: PinSet[];
   wantedSets: PinSet[];
   paxs: PAX[];
+  events: PAXEvent[];
   pinSets: PinSet[];
   groups: PinGroup[];
   showInSets: boolean;
@@ -31,6 +32,7 @@ export const LanyardPinList = ({
   heading,
   paxs,
   pinSets,
+  events,
   groups,
   wantedPins,
   wantedSets,
@@ -71,6 +73,7 @@ export const LanyardPinList = ({
                     pinSets={pinSets}
                     pin={pin}
                     groups={groups}
+                    events={events}
                   />;
                 })}
               </div>
@@ -99,7 +102,8 @@ export const LanyardPinList = ({
                     paxs={paxs}
                     pinSets={pinSets}
                     pin={pin}
-                    groups={groups} />;
+                    groups={groups}
+                    events={events} />;
                 })
               )}
             </div>

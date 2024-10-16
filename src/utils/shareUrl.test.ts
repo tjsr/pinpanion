@@ -1,4 +1,4 @@
-import { findShareGaps } from './shareUrl';
+import { findShareGaps } from './shareUrl.js';
 
 describe('findShareGaps', () => {
   test('Should find a missing range', () => {

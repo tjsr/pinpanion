@@ -55,6 +55,7 @@ const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
       id: pin[0],
       image_name: pin[2],
       name: pin[1],
+      paxId: pin[6],
       pax_id: pin[6],
       set_id: pin[7],
       sub_set_id: null,

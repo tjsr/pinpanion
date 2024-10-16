@@ -1,4 +1,4 @@
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor';
+import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
 import { PinSet } from '../types.js';
 import testData from '../../test/pinpanion-pin-data.json';
 

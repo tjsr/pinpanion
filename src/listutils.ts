@@ -50,6 +50,12 @@ export const compareYearThenId = (a: YearAndIdComparable, b: YearAndIdComparable
   if (a.year === b.year) {
     return descending ? b.id - a.id : a.id - b.id;
   }
-  return descending ? b.year - a.year : a.year - b.year;
+  if (b.year && !a.year) {
+    return descending ? 1 : -1;
+  }
+  if (a.year && !b.year) {
+    return descending ? -1 : 1;
+  }
+  return descending ? (b.year ?? 0) - (a.year ?? 0) : (a.year ?? 0) - (b.year ?? 0);
 };
 

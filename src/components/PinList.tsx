@@ -1,8 +1,9 @@
 import '../css/pins.css';
 
-import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints';
+import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints.js';
 import {
   PAX,
+  PAXEvent,
   Pin,
   PinGroup,
   PinListFilter,
@@ -11,19 +12,19 @@ import {
   SizesType,
   UserId,
   YearAndIdComparable
-} from '../types';
+} from '../types.js';
 import React, { useEffect, useRef } from 'react';
-import { compareYearThenId, removeOrAddId } from '../listutils';
+import { compareYearThenId, removeOrAddId } from '../listutils.js';
 
-import { FilterQRCode } from './FilterQRCode';
+import { FilterQRCode } from './FilterQRCode.js';
 import { FixedSizeGrid as Grid } from 'react-window';
-import { MemoizedPinInfo } from './PinInfo';
-import { MemoizedPinSetInfo } from './PinSetInfo';
-import { PinListButtons } from './PinButtons';
-import { getUserId } from '../settingsStorage';
-import { isEditable } from '../utils';
-import { newSelectionList } from '../fixture';
-import useWindowDimensions from '../utils/useWindowDimensions';
+import { MemoizedPinInfo } from './PinInfo.js';
+import { MemoizedPinSetInfo } from './PinSetInfo.js';
+import { PinListButtons } from './PinButtons.js';
+import { getUserId } from '../settingsStorage.js';
+import { isEditable } from '../utils.js';
+import { newSelectionList } from '../fixture.js';
+import useWindowDimensions from '../utils/useWindowDimensions.js';
 
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;
@@ -37,6 +38,7 @@ interface PinListPropTypes {
   pins: Pin[];
   pinSets: PinSet[];
   groups: PinGroup[];
+  events: PAXEvent[];
   setPinSet?: (list: PinSelectionList) => void;
   currentUserId: UserId;
   showInSets?: boolean;
@@ -104,6 +106,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     paxs,
     pinSets,
     groups,
+    events,
     filter,
     activePinSet,
     isPinFiltered,
@@ -270,7 +273,14 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
 
     return (
       <div className="pinInfoPadding" style={style}>
-        <MemoizedPinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} groups={groups}>
+        <MemoizedPinInfo
+          displaySize={displaySize}
+          key={pin.id}
+          paxs={paxs}
+          pinSets={pinSets}
+          pin={pin}
+          groups={groups}
+          events={events}>
           {activePinSet && isEditable(currentUserId, activePinSet) && !hideCollectionButtonsSelected && (
             <PinListButtons
               availableCount={countPinAvailable(pin.id)}
