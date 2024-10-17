@@ -51,13 +51,13 @@ const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
   pinArray.map((pin: Pinnypals2PinIdentifier) => {
     const outputPin: Pin & Pinnypals2PinData = {
       alternate: '',
-      category_ids: [],
+      categoryIds: [],
       id: pin[0],
       image_name: pin[2],
       name: pin[1],
       paxId: pin[6],
       pax_id: pin[6],
-      set_id: pin[7],
+      setId: pin[7],
       sub_set_id: null,
       year: pin[3],
     };
@@ -72,7 +72,7 @@ const extractPinSets = (pinSetArray: Pinnypals2SetsArray): PinSet[] =>
       isPackagedSet: pinSet[5] == 1,
       isReprint: pinSet[3] > 0,
       name: pinSet[1],
-      sub_set_id: pinSet[7],
+      subSetId: pinSet[7],
       variants: pinSet[4],
       year: pinSet[2],
     };

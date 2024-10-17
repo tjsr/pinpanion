@@ -56,7 +56,7 @@ export const LanyardPinList = ({
             { displayedAvailableSets.length > 0 && (
               <div className="availableSets">
                 {displayedAvailableSets.map((pinSet: PinSet) => {
-                  const pinsInSet = allPins.filter((pin: Pin) => pin.set_id === pinSet.id);
+                  const pinsInSet = allPins.filter((pin: Pin) => pin.setId === pinSet.id);
                   return <PinSetInfo
                     displaySize={displaySize} key={pinSet.id} paxs={paxs}
                     pinSets={pinSets} pinSet={pinSet} pinSetPins={pinsInSet} />;
@@ -86,7 +86,7 @@ export const LanyardPinList = ({
             <div className="wantedSets">
               {displayedWantedSets.length > 0 && (
                 displayedWantedSets.map((pinSet: PinSet) => {
-                  const pinsInSet = allPins.filter((pin: Pin) => pin.set_id === pinSet.id);
+                  const pinsInSet = allPins.filter((pin: Pin) => pin.setId === pinSet.id);
                   return <PinSetInfo
                     displaySize={displaySize} key={pinSet.id}
                     paxs={paxs} pinSets={pinSets} pinSet={pinSet} pinSetPins={pinsInSet} />;

@@ -94,7 +94,7 @@ const getPinSetInfoRowHeight = (displaySize: SizesType): number => {
 };
 
 const getPinsInSet = (pinSet: PinSet, allPins: Pin[]): Pin[] => {
-  return allPins.filter((pin: Pin) => pinSet.isPackagedSet == true && pin.set_id === pinSet.id);
+  return allPins.filter((pin: Pin) => pinSet.isPackagedSet == true && pin.setId === pinSet.id);
 };
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {

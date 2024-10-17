@@ -66,3 +66,17 @@ export type Pinnypals3ItemDataSet = Pinnypals3ItemDataRequest['sets'][0];
 export type Pinnypals3ItemDataGroup = Pinnypals3ItemDataRequest['groups'][0];
 
 export type Pinnypals3Set = paths['/sets']['get']['responses'][200]['content']['application/json'][0];
+
+export class PinnypalsDataError extends Error {
+  constructor(message: string) {
+    super(message);
+  }
+}
+
+export class PinnypalsPinDataError extends PinnypalsDataError {
+  _inputPin: Pinnypals3ItemDataPin;
+  constructor(message: string, inputPin: Pinnypals3ItemDataPin) {
+    super(message);
+    this._inputPin = inputPin;
+  }
+}

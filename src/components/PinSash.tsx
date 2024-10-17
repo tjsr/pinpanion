@@ -38,29 +38,31 @@ interface PinSashPropTypes {
 // & ModelObject & { isTransferObject: true, isModelObject: false };
 
 export const PinSash = ({ pin, sets, groups, events }: PinSashPropTypes): React.ReactNode => {
-  const group: PinGroup | undefined = groups.find((g) => g.id === pin.group_id);
+  const group: PinGroup | undefined = groups.find((g) => g.id === pin.groupId);
   if (group) {
     return <PinGroupSash group={group} />;
   }
 
-  const event: PAXEvent|undefined = events.find((e) => e.id === pin.pax_event_id);
+  if (pin.setId) {
+    return <PinSetSash pinSetId={pin.setId} paxEventId={pin.paxEventId!} sets={sets} events={events} />;
+  }
+
+  const event: PAXEvent|undefined = events.find((e) => e.id === pin.paxEventId);
   if (event) {
     return <PaxEventSash event={event} events={events} />;
   }
 
-  if (pin.set_id) {
-    return <PinSetSash pinSetId={pin.set_id} paxEventId={pin.pax_event_id!} sets={sets} events={events} />;
-  }
-
-  if (pin.pax_event_id) {
-    return <PaxEventSash eventId={pin.pax_event_id} events={events} />;
+  if (pin.paxEventId) {
+    return <PaxEventSash eventId={pin.paxEventId} events={events} />;
   } else {
     console.warn(`No eventId on pin ${pin.id}`, pin);
     return <div className='pax'>Unknown PAX event {pin.year}</div>;
   }
 };
 
-const PaxEventSash = ({ eventId, event, events } : { eventId?: PAXEventId, event?: PAXEvent, events?: PAXEvent[] }) => {
+export const PaxEventSash = (
+  { eventId, event, events } : { eventId?: PAXEventId, event?: PAXEvent, events?: PAXEvent[] }
+) => {
   if (!event && !eventId && !events) {
     throw new Error('Either event or events list with eventId must be provided');
   }
@@ -74,7 +76,7 @@ const PaxEventSash = ({ eventId, event, events } : { eventId?: PAXEventId, event
     }
     return <div
       className={'event ' + paxDisplay.cssClass}
-      data-pin-event-id={eventId || event!.id}>{paxDisplay.description}</div>;
+      data-pin-event-id={eventId || event!.id}>{event?.name}</div>;
   } catch (err) {
     if (event) {
       console.warn(err, event);
@@ -104,7 +106,5 @@ const PinSetSash = ({ pinSetId, paxEventId, sets, events } : PinSetSashPropTypes
   }
 
   const setCssClass = 'set ' + getPaxCssClassFromEventId(paxEventId, events);
-  return <div>
-    <div className={setCssClass} data-pin-set-id={pinSetId}>{pinSet.name}</div>
-  </div>;
+  return <div className={setCssClass} data-pin-set-id={pinSetId}>{pinSet.name}</div>;
 };

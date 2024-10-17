@@ -1,4 +1,4 @@
-import { GroupTypes, Pin } from '../types.js';
+import { GroupTypes, Pin, PinCategoryId } from '../types.js';
 import {
   PinCollectionData,
   convertPinnypals3ItemDataEventToPAXEvent,
@@ -43,11 +43,12 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
   });
 
   test('V3 - Find all pins in the West 18 show set', () => {
-    expect(data.pins.filter((p: Pin) => p.set_id === 73).length).toBe(4);
+    expect(data.pins.filter((p: Pin) => p.setId === 73).length).toBe(4);
   });
 
   it('Should not have any pins that lack set, event or group IDs', () => {
-    const pinsWithNoLinkedData = data.pins.filter((p: Pin) => !p.set_id && !p.pax_event_id && !p.group_id);
+    const pinsWithNoLinkedData = data.pins.filter((p: Pin) =>
+      !p.paxId && !p.setId && !p.paxEventId && !p.groupId && (!p.categoryIds || p.categoryIds.length === 0));
     expect(
       pinsWithNoLinkedData.length, pinsWithNoLinkedData.map((p) => JSON.stringify(p)).join(',')
     ).toBe(0);
@@ -55,17 +56,20 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
 });
 
 describe('convertPinnypals3PinDataToPin', () => {
+  const paxCategoryId: PinCategoryId = 4;
   test('V3 - Should accept pin if it has no Pax ID', () => {
     const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
-    expect(() => convertPinnypals3ItemDataPinsDataToPins(v3testData.pins, eventData, v3testData.groups)).not.toThrow();
+    expect(() => convertPinnypals3ItemDataPinsDataToPins(
+      v3testData.pins, eventData, v3testData.groups, paxCategoryId)).not.toThrow();
   });
 
   test('Should have a collection for staff pins', () => {
     const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
-    const pinData = convertPinnypals3ItemDataPinsDataToPins(v3testData.pins, eventData, v3testData.groups);
+    const pinData = convertPinnypals3ItemDataPinsDataToPins(
+      v3testData.pins, eventData, v3testData.groups, paxCategoryId);
     const securityPin: Pin = findTestPin(pinData, 'PAX Space Security', 1276);
 
-    expect(securityPin.group_id).toEqual(136);
+    expect(securityPin.groupId).toEqual(136);
   });
 });
 

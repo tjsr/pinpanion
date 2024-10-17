@@ -1,11 +1,24 @@
-import { GroupTypes, PAX, PAXEvent, PAXEventId, PAXId, Pin, PinGroup, PinSet, PublishYear } from '../types.js';
+import {
+  GroupTypes,
+  PAX,
+  PAXEvent,
+  PAXEventId,
+  PAXId,
+  Pin,
+  PinCategoryId,
+  PinGroup,
+  PinSet,
+  PublishYear
+} from '../types.js';
 import {
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
   Pinnypals3ItemDataPin,
   Pinnypals3ItemDataRequest,
   Pinnypals3ItemDataSet,
-  Pinnypals3PinSet
+  Pinnypals3PinSet,
+  PinnypalsDataError,
+  PinnypalsPinDataError
 } from './pinnypals3types.js';
 
 import { stripPathFromImageLocation } from '../utils.js';
@@ -93,9 +106,9 @@ const getPinnypals3SetById = (sets: Pinnypals3PinSet[], setId: number): Pinnypal
   return set;
 };
 
-const paxIdFromEventId = (eventId: PAXEventId|undefined, events: PAXEvent[]): PAXId|undefined => {
+const paxIdFromEventId = (eventId: PAXEventId|undefined, events: PAXEvent[]): PAXId|null => {
   if (eventId === undefined) {
-    return undefined;
+    return null;
   }
   const event: PAXEvent|undefined = events.find((e) => e.id === eventId);
   if (event === undefined) {
@@ -126,24 +139,34 @@ export const convertPinnypals3ItemDataGroupToPinGroup = (group: Pinnypals3ItemDa
 export const convertPinnypals3ItemDataPinsDataToPins = (
   pins: Pinnypals3ItemDataPin[],
   events: PAXEvent[],
-  groups: Pinnypals3ItemDataGroup[]
+  groups: Pinnypals3ItemDataGroup[],
+  paxCategoryId: PinCategoryId
 ): Pin[] => {
   return pins.map((pin: Pinnypals3ItemDataPin) => {
     groups.find((g) => g.id === pin.groupId);
     const outputPin: Pin = {
       alternate: undefined,
-      category_ids: pin.categoryIds,
-      group_id: pin.groupId,
+      categoryIds: [...pin.categoryIds],
+      groupId: pin.groupId,
       id: pin.id,
       image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
       name: pin.name,
-      paxId: paxIdFromEventId(pin.eventId, events) ?? 0,
-      pax_event_id: pin.eventId,
-      set_id: pin.setId ?? null,
+      paxEventId: pin.eventId,
+      paxId: paxIdFromEventId(pin.eventId, events),
+      setId: pin.setId ?? null,
       year: pin.year,
     };
-    if (!pin.eventId && !pin.groupId && !pin.setId && (!pin.categoryIds || pin.categoryIds.length === 0)) {
-      throw new Error(`Pin has no EventID, GroupID, SetID or CategoryID: ${JSON.stringify(pin)}`);
+    if (!pin.categoryIds || pin.categoryIds.length === 0) {
+      if (!pin.eventId && !pin.groupId && !pin.setId) {
+        throw new PinnypalsPinDataError(`Pin has no EventID, GroupID, SetID or CategoryID`, pin);
+      }
+      if (outputPin.paxId) {
+        if (!outputPin.categoryIds.includes(paxCategoryId)) {
+          outputPin.categoryIds.push(paxCategoryId);
+        }
+      } else if (!pin.groupId) {
+        throw new PinnypalsPinDataError(`Pin ${pin.id} must have at least one cateogryId`, pin);
+      }
     }
     if (pin.variantYears.filter((y) => y != pin.year).length > 1) {
       console.warn(`Pin ${pin.id} has multiple years: ${pin.variantYears.join(', ')}`);
@@ -168,8 +191,12 @@ export const convertPinnypals3ItemDataSetsDataToSets = (
 };
 
 export const requestToDataSet = (json: Pinnypals3ItemDataRequest): PinCollectionData => {
+  const paxCategoryId: PinCategoryId|undefined = json.categories.find((c) => c.name === 'PAX')?.id;
+  if (!paxCategoryId) {
+    throw new PinnypalsDataError('Pinnypals input data must include a category for PAX events');
+  }
   const events: PAXEvent[] = convertPinnypals3ItemDataEventsToPAXEvent(json.events);
-  const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, events, json.groups);
+  const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, events, json.groups, paxCategoryId);
   const sets: PinSet[] = convertPinnypals3ItemDataSetsDataToSets(json.sets, json.pins);
   const groups: PinGroup[] = json.groups.map(convertPinnypals3ItemDataGroupToPinGroup);
 

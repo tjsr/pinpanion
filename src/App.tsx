@@ -279,7 +279,7 @@ const App = (): JSX.Element => {
                     const isOnLanyard: boolean = isPinSetOnLanyard(pinSet, activePinList);
                     return !isOnLanyard;
                   }
-                  const pinsInSet: Pin[] = pins.filter((pin) => pin.set_id === pinSet.id);
+                  const pinsInSet: Pin[] = pins.filter((pin) => pin.setId === pinSet.id);
                   return isPinSetFiltered(pinSet, pinsInSet, filter);
                 }}
                 paxs={paxs}

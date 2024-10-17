@@ -33,12 +33,12 @@ export interface PinGroup {
 export interface Pin extends YearAndIdComparable {
   id: PinId;
   name: string;
-  set_id: PinSetId | null;
+  setId: PinSetId | null;
   year: PublishYear;
-  group_id?: PinGroupId;
-  category_ids: PinCategoryId[];
-  paxId: PAXId;
-  pax_event_id?: PAXEventId;
+  groupId?: PinGroupId;
+  categoryIds: PinCategoryId[];
+  paxId: PAXId|null;
+  paxEventId?: PAXEventId;
   alternate?: string | null | undefined;
   image_name: string | null;
 }
@@ -110,7 +110,7 @@ export interface PinSet extends YearAndIdComparable {
   name: string;
   year: PublishYear | undefined;
   isPackagedSet: boolean;
-  sub_set_id?: PinSetId;
+  subSetId?: PinSetId;
   image_name: string;
   variants: PinSetVariant[]
 }

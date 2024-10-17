@@ -36,8 +36,8 @@ export const PinInfo = ({
   // const pinPax: PAX | undefined = paxs?.find((pax: PAX) => pax.id == pin.pax_id);
 
   let pinClasses = getPinClassForSize(displaySize);
-  if (pin.pax_event_id) {
-    pinClasses = [pinClasses, getPaxCssClassFromEventId(pin.pax_event_id, events)].join(' ');
+  if (pin.paxEventId) {
+    pinClasses = [pinClasses, getPaxCssClassFromEventId(pin.paxEventId, events)].join(' ');
   }
 
   return (

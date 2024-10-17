@@ -194,7 +194,7 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
   if (filter.paxId && pin.paxId != filter.paxId) {
     return true;
   }
-  if (filter.pinSetId && pin.set_id != filter.pinSetId) {
+  if (filter.pinSetId && pin.setId != filter.pinSetId) {
     return true;
   }
 
