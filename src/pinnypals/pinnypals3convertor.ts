@@ -78,9 +78,6 @@ export const convertPinnypals3ItemDataEventToPAXEvent = (event: Pinnypals3ItemDa
   if (event.type === undefined) {
     throw new MalformedPinnypalsData('Missing PAX type property on Pinnypals3Event element');
   }
-  if (event.subType === undefined) {
-    throw new PinnypalsDataError(`PAX event ${JSON.stringify(outputPax)} has no subtype`);
-  }
   checkEventSubtype(event);
 
   const outputPax: PAXEvent = {

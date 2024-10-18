@@ -1,6 +1,6 @@
 import { PAXEvent, Pin, PinId } from '../types.js';
 import { PaxEventSash, PinCategorySash, PinSash } from './PinSash.js';
-import { queryByText, queryHelpers, render } from '@testing-library/react';
+import { queryByText, render } from '@testing-library/react';
 
 import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
 import { PinInfo } from './PinInfo.js';
@@ -10,8 +10,6 @@ import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 const failureMessage = (pin: Pin, html?: string): string => {
   return `Pin ${JSON.stringify(pin)} failed to render properly: ${html}`;
 };
-
-const queryByPinSetId = queryHelpers.queryByAttribute.bind(null, 'data-pin-set-id');
 
 const assertPinInfoSash = (
   pinData: PinCollectionData, pinId: PinId, pinName: string, expectedSash: string
@@ -79,27 +77,18 @@ describe('PinSash', () => {
 
   it('Should get sash for specific event year', async () => {
     const unpluggedContainer = assertPinSash(pinData, 829, 'Kill Doctor Lucky', 'PAX Unplugged 2018');
-    console.log(unpluggedContainer.innerHTML);
     expect(unpluggedContainer).toHaveAttribute('data-pin-event-id', '40');
     expect(unpluggedContainer).toHaveClass('event paxUnplugged');
   });
 
   it('Should get a show set pin sash', async () => {
     const southContainer = assertPinSash(pinData, 199, 'Hotstepper Gabe', 'South Core');
-    const foundPinSet = queryByPinSetId(southContainer, '28');
-    expect(foundPinSet?.innerHTML).toEqual('South Core');
-    const setId = southContainer.attributes.getNamedItem('data-pin-set-id');
-    console.log(setId);
     expect(southContainer).toHaveAttribute('data-pin-set-id', '28');
     expect(southContainer).toHaveClass('set paxSouth');
-    // expect(southContainer.getAttribute('data-pin-set-id')).toEqual('28');
-    // expect(southContainer.getAttribute('class')).toEqual('set paxSouth');
 
-    const ausContainer = assertPinSash(pinData, 184, 'Dropbear', 'Aus 2014 Core');
+    const ausContainer = assertPinSash(pinData, 185, 'Dropbear', 'Aus Core 2014');
     expect(ausContainer).toHaveAttribute('data-pin-set-id', '24');
     expect(ausContainer).toHaveClass('set paxAus');
-    // expect(ausContainer.getAttribute('data-pin-set-id')).toEqual('24');
-    // expect(ausContainer.getAttribute('class')).toEqual('set paxAus');
   });
 
   it('Should get a limited edition sash', async () => {
@@ -143,18 +132,20 @@ describe('PinInfo.EventSash', () => {
 describe('PinInfo.CategorySash', () => {
   const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
 
-  it('Should display limited edition pin info category sash', async () => {
+  it('Should display NY limited edition pin info category sash', async () => {
     const nyPin = assertPinInfoSash(pinData, 1508, 'New Year 2024', 'Limited');
     const nyPinSash = queryByText(nyPin, 'Limited');
     expect(nyPinSash, nyPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
     expect(nyPinSash, nyPinSash?.innerHTML).toHaveClass('category categoryLimited');
-    const aiPin = assertPinInfoSash(pinData, 1549, 'Acquisitions Incorporate Series 2 Kickstarter', 'Limited');
+  });
+
+  it('Should display AI limited edition pin info category sash', async () => {
+    const aiPin = assertPinInfoSash(pinData, 1549, 'Acquisitions Incorporated Series 2 Kickstarter', 'Limited');
     const aiPinSash = queryByText(aiPin, 'Limited');
     expect(aiPinSash, aiPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
     expect(aiPinSash, aiPinSash?.innerHTML).toHaveClass('category categoryLimited');
   });
 });
-
 
 describe('PinSash.PinCategorySash', () => {
   const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
