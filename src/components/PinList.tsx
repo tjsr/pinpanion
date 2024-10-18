@@ -5,6 +5,7 @@ import {
   PAX,
   PAXEvent,
   Pin,
+  PinCategory,
   PinGroup,
   PinListFilter,
   PinSelectionList,
@@ -28,6 +29,7 @@ import useWindowDimensions from '../utils/useWindowDimensions.js';
 
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;
+  categories: PinCategory[];
   displaySize?: SizesType;
   descendingAge: boolean;
   filter?: PinListFilter;
@@ -99,6 +101,7 @@ const getPinsInSet = (pinSet: PinSet, allPins: Pin[]): Pin[] => {
 
 export const PinList = (props: PinListPropTypes): JSX.Element => {
   const {
+    categories,
     descendingAge,
     displaySize = 'normal',
     heading,
@@ -274,6 +277,7 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
     return (
       <div className="pinInfoPadding" style={style}>
         <MemoizedPinInfo
+          categories={categories}
           displaySize={displaySize}
           key={pin.id}
           paxs={paxs}

@@ -3,7 +3,7 @@
   --pax-colour-aus: #FBB024;
   --pax-colour-east: #CE1D24;
   --pax-colour-gaming: #097F00;
-  --pax-colour-staff: #001DD5;
+  --pax-colour-staff: #000;
   --pax-colour-limited: #000;
   --pax-colour-online: #000;
   --pax-colour-unplugged: #90479A;
@@ -11,6 +11,11 @@
 
   --pax-text-light: #e1e1e1;
   --pax-text-dark: #1e1e1e;
+}
+
+.set {
+  background-color: var(--pax-colour-limited);
+  color: var(--pax-text-light);
 }
 
 .paxWest {
@@ -31,11 +36,11 @@
   color: var(--pax-text-light);
 }
 
-.paxStaff {
+.groupStaff, .groupBlindbox {
   background-color: var(--pax-colour-staff)
 }
 
-.paxLimited {
+.categoryPax, .groupOther, .categoryLimited, .categoryGaming, .categoryOnline {
   background-color: var(--pax-colour-limited);
   color: var(--pax-text-light);
 }
@@ -88,7 +93,7 @@
   border-color: var(--pax-colour-south)
 }
 
-.pax {
+.pax, .set, .group, .category {
   font-weight: bold;
   font-size: 0.8rem;
   height: 1rem;

@@ -1,6 +1,18 @@
-import { PAX, PAXEvent, PAXEventId, Pin, PinGroup, PinGroupId, PinSet, PinSetId } from '../types.js';
+import {
+  PAX,
+  PAXEvent,
+  PAXEventId,
+  Pin,
+  PinCategory,
+  PinCategoryId,
+  PinGroup,
+  PinGroupId,
+  PinSet,
+  PinSetId
+} from '../types.js';
 import {
   convertEventSubtypeToCssName,
+  getCategoryCssClass,
   getCssNameForEventId,
   getGroupCssClass
 } from '../css/cssClasses.js';
@@ -14,11 +26,12 @@ export const getGroupById = (groupId: PinGroupId, groups: PinGroup[]): PinGroup 
 };
 
 interface PinSashPropTypes {
-  pin: Pin;
-  sets: PinSet[];
+  categories: PinCategory[];
+  events: PAXEvent[];
   groups: PinGroup[];
   paxs: PAX[];
-  events: PAXEvent[];
+  pin: Pin;
+  sets: PinSet[];
 }
 
 
@@ -36,7 +49,7 @@ interface PinSashPropTypes {
 // type AsModel<TO extends TransferObject> = TO & ModelObject
 // & ModelObject & { isTransferObject: true, isModelObject: false };
 
-export const PinSash = ({ pin, sets, groups, events }: PinSashPropTypes): React.ReactNode => {
+export const PinSash = ({ pin, sets, groups, events, categories }: PinSashPropTypes): React.ReactNode => {
   const group: PinGroup | undefined = groups.find((g) => g.id === pin.groupId);
   if (group) {
     return <PinGroupSash group={group} />;
@@ -53,7 +66,10 @@ export const PinSash = ({ pin, sets, groups, events }: PinSashPropTypes): React.
 
   if (pin.paxEventId) {
     return <PaxEventSash eventId={pin.paxEventId} events={events} />;
+  } else if (pin.categoryIds?.length > 0) {
+    return <PinCategorySash categoryIds={pin.categoryIds} pinCategories={categories} />;
   } else {
+    console.log('Unknown PAX event', pin);
     return <div className='pax'>Unknown PAX event {pin.year}</div>;
   }
 };
@@ -76,9 +92,22 @@ export const PaxEventSash = (
     data-pin-event-id={paxEvent.id}>{paxEvent.name}</div>;
 };
 
-const PinGroupSash = ({ group } : { group: PinGroup }) => {
-  const groupCssClass = 'group  ' + getGroupCssClass(group);
+export const PinGroupSash = ({ group } : { group: PinGroup }) => {
+  const groupCssClass = 'group group' + getGroupCssClass(group);
   return <div className={groupCssClass} data-pin-group-id={group.id}>{group.name}</div>;
+};
+
+export const PinCategorySash = (
+  { categoryIds, pinCategories } : { categoryIds: PinCategoryId[], pinCategories: PinCategory[] }
+) => {
+  const firstCategoryId = categoryIds[0];
+  const category = pinCategories.find((c) => c.id === firstCategoryId);
+  if (!category) {
+    throw new Error(`Category with id ${firstCategoryId} not found`);
+  }
+
+  const categoryCssClass = 'category ' + getCategoryCssClass(category);
+  return <div className={categoryCssClass} data-pin-category-id={category.id}>{category.name}</div>;
 };
 
 interface PinSetSashPropTypes {
@@ -88,7 +117,7 @@ interface PinSetSashPropTypes {
   events: PAXEvent[];
 }
 
-const PinSetSash = ({ pinSetId, paxEventId, sets, events } : PinSetSashPropTypes) => {
+export const PinSetSash = ({ pinSetId, paxEventId, sets, events } : PinSetSashPropTypes) => {
   const pinSet: PinSet | undefined = sets?.find((set: PinSet) => set?.id == pinSetId);
   if (!pinSet) {
     return <></>;

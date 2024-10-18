@@ -3,7 +3,7 @@ import './css/pins.css';
 
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, PAXEvent, Pin, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
@@ -24,6 +24,7 @@ import { generateRandomName } from './namegenerator';
 const PINS_CACHE_DATA_FILE = 'pins.json';
 
 const App = (): JSX.Element => {
+  const [categories, setCategories] = useState<PinCategory[]>([]);
   const [pins, setPins] = useState<Pin[] | undefined>(undefined);
   const [pinSets, setPinSets] = useState<PinSet[]>([]);
   const [pinGroups, setPinGroups] = useState<PinGroup[]>([]);
@@ -93,6 +94,7 @@ const App = (): JSX.Element => {
         const data: PinCollectionData = await response.json();
         console.log(`Loaded pins list from ${PINS_CACHE_DATA_FILE}`);
 
+        setCategories(data.categories);
         setPins(data.pins);
         setPinSets(data.sets);
         setPinGroups(data.groups);
@@ -246,6 +248,7 @@ const App = (): JSX.Element => {
             {applicationSettings.splitActiveAndWanted && selectionFilterEnabled ? (
               <LanyardPinList
                 allPins={pins}
+                categories={categories}
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 heading={`Lanyard for ${activePinList.name}`}
@@ -263,6 +266,7 @@ const App = (): JSX.Element => {
             ) : (
               <PinList
                 activePinSet={activePinList}
+                categories={categories}
                 descendingAge={applicationSettings.descendingAge}
                 displaySize={applicationSettings.displaySize}
                 filter={filter}

@@ -1,6 +1,6 @@
 import { PAXEvent, Pin, PinId } from '../types.js';
-import { PaxEventSash, PinSash } from './PinSash.js';
-import { queryHelpers, render } from '@testing-library/react';
+import { PaxEventSash, PinCategorySash, PinSash } from './PinSash.js';
+import { queryByText, queryHelpers, render } from '@testing-library/react';
 
 import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
 import { PinInfo } from './PinInfo.js';
@@ -25,6 +25,7 @@ const assertPinInfoSash = (
 
   const { container, queryByText } = render(
     <PinInfo
+      categories={pinData.categories}
       displaySize="normal"
       pin={pin}
       paxs={pinData.pax}
@@ -38,7 +39,7 @@ const assertPinInfoSash = (
   expect(element, failureMessage(pin, container?.innerHTML)).not.toBeNull();
   expect(element).toBeInTheDocument();
   expect(element).toBeVisible();
-  return container;
+  return container.children[0] as HTMLElement;
 };
 
 const assertPinSash = (
@@ -58,6 +59,7 @@ const assertPinSash = (
       sets={pinData.sets}
       groups={pinData.groups}
       events={pinData.events}
+      categories={pinData.categories}
     />
   );
   const element = queryByText(expectedSash);
@@ -65,7 +67,7 @@ const assertPinSash = (
   expect(element, failureMessage(pin, container?.innerHTML)).not.toBeNull();
   expect(element).toBeInTheDocument();
   expect(element).toBeVisible();
-  return container;
+  return container.children[0] as HTMLElement;
 };
 
 describe('PinSash', () => {
@@ -79,13 +81,15 @@ describe('PinSash', () => {
     const unpluggedContainer = assertPinSash(pinData, 829, 'Kill Doctor Lucky', 'PAX Unplugged 2018');
     console.log(unpluggedContainer.innerHTML);
     expect(unpluggedContainer).toHaveAttribute('data-pin-event-id', '40');
-    expect(unpluggedContainer).toHaveClass('set paxUnplugged');
+    expect(unpluggedContainer).toHaveClass('event paxUnplugged');
   });
 
   it('Should get a show set pin sash', async () => {
     const southContainer = assertPinSash(pinData, 199, 'Hotstepper Gabe', 'South Core');
     const foundPinSet = queryByPinSetId(southContainer, '28');
     expect(foundPinSet?.innerHTML).toEqual('South Core');
+    const setId = southContainer.attributes.getNamedItem('data-pin-set-id');
+    console.log(setId);
     expect(southContainer).toHaveAttribute('data-pin-set-id', '28');
     expect(southContainer).toHaveClass('set paxSouth');
     // expect(southContainer.getAttribute('data-pin-set-id')).toEqual('28');
@@ -96,6 +100,12 @@ describe('PinSash', () => {
     expect(ausContainer).toHaveClass('set paxAus');
     // expect(ausContainer.getAttribute('data-pin-set-id')).toEqual('24');
     // expect(ausContainer.getAttribute('class')).toEqual('set paxAus');
+  });
+
+  it('Should get a limited edition sash', async () => {
+    const leContainer = assertPinSash(pinData, 1508, 'New Year 2024', 'Limited');
+    expect(leContainer).toHaveAttribute('data-pin-category-id', '6');
+    expect(leContainer).toHaveClass('category categoryLimited');
   });
 });
 
@@ -127,5 +137,42 @@ describe('PinInfo.EventSash', () => {
 
   it('Should display PAX event info pane with sash for a non-show set pin', async () => {
     assertPinInfoSash(pinData, 1382, 'Light Blue Squid', 'Splatoon Inkling');
+  });
+});
+
+describe('PinInfo.CategorySash', () => {
+  const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
+
+  it('Should display limited edition pin info category sash', async () => {
+    const nyPin = assertPinInfoSash(pinData, 1508, 'New Year 2024', 'Limited');
+    const nyPinSash = queryByText(nyPin, 'Limited');
+    expect(nyPinSash, nyPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(nyPinSash, nyPinSash?.innerHTML).toHaveClass('category categoryLimited');
+    const aiPin = assertPinInfoSash(pinData, 1549, 'Acquisitions Incorporate Series 2 Kickstarter', 'Limited');
+    const aiPinSash = queryByText(aiPin, 'Limited');
+    expect(aiPinSash, aiPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(aiPinSash, aiPinSash?.innerHTML).toHaveClass('category categoryLimited');
+  });
+});
+
+
+describe('PinSash.PinCategorySash', () => {
+  const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
+
+  it('Should display a limited edition cateogry sash', async () => {
+    const nySash = assertPinSash(pinData, 1508, 'New Year 2024', 'Limited');
+    expect(nySash, nySash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(nySash, nySash?.innerHTML).toHaveClass('category categoryLimited');
+  });
+});
+
+describe('PinCategorySash', () => {
+  const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
+
+  it('Should display a limited edition cateogry sash', async () => {
+    const { container } = render(
+      <PinCategorySash categoryIds={[6]} pinCategories={pinData.categories} />
+    );
+    expect(container).not.toBeNull();
   });
 });

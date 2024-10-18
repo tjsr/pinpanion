@@ -114,7 +114,7 @@ describe('convertPinnypals3EventToPAXEvent', () => {
     };
     expect(
       () => convertPinnypals3ItemDataEventToPAXEvent(badEvent as Pinnypals3ItemDataEvent))
-      .toThrow('Unknown PAX event type: PAX_BAD');
+      .toThrow('Invalid event subtype: PAX_BAD');
   });
 
   // test('V3 - Should convert PAX event type to PAX ID', () => {

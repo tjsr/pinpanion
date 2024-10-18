@@ -126,3 +126,23 @@ div.pinListContent {
   padding-bottom: 0.1rem;
   overflow: hidden;
 }
+
+.event {
+  font-weight: bold;
+  color: #e1e1e1;
+  font-size: 0.8rem;
+  height: 1rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  overflow: hidden;
+}
+
+.group {
+  font-weight: bold;
+  color: #e1e1e1;
+  font-size: 0.8rem;
+  height: 1rem;
+  padding-top: 0.1rem;
+  padding-bottom: 0.1rem;
+  overflow: hidden;
+}

@@ -1,4 +1,4 @@
-import { Pinnypals3EventSubtypes, Pinnypals3EventTypes } from './pinnypals/pinnypals3types.js';
+import { Pinnypald3PinCategory, Pinnypals3EventSubtypes, Pinnypals3EventTypes } from './pinnypals/pinnypals3types.js';
 
 type uuid = string;
 export type UserId = uuid;
@@ -119,6 +119,8 @@ export interface PinSet extends YearAndIdComparable {
   image_name: string;
   variants: PinSetVariant[]
 }
+
+export type PinCategory = Pinnypald3PinCategory;
 
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
 

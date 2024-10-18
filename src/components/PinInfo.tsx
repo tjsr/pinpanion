@@ -1,14 +1,14 @@
 import '../css/pincolours.css';
 
-import { PAX, PAXEvent, Pin, PinGroup, PinSet, SizesType } from '../types.js';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.js';
 
 import { PinSash } from './PinSash.js';
 import React from 'react';
 import config from '../config.json';
-import { getCssNameForEventId } from '../css/cssClasses.js';
 import { getPinClassForSize } from '../utils.js';
 
 type PinInfoPropTypes = {
+  categories: PinCategory[];
   displaySize: SizesType;
   pin: Pin;
   paxs: PAX[];
@@ -20,6 +20,7 @@ type PinInfoPropTypes = {
 };
 
 export const PinInfo = ({
+  categories,
   displaySize = 'normal',
   pin,
   paxs,
@@ -40,7 +41,7 @@ export const PinInfo = ({
       <div className={pinClasses} id={`pin_${pin.id}`} style={style}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
-          <PinSash pin={pin} sets={pinSets} groups={groups} events={events} paxs={paxs} />
+          <PinSash pin={pin} sets={pinSets} groups={groups} events={events} paxs={paxs} categories={categories}/>
           { url && <img className="pinImage" alt={pin.name} src={url} />}
         </div>
         {children}

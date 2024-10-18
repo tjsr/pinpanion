@@ -1,6 +1,6 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, PAXEvent, Pin, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.js';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.js';
 
 import { PinInfo } from './PinInfo.js';
 import { PinSetInfo } from './PinSetInfo.js';
@@ -8,6 +8,7 @@ import { compareYearThenId } from '../listutils.js';
 
 type LanyardPinListPropTypes = {
   allPins: Pin[];
+  categories: PinCategory[];
   descendingAge: boolean;
   displaySize?: SizesType;
   heading: string;
@@ -25,6 +26,7 @@ type LanyardPinListPropTypes = {
 
 export const LanyardPinList = ({
   allPins,
+  categories,
   availablePins,
   availableSets,
   descendingAge,
@@ -67,6 +69,7 @@ export const LanyardPinList = ({
               <div className="availablePins">
                 {displayedAvailable.map((pin: Pin) => {
                   return <PinInfo
+                    categories={categories}
                     displaySize={displaySize}
                     key={pin.id}
                     paxs={paxs}
@@ -97,6 +100,7 @@ export const LanyardPinList = ({
               {displayedWanted.length > 0 && (
                 displayedWanted.map((pin: Pin) => {
                   return <PinInfo
+                    categories={categories}
                     displaySize={displaySize}
                     key={pin.id}
                     paxs={paxs}

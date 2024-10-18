@@ -1,4 +1,4 @@
-import { PAXEvent, PAXEventDisplayTypes, PAXEventId, PAXId, PinGroup } from '../types.js';
+import { PAXEvent, PAXEventDisplayTypes, PAXEventId, PAXId, PinCategory, PinCategoryId, PinGroup } from '../types.js';
 import { Pinnypals3EventSubtypes, PinnypalsDataError } from '../pinnypals/pinnypals3types.js';
 
 import eventDisplayTypes from '../static/eventDisplayTypes.json';
@@ -7,14 +7,6 @@ import { toProperCase } from '../utils.js';
 type CSSClassName = string|undefined;
 
 const displayTypes: PAXEventDisplayTypes[] = eventDisplayTypes as PAXEventDisplayTypes[];
-
-export const getPaxDisplayForPaxId = (paxId: PAXId): PAXEventDisplayTypes => {
-  const paxDisplay = eventDisplayTypes.find((p) => p.id === paxId);
-  if (!paxDisplay) {
-    throw new Error(`No PAX display info found for PAX ${paxId}`);
-  }
-  return paxDisplay;
-};
 
 export const convertEventSubtypeToCssName = (subtype: Pinnypals3EventSubtypes): string => {
   const event = subtype.split('_')[1];
@@ -72,3 +64,18 @@ export const getGroupCssClass = (group: PinGroup): string => toProperCase(group.
 export const getPaxCssClass = (prefix: string, paxId: PAXId): string|undefined => {
   return prefix + getPaxCssClassName(paxId);
 };
+
+export const getCategoryCssClass = (
+  category: PinCategory
+): string => 'category' + toProperCase(category.name || 'OTHER');
+
+export const getCategoryIdCssClass = (
+  categoryId: PinCategoryId, categories: PinCategory[]
+): string => {
+  const category = categories.find((c) => c.id === categoryId);
+  if (!category) {
+    throw new Error(`No category found for ${categoryId}`);
+  }
+  return getCategoryCssClass(category);
+};
+

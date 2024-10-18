@@ -4,6 +4,7 @@ import {
   PAXEvent,
   PAXId,
   Pin,
+  PinCategory,
   PinCategoryId,
   PinGroup,
   PinSet,
@@ -16,12 +17,14 @@ import {
   Pinnypals3ItemDataRequest,
   Pinnypals3ItemDataSet,
   PinnypalsDataError,
-  PinnypalsPinDataError
+  PinnypalsPinDataError,
+  checkEventSubtype
 } from './pinnypals3types.js';
 
 import { stripPathFromImageLocation } from '../utils.js';
 
 export interface PinCollectionData {
+  categories: PinCategory[];
   pax: PAX[];
   events: PAXEvent[];
   pins: Pin[];
@@ -75,6 +78,10 @@ export const convertPinnypals3ItemDataEventToPAXEvent = (event: Pinnypals3ItemDa
   if (event.type === undefined) {
     throw new MalformedPinnypalsData('Missing PAX type property on Pinnypals3Event element');
   }
+  if (event.subType === undefined) {
+    throw new PinnypalsDataError(`PAX event ${JSON.stringify(outputPax)} has no subtype`);
+  }
+  checkEventSubtype(event);
 
   const outputPax: PAXEvent = {
     colour: event.colour || '#000000',
@@ -86,9 +93,6 @@ export const convertPinnypals3ItemDataEventToPAXEvent = (event: Pinnypals3ItemDa
     type: event.type,
     year: event.year,
   };
-  if (outputPax.subType === undefined) {
-    throw new PinnypalsDataError(`PAX event ${JSON.stringify(outputPax)} has no subtype`);
-  }
   return outputPax;
 };
 
@@ -197,8 +201,10 @@ export const requestToDataSet = (json: Pinnypals3ItemDataRequest): PinCollection
   const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, json.groups);
   const sets: PinSet[] = convertPinnypals3ItemDataSetsDataToSets(json.sets, json.pins);
   const groups: PinGroup[] = json.groups.map(convertPinnypals3ItemDataGroupToPinGroup);
+  const categories: PinCategory[] = json.categories;
 
   const converted: PinCollectionData = {
+    categories: categories,
     events: events,
     groups: groups,
     pax: pax,
