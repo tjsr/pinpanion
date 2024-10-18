@@ -1,6 +1,8 @@
 import { defineConfig } from 'vitest/config';
-import path from 'node:path';
+import { findFileUpwards } from './test/testutils.ts';
 import tsconfigPaths from 'vite-tsconfig-paths';
+
+const setupPath = findFileUpwards('test/vitest.setup.ts');
 
 export default defineConfig({
   plugins: [tsconfigPaths()],
@@ -10,7 +12,7 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: true,
-    setupFiles: [path.join(process.env.PROJECT_ROOT || process.cwd(), 'test/vitest.setup.ts')],
+    setupFiles: [setupPath],
     testTimeout: (process.env['VITEST_VSCODE'] !== undefined ? 120 : 3) * 1000,
   },
 });
