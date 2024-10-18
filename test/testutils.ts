@@ -12,10 +12,10 @@ export const findPinByName = (pins: Pin[], name: string): Pin|undefined => {
 export const findTestPin = (pins: Pin[], pinName: string, pinId: number): Pin => {
   const pin: Pin | undefined = findPinByName(pins, pinName);
   if (!pin) {
-    throw new Error('Staff test pin not found');
+    throw new Error(`${pinName} pin not found`);
   }
   if (pin.id !== pinId) {
-    throw new PinpanionDataError('Light Blue Squid doees not have the expected Id of ID');
+    throw new PinpanionDataError(`${pinName} has id of ${pin.id} not expected Id of ${pinId}`);
   }
   return pin;
 };

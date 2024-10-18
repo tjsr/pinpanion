@@ -1,9 +1,8 @@
 import { PAX, PAXEvent, PAXEventId, Pin, PinGroup, PinGroupId, PinSet, PinSetId } from '../types.js';
 import {
-  getGroupCssClass,
-  getPaxCssClassFromEventId,
-  getPaxDisplayForEvent,
-  getPaxDisplayForEventId
+  convertEventSubtypeToCssName,
+  getCssNameForEventId,
+  getGroupCssClass
 } from '../css/cssClasses.js';
 
 export const getGroupById = (groupId: PinGroupId, groups: PinGroup[]): PinGroup => {
@@ -55,7 +54,6 @@ export const PinSash = ({ pin, sets, groups, events }: PinSashPropTypes): React.
   if (pin.paxEventId) {
     return <PaxEventSash eventId={pin.paxEventId} events={events} />;
   } else {
-    console.warn(`No eventId on pin ${pin.id}`, pin);
     return <div className='pax'>Unknown PAX event {pin.year}</div>;
   }
 };
@@ -67,24 +65,15 @@ export const PaxEventSash = (
     throw new Error('Either event or events list with eventId must be provided');
   }
 
-  let paxDisplay;
-  try {
-    if (event) {
-      paxDisplay = getPaxDisplayForEvent(event);
-    } else {
-      paxDisplay = getPaxDisplayForEventId(eventId!, events!);
-    }
-    return <div
-      className={'event ' + paxDisplay.cssClass}
-      data-pin-event-id={eventId || event!.id}>{event?.name}</div>;
-  } catch (err) {
-    if (event) {
-      console.warn(err, event);
-    } else {
-      console.warn(err, eventId);
-    }
-    return <div className='event'>Unknown PAX event {eventId || event!.id}</div>;
+  const paxEvent = event || events?.find((e) => e.id === eventId);
+  if (!paxEvent) {
+    throw new Error(`No PAX event found for ${eventId}`);
+    // return <div className='event'>Unknown PAX event {eventId || event!.id}</div>;
   }
+  const cssName = convertEventSubtypeToCssName(paxEvent.subType);
+  return <div
+    className={'event ' + cssName}
+    data-pin-event-id={paxEvent.id}>{paxEvent.name}</div>;
 };
 
 const PinGroupSash = ({ group } : { group: PinGroup }) => {
@@ -105,6 +94,10 @@ const PinSetSash = ({ pinSetId, paxEventId, sets, events } : PinSetSashPropTypes
     return <></>;
   }
 
-  const setCssClass = 'set ' + getPaxCssClassFromEventId(paxEventId, events);
+  if (!paxEventId) {
+    return <div className='set' data-pin-set-id={pinSetId}>{pinSet.name}</div>;
+  }
+
+  const setCssClass = 'set ' + getCssNameForEventId(paxEventId, events);
   return <div className={setCssClass} data-pin-set-id={pinSetId}>{pinSet.name}</div>;
 };

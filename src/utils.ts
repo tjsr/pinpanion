@@ -24,7 +24,7 @@ export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): n
   if (!isEmpty(filter.filterText)) {
     filters++;
   }
-  if (!filteredSetsOnly && filter?.paxId !== undefined && filter?.paxId > 0) {
+  if (!filteredSetsOnly && filter?.paxType !== undefined) {
     filters++;
   }
   if (filteredSetsOnly && filter?.pinSetId !== undefined && filter?.pinSetId > 0) {

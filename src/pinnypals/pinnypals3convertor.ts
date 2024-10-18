@@ -2,7 +2,6 @@ import {
   GroupTypes,
   PAX,
   PAXEvent,
-  PAXEventId,
   PAXId,
   Pin,
   PinCategoryId,
@@ -16,7 +15,6 @@ import {
   Pinnypals3ItemDataPin,
   Pinnypals3ItemDataRequest,
   Pinnypals3ItemDataSet,
-  Pinnypals3PinSet,
   PinnypalsDataError,
   PinnypalsPinDataError
 } from './pinnypals3types.js';
@@ -38,15 +36,15 @@ const shortenPaxName = (name: string): string => {
   return outputName;
 };
 
-const paxSubtypeMap: Map<string, PAXId> = new Map<string, PAXId>([
-  ['PAX_WEST', 1],
-  ['PAX_EAST', 2],
-  ['PAX_AUS', 3],
-  ['PAX_DEV', 4],
-  ['PAX_UNPLUGGED', 5],
-  ['PAX_ONLINE', 6],
-  ['PAX_SOUTH', 7],
-]);
+// const paxSubtypeMap: Map<string, PAXId> = new Map<string, PAXId>([
+//   ['PAX_WEST', 1],
+//   ['PAX_EAST', 2],
+//   ['PAX_AUS', 3],
+//   ['PAX_DEV', 4],
+//   ['PAX_UNPLUGGED', 5],
+//   ['PAX_ONLINE', 6],
+//   ['PAX_SOUTH', 7],
+// ]);
 
 const pax: PAX[] = [
   { id: 1, name: 'PAX West', shortName: 'PAX_WEST', styleName: 'west' },
@@ -74,9 +72,6 @@ class MalformedPinnypalsData extends Error {
 }
 
 export const convertPinnypals3ItemDataEventToPAXEvent = (event: Pinnypals3ItemDataEvent): PAXEvent => {
-  if (!paxSubtypeMap.has(event.subType)) {
-    throw new Error('Unknown PAX event type: ' + event.subType);
-  }
   if (event.type === undefined) {
     throw new MalformedPinnypalsData('Missing PAX type property on Pinnypals3Event element');
   }
@@ -86,10 +81,14 @@ export const convertPinnypals3ItemDataEventToPAXEvent = (event: Pinnypals3ItemDa
     endDate: event.endDate,
     id: event.id,
     name: event.name,
-    paxId: paxSubtypeMap.get(event.subType)!,
     startDate: event.startDate,
+    subType: event.subType,
+    type: event.type,
     year: event.year,
   };
+  if (outputPax.subType === undefined) {
+    throw new PinnypalsDataError(`PAX event ${JSON.stringify(outputPax)} has no subtype`);
+  }
   return outputPax;
 };
 
@@ -97,25 +96,25 @@ export const convertPinnypals3ItemDataEventsToPAXEvent = (events: Pinnypals3Item
   return events.map(convertPinnypals3ItemDataEventToPAXEvent);
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const getPinnypals3SetById = (sets: Pinnypals3PinSet[], setId: number): Pinnypals3PinSet => {
-  const set: Pinnypals3PinSet|undefined = sets.find((s) => s.id === setId);
-  if (set === undefined) {
-    throw new Error(`Set ${setId} not found`);
-  }
-  return set;
-};
+// // eslint-disable-next-line @typescript-eslint/no-unused-vars
+// const getPinnypals3SetById = (sets: Pinnypals3PinSet[], setId: number): Pinnypals3PinSet => {
+//   const set: Pinnypals3PinSet|undefined = sets.find((s) => s.id === setId);
+//   if (set === undefined) {
+//     throw new Error(`Set ${setId} not found`);
+//   }
+//   return set;
+// };
 
-const paxIdFromEventId = (eventId: PAXEventId|undefined, events: PAXEvent[]): PAXId|null => {
-  if (eventId === undefined) {
-    return null;
-  }
-  const event: PAXEvent|undefined = events.find((e) => e.id === eventId);
-  if (event === undefined) {
-    throw new Error(`Event ${eventId} not found`);
-  }
-  return event.paxId;
-};
+// const paxIdFromEventId = (eventId: PAXEventId|undefined, events: PAXEvent[]): PAXId|null => {
+//   if (eventId === undefined) {
+//     return null;
+//   }
+//   const event: PAXEvent|undefined = events.find((e) => e.id === eventId);
+//   if (event === undefined) {
+//     throw new Error(`Event ${eventId} not found`);
+//   }
+//   return event.paxId;
+// };
 
 const stringToEnum = <T extends { [s: string]: unknown; } | ArrayLike<unknown>>(
   enumObj: T, value: string): T[keyof T] | undefined => {
@@ -138,9 +137,7 @@ export const convertPinnypals3ItemDataGroupToPinGroup = (group: Pinnypals3ItemDa
 
 export const convertPinnypals3ItemDataPinsDataToPins = (
   pins: Pinnypals3ItemDataPin[],
-  events: PAXEvent[],
-  groups: Pinnypals3ItemDataGroup[],
-  paxCategoryId: PinCategoryId
+  groups: Pinnypals3ItemDataGroup[]
 ): Pin[] => {
   return pins.map((pin: Pinnypals3ItemDataPin) => {
     groups.find((g) => g.id === pin.groupId);
@@ -152,7 +149,7 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
       image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
       name: pin.name,
       paxEventId: pin.eventId,
-      paxId: paxIdFromEventId(pin.eventId, events),
+      // paxId: paxIdFromEventId(pin.eventId, events),
       setId: pin.setId ?? null,
       year: pin.year,
     };
@@ -160,13 +157,14 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
       if (!pin.eventId && !pin.groupId && !pin.setId) {
         throw new PinnypalsPinDataError(`Pin has no EventID, GroupID, SetID or CategoryID`, pin);
       }
-      if (outputPin.paxId) {
-        if (!outputPin.categoryIds.includes(paxCategoryId)) {
-          outputPin.categoryIds.push(paxCategoryId);
-        }
-      } else if (!pin.groupId) {
-        throw new PinnypalsPinDataError(`Pin ${pin.id} must have at least one cateogryId`, pin);
-      }
+      // if (outputPin.paxId) {
+      //   if (!outputPin.categoryIds.includes(paxCategoryId)) {
+      //     outputPin.categoryIds.push(paxCategoryId);
+      //   }
+      // } else
+      // if (!pin.groupId) {
+      //   throw new PinnypalsPinDataError(`Pin ${pin.id} must have at least one cateogryId`, pin);
+      // }
     }
     if (pin.variantYears.filter((y) => y != pin.year).length > 1) {
       console.warn(`Pin ${pin.id} has multiple years: ${pin.variantYears.join(', ')}`);
@@ -196,7 +194,7 @@ export const requestToDataSet = (json: Pinnypals3ItemDataRequest): PinCollection
     throw new PinnypalsDataError('Pinnypals input data must include a category for PAX events');
   }
   const events: PAXEvent[] = convertPinnypals3ItemDataEventsToPAXEvent(json.events);
-  const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, events, json.groups, paxCategoryId);
+  const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, json.groups);
   const sets: PinSet[] = convertPinnypals3ItemDataSetsDataToSets(json.sets, json.pins);
   const groups: PinGroup[] = json.groups.map(convertPinnypals3ItemDataGroupToPinGroup);
 

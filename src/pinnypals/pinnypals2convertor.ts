@@ -7,7 +7,7 @@ import {
   Pinnypals2PinsRequest,
   Pinnypals2SetIdentifier,
   Pinnypals2SetsArray
-} from './pinnypals2types';
+} from './pinnypals2types.js';
 
 export interface PinCollectionData {
   pax: PAX[];
@@ -55,7 +55,6 @@ const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
       id: pin[0],
       image_name: pin[2],
       name: pin[1],
-      paxId: pin[6],
       pax_id: pin[6],
       setId: pin[7],
       sub_set_id: null,

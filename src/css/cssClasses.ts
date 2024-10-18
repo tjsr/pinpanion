@@ -1,4 +1,5 @@
 import { PAXEvent, PAXEventDisplayTypes, PAXEventId, PAXId, PinGroup } from '../types.js';
+import { Pinnypals3EventSubtypes, PinnypalsDataError } from '../pinnypals/pinnypals3types.js';
 
 import eventDisplayTypes from '../static/eventDisplayTypes.json';
 import { toProperCase } from '../utils.js';
@@ -15,29 +16,48 @@ export const getPaxDisplayForPaxId = (paxId: PAXId): PAXEventDisplayTypes => {
   return paxDisplay;
 };
 
-export const getPaxDisplayForEventId = (paxEventId: PAXEventId, events: PAXEvent[]): PAXEventDisplayTypes => {
-  const paxEvent = events.find((e) => e.id === paxEventId);
+export const convertEventSubtypeToCssName = (subtype: Pinnypals3EventSubtypes): string => {
+  const event = subtype.split('_')[1];
+  if (!event) {
+    throw new PinnypalsDataError(`Subtype must follow the format PAX_XYZ but was ${subtype}`);
+  }
+  const cssName = toProperCase(event);
+  return 'pax' + cssName;
+};
+
+export const getCssNameForEventId = (eventId: PAXEventId, events: PAXEvent[]): string => {
+  const paxEvent = events.find((e) => e.id === eventId);
   if (!paxEvent) {
-    throw new Error(`No PAX found for EventId ${paxEventId}`);
+    throw new Error(`No PAX found for EventId ${eventId}`);
+  }
+  if (!paxEvent.subType) {
+    throw new Error(`PAX event ${JSON.stringify(paxEvent)} has no subtype`);
   }
 
-  return getPaxDisplayForPaxId(paxEvent.paxId);
+  return convertEventSubtypeToCssName(paxEvent.subType);
 };
 
-export const getPaxDisplayForEvent = (event: PAXEvent): PAXEventDisplayTypes => {
-  return getPaxDisplayForPaxId(event.paxId);
-};
+// export const getPaxDisplayForEventId = (paxEventId: PAXEventId, events: PAXEvent[]): PAXEventDisplayTypes => {
+//   const paxEvent = events.find((e) => e.id === paxEventId);
+//   if (!paxEvent) {
+//     throw new Error(`No PAX found for EventId ${paxEventId}`);
+//   }
+//   return getPaxDisplayForPaxId(paxEvent.paxId);
+// };
 
-export const getPaxNameFromEventId = (paxEventId: PAXEventId, events: PAXEvent[]): string => {
-  const paxDisplay = getPaxDisplayForEventId(paxEventId, events);
-  return paxDisplay.description;
-};
+// export const getPaxDisplayForEvent = (event: PAXEvent): PAXEventDisplayTypes => {
+//   return getPaxDisplayForPaxId(event.paxId);
+// };
 
-export const getPaxCssClassFromEventId = (paxEventId: PAXEventId, events: PAXEvent[]): CSSClassName => {
-  const paxDisplay = getPaxDisplayForEventId(paxEventId, events);
-  return paxDisplay.cssClass;
-};
+// export const getPaxNameFromEventId = (paxEventId: PAXEventId, events: PAXEvent[]): string => {
+//   const paxDisplay = getPaxDisplayForEventId(paxEventId, events);
+//   return paxDisplay.description;
+// };
 
+// export const getPaxCssClassFromEventId = (paxEventId: PAXEventId, events: PAXEvent[]): CSSClassName => {
+//   const paxDisplay = getPaxDisplayForEventId(paxEventId, events);
+//   return paxDisplay.cssClass;
+// };
 
 const getPaxCssClassName = (paxId: PAXId): CSSClassName => {
   const event = displayTypes.find((p) => p.id === paxId);

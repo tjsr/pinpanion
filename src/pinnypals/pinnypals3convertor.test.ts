@@ -1,15 +1,14 @@
-import { GroupTypes, Pin, PinCategoryId } from '../types.js';
+import { GroupTypes, Pin } from '../types.js';
 import {
   PinCollectionData,
   convertPinnypals3ItemDataEventToPAXEvent,
-  convertPinnypals3ItemDataEventsToPAXEvent,
   convertPinnypals3ItemDataGroupToPinGroup,
   convertPinnypals3ItemDataPinsDataToPins,
-  getPaxById,
   requestToDataSet
 } from './pinnypals3convertor.js';
 import {
   Pinnypals3Event,
+  Pinnypals3EventSubtypes,
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
   Pinnypals3ItemDataRequest
@@ -28,10 +27,10 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
     expect(data.events[15].name).toBe('PAX East 2018');
   });
 
-  test('V3 - Lookup details for a linked PAX for a PAX Event', () => {
-    expect(getPaxById(data.events[4].paxId)?.shortName).toBe('PAX_WEST');
-    expect(getPaxById(data.events[15].paxId)?.shortName).toBe('PAX_EAST');
-  });
+  // test('V3 - Lookup details for a linked PAX for a PAX Event', () => {
+  //   expect(getPaxById(data.events[4].paxId)?.shortName).toBe('PAX_WEST');
+  //   expect(getPaxById(data.events[15].paxId)?.shortName).toBe('PAX_EAST');
+  // });
 
   test('V3 - Parse a pin', () => {
     expect(data.pins[0].name).toBe('Pinny Arcade Logo');
@@ -48,7 +47,7 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
 
   it('Should not have any pins that lack set, event or group IDs', () => {
     const pinsWithNoLinkedData = data.pins.filter((p: Pin) =>
-      !p.paxId && !p.setId && !p.paxEventId && !p.groupId && (!p.categoryIds || p.categoryIds.length === 0));
+      !p.setId && !p.paxEventId && !p.groupId && (!p.categoryIds || p.categoryIds.length === 0));
     expect(
       pinsWithNoLinkedData.length, pinsWithNoLinkedData.map((p) => JSON.stringify(p)).join(',')
     ).toBe(0);
@@ -56,17 +55,17 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
 });
 
 describe('convertPinnypals3PinDataToPin', () => {
-  const paxCategoryId: PinCategoryId = 4;
+  // const paxCategoryId: PinCategoryId = 4;
   test('V3 - Should accept pin if it has no Pax ID', () => {
-    const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
+    // const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
     expect(() => convertPinnypals3ItemDataPinsDataToPins(
-      v3testData.pins, eventData, v3testData.groups, paxCategoryId)).not.toThrow();
+      v3testData.pins, v3testData.groups)).not.toThrow();
   });
 
   test('Should have a collection for staff pins', () => {
-    const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
+    // const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
     const pinData = convertPinnypals3ItemDataPinsDataToPins(
-      v3testData.pins, eventData, v3testData.groups, paxCategoryId);
+      v3testData.pins, v3testData.groups);
     const securityPin: Pin = findTestPin(pinData, 'PAX Space Security', 1276);
 
     expect(securityPin.groupId).toEqual(136);
@@ -98,7 +97,7 @@ describe('convertPinnypals3EventToPAXEvent', () => {
     id: 99,
     name: 'Bad Event',
     startDate: '2023-01-01',
-    subType: 'PAX_BAD',
+    subType: 'PAX_BAD' as Pinnypals3EventSubtypes,
     year: 2023,
   } as Pinnypals3Event;
 
@@ -109,7 +108,7 @@ describe('convertPinnypals3EventToPAXEvent', () => {
       id: 99,
       name: 'Bad Event',
       startDate: '2023-01-01',
-      subType: 'PAX_BAD',
+      subType: 'PAX_BAD' as Pinnypals3EventSubtypes,
       type: 'PAX',
       year: 2023,
     };
@@ -118,20 +117,20 @@ describe('convertPinnypals3EventToPAXEvent', () => {
       .toThrow('Unknown PAX event type: PAX_BAD');
   });
 
-  test('V3 - Should convert PAX event type to PAX ID', () => {
-    const paxEvent = {
-      colour: 'blue',
-      endDate: '2023-01-03',
-      id: 1,
-      name: 'PAX West',
-      startDate: '2023-01-01',
-      subType: 'PAX_WEST',
-      type: 'PAX',
-      year: 2023,
-    };
-    const paxEvents = convertPinnypals3ItemDataEventToPAXEvent(paxEvent as Pinnypals3ItemDataEvent);
-    expect(paxEvents.paxId).toBe(1);
-  });
+  // test('V3 - Should convert PAX event type to PAX ID', () => {
+  //   const paxEvent = {
+  //     colour: 'blue',
+  //     endDate: '2023-01-03',
+  //     id: 1,
+  //     name: 'PAX West',
+  //     startDate: '2023-01-01',
+  //     subType: 'PAX_WEST',
+  //     type: 'PAX',
+  //     year: 2023,
+  //   };
+  //   const paxEvents = convertPinnypals3ItemDataEventToPAXEvent(paxEvent as Pinnypals3ItemDataEvent);
+  //   expect(paxEvents.paxId).toBe(1);
+  // });
 
   test('Should reject an event with no type', () => {
     const badEvent = { ...sampleTestEvent,

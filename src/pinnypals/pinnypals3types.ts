@@ -34,8 +34,8 @@ export interface Pinnypals3Category {
 export interface Pinnypals3Event {
   id: PaxEventId;
   name: string;
-  type: string;
-  subType: string;
+  type: Pinnypals3EventTypes;
+  subType: Pinnypals3EventSubtypes;
   colour: HexColourCode;
   year: Year;
   startDate: ISO8601Date;
@@ -56,7 +56,7 @@ export interface Pinnypals3ItemDataRequestOld {
   groups: Pinnypals3Group[];
 }
 
-import { paths } from './pp3schema';
+import { components, paths } from './pp3schema';
 
 export type Pinnypals3ItemDataRequest = paths['/item-data']['get']['responses'][200]['content']['application/json'];
 export type Pinnypals3SetCollectionRequest = paths['/sets']['get']['responses'][200]['content']['application/json'];
@@ -66,6 +66,10 @@ export type Pinnypals3ItemDataSet = Pinnypals3ItemDataRequest['sets'][0];
 export type Pinnypals3ItemDataGroup = Pinnypals3ItemDataRequest['groups'][0];
 
 export type Pinnypals3Set = paths['/sets']['get']['responses'][200]['content']['application/json'][0];
+
+export type Pinnypals3EventDTO = components['schemas']['EventDto'];
+export type Pinnypals3EventTypes = Pinnypals3EventDTO['type'];
+export type Pinnypals3EventSubtypes = Pinnypals3EventDTO['subType'];
 
 export class PinnypalsDataError extends Error {
   constructor(message: string) {

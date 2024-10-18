@@ -5,8 +5,8 @@ import { PAX, PAXEvent, Pin, PinGroup, PinSet, SizesType } from '../types.js';
 import { PinSash } from './PinSash.js';
 import React from 'react';
 import config from '../config.json';
-import { getPaxCssClassFromEventId } from '../css/cssClasses.js';
-import { getPinClassForSize } from '../utils';
+import { getCssNameForEventId } from '../css/cssClasses.js';
+import { getPinClassForSize } from '../utils.js';
 
 type PinInfoPropTypes = {
   displaySize: SizesType;
@@ -33,13 +33,8 @@ export const PinInfo = ({
     throw new Error(`PAXEvents list is required (${events === undefined ? 'undefined' : 'empty list'})`);
   }
   const url = pin.image_name ? `${config.imagePrefix}/${pin.image_name.split('?')[0]}` : undefined;
-  // const pinPax: PAX | undefined = paxs?.find((pax: PAX) => pax.id == pin.pax_id);
 
-  let pinClasses = getPinClassForSize(displaySize);
-  if (pin.paxEventId) {
-    pinClasses = [pinClasses, getPaxCssClassFromEventId(pin.paxEventId, events)].join(' ');
-  }
-
+  const pinClasses = getPinClassForSize(displaySize);
   return (
     <>
       <div className={pinClasses} id={`pin_${pin.id}`} style={style}>

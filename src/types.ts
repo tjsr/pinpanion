@@ -1,3 +1,5 @@
+import { Pinnypals3EventSubtypes, Pinnypals3EventTypes } from './pinnypals/pinnypals3types.js';
+
 type uuid = string;
 export type UserId = uuid;
 export type PAXId = number;
@@ -8,7 +10,7 @@ export type PinGroupId = number;
 export type PinCategoryId = number;
 export type HexColourCode = string;
 export type ISO8601Date = string;
-type PinId = number;
+export type PinId = number;
 
 export interface YearAndIdComparable {
   id: number;
@@ -37,7 +39,7 @@ export interface Pin extends YearAndIdComparable {
   year: PublishYear;
   groupId?: PinGroupId;
   categoryIds: PinCategoryId[];
-  paxId: PAXId|null;
+  // paxId: PAXId|null;
   paxEventId?: PAXEventId;
   alternate?: string | null | undefined;
   image_name: string | null;
@@ -69,12 +71,14 @@ export type PinSelectionList = {
   wantedSetIds: PinSetId[];
 };
 
+export type PaxType = Pinnypals3EventSubtypes;
+
 export type PinListFilter = {
   startYear?: PublishYear;
   endYear?: PublishYear;
   setPinsOnly?: boolean;
   selectedPinsOnly?: boolean;
-  paxId?: PAXId;
+  paxType?: PaxType;
   pinSetId?: PinSetId;
   filterText?: string;
 };
@@ -95,10 +99,11 @@ export type PAXEventDisplayTypes = {
 export type PAXEvent = {
   id: PAXEventId;
   name: string;
-  paxId: PAXId;
   colour: HexColourCode;
   year: PublishYear;
   startDate: ISO8601Date;
+  type: Pinnypals3EventTypes,
+  subType: Pinnypals3EventSubtypes,
   endDate: ISO8601Date;
 }
 
