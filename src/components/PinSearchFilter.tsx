@@ -2,20 +2,20 @@ import '../css/pins.css';
 import '../css/search.css';
 import '../css/App.css';
 
-import { PAX, Pin, PinListFilter, PinSet } from '../types';
+import { PAX, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.js';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
-import { EMPTY_FILTER } from '../fixture';
+import { EMPTY_FILTER } from '../fixture.js';
 import FormControl from '@mui/material/FormControl';
-import { PAXSelector } from './PAXFilter';
-import { PinSetSelector } from './PinSetSelector';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
+import { PAXSelector } from './PAXFilter.js';
+import { PinSetSelector } from './PinSetSelector.js';
+import { SEARCH_CONTROL_WIDTH } from '../globals.js';
 import TextField from '@mui/material/TextField';
-import { YearSelector } from './YearSelector';
+import { YearSelector } from './YearSelector.js';
 import config from '../config.json';
 import fuzzy from 'fuzzy';
-import { isEmpty } from '../utils';
+import { isEmpty } from '../utils.js';
 
 export type PinListFilterDisplayProps = {
   filter?: PinListFilter;
@@ -114,7 +114,7 @@ export const PinSearchFilterDisplay = ({
             <PAXSelector
               id="byPax"
               paxs={paxs}
-              selectedPax={filter?.paxId}
+              selectedPax={filter?.paxType}
               paxSelected={(paxId: number | undefined) => {
                 const updatedFilter = {
                   ...filter,
@@ -191,13 +191,7 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
   if (filter.endYear && pin.year > filter.endYear) {
     return true;
   }
-  if (filter.setPinsOnly && pin.sub_set_id == null) {
-    return true;
-  }
-  if (filter.paxId && pin.pax_id != filter.paxId) {
-    return true;
-  }
-  if (filter.pinSetId && pin.set_id != filter.pinSetId) {
+  if (filter.pinSetId && pin.setId != filter.pinSetId) {
     return true;
   }
 
@@ -213,18 +207,22 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
   return false;
 };
 
+const isPaxEventType = (eventId: PAXEventId | undefined, paxType: PaxType | undefined): boolean => {
+  return paxType !== undefined && eventId !== undefined;
+};
+
 export const isPinSetFiltered = (pinSet: PinSet, pinsInSet: Pin[], filter?: PinListFilter): boolean => {
   if (!filter) {
     return false;
   }
-  if (filter.startYear && pinSet.year < filter.startYear) {
+  if (filter.startYear && pinSet.year && pinSet.year < filter.startYear) {
     return true;
   }
-  if (filter.endYear && pinSet.year > filter.endYear) {
+  if (filter.endYear && pinSet.year && pinSet.year > filter.endYear) {
     return true;
   }
-  const hasPinInFilteredPax = pinsInSet.some((pin: Pin) => pin.pax_id == filter.paxId);
-  if (filter.paxId && !hasPinInFilteredPax) {
+  const hasPinInFilteredPax = pinsInSet.some((pin: Pin) => isPaxEventType(pin.paxEventId, filter.paxType));
+  if (filter.paxType && !hasPinInFilteredPax) {
     return true;
   }
 

@@ -19,6 +19,9 @@ const DOWNLOAD_ALL = true;
 const TEST_MODE = process.env.TEST_MODE == 'true' || process.env.NODE_ENV === 'test';
 const DEFAULT_IMAGE_LIMIT = TEST_MODE ? 10 : -1;
 const LIMIT_IMAGE_DOWNLOADS = TEST_MODE && !DOWNLOAD_ALL ? DEFAULT_IMAGE_LIMIT : -1;
+const skipImages = process.env.SKIP_ALL_IMAGES === 'true';
+
+const printSkipMessages = process.env.PRINT_SKIPPED_IMAGES == 'true';
 // const LIMIT_PINNYPALS_DOWNLOADS = 10;
 
 const configFile = 'src/config.json';
@@ -78,8 +81,8 @@ const pinpanionImagePrefix: string = config.pinpanionImagePrefix;
 const pinnypalsImagePrefix: string = (config as any)[versionFieldsToUse.imagePrefix] || PINNYPALS3_IMAGE_PREFIX;
 console.log(`Pinnypals version ${PINNYPALS_VERSION} request URL:`, pinnypalsPinRequestUrl);
 
-const PINNYPALS_PINS_CACHE_FILE = 'public/pinnypalpins.json';
-const PINPANION_PINS_CACHE_FILE = 'public/pins.json';
+const PINNYPALS_PINS_CACHE_FILE = process.env.PINNYPALS_PINS_CACHE_FILE || 'public/pinnypalpins.json';
+const PINPANION_PINS_CACHE_FILE = process.env.PINPANION_PINS_CACHE_FILE || 'public/pins.json';
 
 const parsePinnypalData = (data: unknown): Pin[] => {
   if (LIMIT_IMAGE_DOWNLOADS > -1) {
@@ -95,9 +98,10 @@ const parsePinnypalData = (data: unknown): Pin[] => {
     const pp2d: V2PinCollectionData = pp2requestToDataSet(data as Pinnypals2PinsRequest);
     if (LIMIT_IMAGE_DOWNLOADS > -1) {
       pins = pp2d.pins.filter((p) => p.id < LIMIT_IMAGE_DOWNLOADS);
-      console.warn(`Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp2d.pins.length} total`);
+      console.warn('Pinnypals V2',
+        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp2d.pins.length} total`);
     } else {
-      console.log(
+      console.log('Pinnypals V2',
         `Pin data contained ${pp2d.pins.length} pins, ${pp2d.sets.length} sets and ${pp2d.pax.length} PAX events`
       );
       pins = pp2d.pins;
@@ -106,9 +110,10 @@ const parsePinnypalData = (data: unknown): Pin[] => {
     const pp3d: PinCollectionData = requestToDataSet(data as Pinnypals3ItemDataRequest);
     if (LIMIT_IMAGE_DOWNLOADS > -1) {
       pins = pp3d.pins.filter((p) => p.id < LIMIT_IMAGE_DOWNLOADS);
-      console.warn(`Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp3d.pins.length} total`);
+      console.warn('Pinnypals V3',
+        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp3d.pins.length} total`);
     } else {
-      console.log(
+      console.log('Pinnypals V3',
         `Pin data contained ${pp3d.pins.length} pins, ${pp3d.sets.length} sets and ${pp3d.pax.length} PAX events`
       );
       pins = pp3d.pins;
@@ -132,21 +137,25 @@ const fetchAndCachePinnypalData = async (): Promise<Pin[]> => {
 
   const pinnypalPinData: string = JSON.stringify(data);
   fs.writeFileSync(PINNYPALS_PINS_CACHE_FILE, pinnypalPinData, 'utf-8');
-  console.log(`Wrote ${pinnypalPinData.length} bytes of updated JSON to ${PINNYPALS_PINS_CACHE_FILE}`);
+  console.log('Pinnypals cache data',
+    `Wrote ${pinnypalPinData.length} bytes of updated JSON to ${PINNYPALS_PINS_CACHE_FILE}`);
 
   const pp3d: PinCollectionData = requestToDataSet(data as Pinnypals3ItemDataRequest);
   const pinpanionData: string = JSON.stringify(pp3d);
   fs.writeFileSync(PINPANION_PINS_CACHE_FILE, pinpanionData, 'utf-8');
-  console.log(`Wrote ${pinpanionData.length} bytes of updated JSON to ${PINPANION_PINS_CACHE_FILE}`);
+  console.log('Pinpanion cache data',
+    `Wrote ${pinpanionData.length} bytes of updated JSON to ${PINPANION_PINS_CACHE_FILE}`);
   return pins;
 };
 
 const downloadPinImageFromPinpanion = (pinpanionUrl: string, outputFilePath: string): Promise<boolean> => {
-  console.debug(`Downloading ${pinpanionUrl} to ${outputFilePath}`);
+  console.debug('Pinpanion data',
+    `Downloading ${pinpanionUrl} to ${outputFilePath}`);
 
   return downloadFile(pinpanionUrl, outputFilePath)
     .then(() => {
-      console.log(`Downloaded ${pinpanionUrl} to ${outputFilePath}`);
+      console.log('Pinpanion data',
+        `Downloaded ${pinpanionUrl} to ${outputFilePath}`);
       return true;
     });
 };
@@ -154,11 +163,11 @@ const downloadPinImageFromPinpanion = (pinpanionUrl: string, outputFilePath: str
 const downloadPinImageFromPinnypals = (pinnypalsUrl: string, outputFilePath: string): Promise<boolean> => {
   return downloadFile(pinnypalsUrl, outputFilePath)
     .then(() => {
-      console.log(`Downloaded ${pinnypalsUrl} to ${outputFilePath}`);
+      console.log(`Pinnypals data - Downloaded ${pinnypalsUrl} to ${outputFilePath}`);
       return true;
     })
     .catch((err) => {
-      console.error(`Error downloading ${pinnypalsUrl} to ${outputFilePath}: ${err}`);
+      console.error(`Pinnypals data - Error downloading ${pinnypalsUrl} to ${outputFilePath}: ${err}`);
       throw err;
     });
 };
@@ -171,6 +180,9 @@ const downloadImageForPin = async (
   destinationPath: string,
   pin: Pin
 ): Promise<DownloadSource> => {
+  if (!pin.image_name) {
+    throw new Error(`Can't download image for Pin ${pin.id} (${pin.name}) which has no image value.`);
+  }
   const pinImageFilename: string = stripPathFromImageLocation(pin.image_name);
 
   const outputFilePath: string = path.resolve(path.join(destinationPath, pinImageFilename));
@@ -184,7 +196,9 @@ const downloadImageForPin = async (
   }
 
   if (fs.existsSync(outputFilePath)) {
-    console.log(`Skipped downloading ${pinImageFilename} because ${outputFilePath} exists.`);
+    if (printSkipMessages) {
+      console.log(`Skipped downloading ${pinImageFilename} because ${outputFilePath} exists.`);
+    }
     return Promise.resolve('cache');
   }
 
@@ -212,7 +226,7 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
     throw new Error(`Failed creating destination directory ${globalDestinationPath}`);
   }
 
-  const promises: Promise<DownloadSource>[] = pinsToDownload.map((p) =>
+  const promises: Promise<DownloadSource>[] = pinsToDownload.filter((pin) => pin.image_name).map((p) =>
     downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
 
   return Promise.allSettled(promises).then((results: PromiseSettledResult<DownloadSource>[]) => {
@@ -222,6 +236,7 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
       console.error('Errors occurred while downloading');
       throw new Error('Errors occurred while downloading');
     }
+    console.log(`Finished downloading ${results.length} images`);
   }).catch((err) => {
     console.error('Error downloading images:', err);
     throw err;
@@ -231,4 +246,6 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
 const useLocal = false;
 const pins: Pin[] = useLocal ? useLocalCachedData() : await fetchAndCachePinnypalData();
 
-await cachePinImages(globalDestinationPath, pins);
+if (!skipImages) {
+  await cachePinImages(globalDestinationPath, pins);
+}

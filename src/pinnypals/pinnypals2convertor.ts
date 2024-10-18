@@ -1,4 +1,4 @@
-import { PAX, Pin, PinSet } from '../types.js';
+import { PAX, PAXId, Pin, PinSet, PinSetId } from '../types.js';
 import {
   Pinnypals2EventsArray,
   Pinnypals2PaxIdentifier,
@@ -7,7 +7,7 @@ import {
   Pinnypals2PinsRequest,
   Pinnypals2SetIdentifier,
   Pinnypals2SetsArray
-} from './pinnypals2types';
+} from './pinnypals2types.js';
 
 export interface PinCollectionData {
   pax: PAX[];
@@ -42,19 +42,25 @@ const extractPAXs = (paxArray: Pinnypals2EventsArray): PAX[] =>
 //   0
 // ]
 
+interface Pinnypals2PinData {
+  pax_id: PAXId;
+  sub_set_id: PinSetId|null;
+}
+
 const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>
   pinArray.map((pin: Pinnypals2PinIdentifier) => {
-    const outputPin: Pin = {
+    const outputPin: Pin & Pinnypals2PinData = {
       alternate: '',
+      categoryIds: [],
       id: pin[0],
       image_name: pin[2],
       name: pin[1],
       pax_id: pin[6],
-      set_id: pin[7],
+      setId: pin[7],
       sub_set_id: null,
       year: pin[3],
     };
-    return outputPin;
+    return outputPin as Pin;
   });
 
 const extractPinSets = (pinSetArray: Pinnypals2SetsArray): PinSet[] =>
@@ -65,7 +71,7 @@ const extractPinSets = (pinSetArray: Pinnypals2SetsArray): PinSet[] =>
       isPackagedSet: pinSet[5] == 1,
       isReprint: pinSet[3] > 0,
       name: pinSet[1],
-      sub_set_id: pinSet[7],
+      subSetId: pinSet[7],
       variants: pinSet[4],
       year: pinSet[2],
     };

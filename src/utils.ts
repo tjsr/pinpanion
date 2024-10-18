@@ -24,7 +24,7 @@ export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): n
   if (!isEmpty(filter.filterText)) {
     filters++;
   }
-  if (!filteredSetsOnly && filter?.paxId !== undefined && filter?.paxId > 0) {
+  if (!filteredSetsOnly && filter?.paxType !== undefined) {
     filters++;
   }
   if (filteredSetsOnly && filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
@@ -105,3 +105,8 @@ export const stripPathFromImageLocation = (inputLocation: string): string => {
   }
   return workingPath;
 };
+
+export const toProperCase = (str: string): string =>
+  str.replace(/\w\S*/g, (txt) =>
+    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
+  );

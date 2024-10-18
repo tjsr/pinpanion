@@ -1,27 +1,48 @@
+import { Pinnypald3PinCategory, Pinnypals3EventSubtypes, Pinnypals3EventTypes } from './pinnypals/pinnypals3types.js';
+
 type uuid = string;
 export type UserId = uuid;
 export type PAXId = number;
 export type PAXEventId = number;
 export type PublishYear = number;
 export type PinSetId = number;
+export type PinGroupId = number;
+export type PinCategoryId = number;
 export type HexColourCode = string;
 export type ISO8601Date = string;
-type PinId = number;
+export type PinId = number;
 
 export interface YearAndIdComparable {
   id: number;
   year: PublishYear | undefined;
 }
 
+export enum GroupTypes {
+  STAFF = 'STAFF',
+  SHOW = 'SHOW',
+  BLINDBOX = 'BLINDBOX',
+  OTHER = 'OTHER',
+}
+
+export interface PinGroup {
+  id: PinGroupId;
+  name: string;
+  type?: GroupTypes;
+  notes?: string;
+  imageUrl?: string;
+};
+
 export interface Pin extends YearAndIdComparable {
   id: PinId;
   name: string;
-  set_id: PinSetId | null;
-  sub_set_id: number | null;
+  setId: PinSetId | null;
   year: PublishYear;
-  pax_id: PAXId;
+  groupId?: PinGroupId;
+  categoryIds: PinCategoryId[];
+  // paxId: PAXId|null;
+  paxEventId?: PAXEventId;
   alternate?: string | null | undefined;
-  image_name: string;
+  image_name: string | null;
 }
 
 export type Collection = {
@@ -50,12 +71,14 @@ export type PinSelectionList = {
   wantedSetIds: PinSetId[];
 };
 
+export type PaxType = Pinnypals3EventSubtypes;
+
 export type PinListFilter = {
   startYear?: PublishYear;
   endYear?: PublishYear;
   setPinsOnly?: boolean;
   selectedPinsOnly?: boolean;
-  paxId?: PAXId;
+  paxType?: PaxType;
   pinSetId?: PinSetId;
   filterText?: string;
 };
@@ -67,13 +90,20 @@ export type PAX = {
   styleName?: string;
 };
 
+export type PAXEventDisplayTypes = {
+  id: PAXId;
+  description: string;
+  cssClass: string;
+}
+
 export type PAXEvent = {
   id: PAXEventId;
   name: string;
-  paxId: PAXId;
   colour: HexColourCode;
   year: PublishYear;
   startDate: ISO8601Date;
+  type: Pinnypals3EventTypes,
+  subType: Pinnypals3EventSubtypes,
   endDate: ISO8601Date;
 }
 
@@ -85,10 +115,12 @@ export interface PinSet extends YearAndIdComparable {
   name: string;
   year: PublishYear | undefined;
   isPackagedSet: boolean;
-  sub_set_id?: PinSetId;
+  subSetId?: PinSetId;
   image_name: string;
   variants: PinSetVariant[]
 }
+
+export type PinCategory = Pinnypald3PinCategory;
 
 export type VariantType = 'text' | 'outlined' | 'contained' | undefined;
 
@@ -109,3 +141,5 @@ export interface ConfigType {
   maxYear: number;
   reverseYears: boolean;
 }
+
+export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;

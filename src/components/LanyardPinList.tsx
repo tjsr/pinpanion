@@ -1,13 +1,14 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, Pin, PinSet, SizesType, YearAndIdComparable } from '../types';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.js';
 
-import { PinInfo } from './PinInfo';
-import { PinSetInfo } from './PinSetInfo';
-import { compareYearThenId } from '../listutils';
+import { PinInfo } from './PinInfo.js';
+import { PinSetInfo } from './PinSetInfo.js';
+import { compareYearThenId } from '../listutils.js';
 
 type LanyardPinListPropTypes = {
   allPins: Pin[];
+  categories: PinCategory[];
   descendingAge: boolean;
   displaySize?: SizesType;
   heading: string;
@@ -16,13 +17,16 @@ type LanyardPinListPropTypes = {
   availableSets: PinSet[];
   wantedSets: PinSet[];
   paxs: PAX[];
+  events: PAXEvent[];
   pinSets: PinSet[];
+  groups: PinGroup[];
   showInSets: boolean;
   setShowInSets: (showInSets: boolean) => void;
 };
 
 export const LanyardPinList = ({
   allPins,
+  categories,
   availablePins,
   availableSets,
   descendingAge,
@@ -30,6 +34,8 @@ export const LanyardPinList = ({
   heading,
   paxs,
   pinSets,
+  events,
+  groups,
   wantedPins,
   wantedSets,
 }: LanyardPinListPropTypes): JSX.Element => {
@@ -52,7 +58,7 @@ export const LanyardPinList = ({
             { displayedAvailableSets.length > 0 && (
               <div className="availableSets">
                 {displayedAvailableSets.map((pinSet: PinSet) => {
-                  const pinsInSet = allPins.filter((pin: Pin) => pin.set_id === pinSet.id);
+                  const pinsInSet = allPins.filter((pin: Pin) => pin.setId === pinSet.id);
                   return <PinSetInfo
                     displaySize={displaySize} key={pinSet.id} paxs={paxs}
                     pinSets={pinSets} pinSet={pinSet} pinSetPins={pinsInSet} />;
@@ -62,7 +68,16 @@ export const LanyardPinList = ({
             {displayedAvailable.length > 0 && (
               <div className="availablePins">
                 {displayedAvailable.map((pin: Pin) => {
-                  return <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />;
+                  return <PinInfo
+                    categories={categories}
+                    displaySize={displaySize}
+                    key={pin.id}
+                    paxs={paxs}
+                    pinSets={pinSets}
+                    pin={pin}
+                    groups={groups}
+                    events={events}
+                  />;
                 })}
               </div>
             )}
@@ -74,7 +89,7 @@ export const LanyardPinList = ({
             <div className="wantedSets">
               {displayedWantedSets.length > 0 && (
                 displayedWantedSets.map((pinSet: PinSet) => {
-                  const pinsInSet = allPins.filter((pin: Pin) => pin.set_id === pinSet.id);
+                  const pinsInSet = allPins.filter((pin: Pin) => pin.setId === pinSet.id);
                   return <PinSetInfo
                     displaySize={displaySize} key={pinSet.id}
                     paxs={paxs} pinSets={pinSets} pinSet={pinSet} pinSetPins={pinsInSet} />;
@@ -84,7 +99,15 @@ export const LanyardPinList = ({
             <div className="wantedPins">
               {displayedWanted.length > 0 && (
                 displayedWanted.map((pin: Pin) => {
-                  return <PinInfo displaySize={displaySize} key={pin.id} paxs={paxs} pinSets={pinSets} pin={pin} />;
+                  return <PinInfo
+                    categories={categories}
+                    displaySize={displaySize}
+                    key={pin.id}
+                    paxs={paxs}
+                    pinSets={pinSets}
+                    pin={pin}
+                    groups={groups}
+                    events={events} />;
                 })
               )}
             </div>

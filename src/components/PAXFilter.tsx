@@ -1,18 +1,18 @@
 import '../css/pins.css';
 
+import { PAX, PaxType } from '../types.js';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { PAX } from '../types';
 import { SEARCH_CONTROL_WIDTH } from '../globals';
-import eventnames from '../eventnames.json';
+import eventnames from '../static/eventDisplayTypes.json';
 
 type PAXSelectorProps = {
   id: string;
   paxs: PAX[];
-  selectedPax: number | undefined;
+  selectedPax: PaxType | undefined;
   paxSelected: (setId: number | undefined) => void;
 };
 

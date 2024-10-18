@@ -2,7 +2,7 @@ import { PinCollectionData, requestToDataSet } from './pinnypals2convertor.js';
 
 import { Pin } from '../types.js';
 import { Pinnypals2PinsRequest } from './pinnypals2types.js';
-import v2testData from '../../test/pins.json';
+import v2testData from '../../test/pinsv2.json';
 
 describe('Should read Pinnypals V2 data in JSON block', () => {
   const data: PinCollectionData = requestToDataSet(v2testData as Pinnypals2PinsRequest);
@@ -24,6 +24,6 @@ describe('Should read Pinnypals V2 data in JSON block', () => {
   });
 
   test('V2 - Find all pins in the West 18 show set', () => {
-    expect(data.pins.filter((p: Pin) => p.set_id === 73).length).toBe(4);
+    expect(data.pins.filter((p: Pin) => p.setId === 73).length).toBe(4);
   });
 });

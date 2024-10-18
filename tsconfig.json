@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "ES2022",
+    "target": "ES2023",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext",
-      "es2021"
+      "ES2023"
     ],
     "allowJs": true,
     "skipLibCheck": true,
@@ -20,7 +20,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "jsx": "react-jsx",
-    "types": ["vitest/globals", "@testing-library/jest-dom/vitest"],
+    "types": ["vitest/globals", "@testing-library/jest-dom/vitest", "@testing-library/react"],
     "sourceMap": true,
   },
   "include": [
