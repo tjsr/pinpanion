@@ -70,7 +70,6 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
             name="shareUrl"
             id="shareUrl"
             value={generatedQrCode}
-            defaultValue={generatedQrCode}
           />
         </div>
         <div className="shareUrlCopyIcon">
