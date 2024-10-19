@@ -2,13 +2,13 @@ import '../css/pins.css';
 import '../css/search.css';
 import '../css/App.css';
 
-import { PAX, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.js';
+import { PAXEvent, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.js';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
 import { EMPTY_FILTER } from '../fixture.js';
 import FormControl from '@mui/material/FormControl';
-import { PAXSelector } from './PAXFilter.js';
+import { PAXEventSelector } from './PAXFilter.js';
 import { PinSetSelector } from './PinSetSelector.js';
 import { SEARCH_CONTROL_WIDTH } from '../globals.js';
 import TextField from '@mui/material/TextField';
@@ -19,7 +19,8 @@ import { isEmpty } from '../utils.js';
 
 export type PinListFilterDisplayProps = {
   filter?: PinListFilter;
-  paxs?: PAX[];
+  // paxs: PAX[];
+  events: PAXEvent[];
   pinSets?: PinSet[];
   onChange: (updatedFilter: PinListFilter) => void;
   isFilterEnabled: boolean;
@@ -38,7 +39,7 @@ const filterString = (filter: PinListFilter): string => {
 export const PinSearchFilterDisplay = ({
   filter,
   isFilterEnabled,
-  paxs,
+  events,
   pinSets,
   onChange,
 }: PinListFilterDisplayProps): JSX.Element => {
@@ -109,16 +110,17 @@ export const PinSearchFilterDisplay = ({
             }}
           />
         </div>
-        {paxs ? (
+        {events ? (
           <div>
-            <PAXSelector
+            <PAXEventSelector
+              data-testid="paxEventSelector"
               id="byPax"
-              paxs={paxs}
-              selectedPax={filter?.paxType}
-              paxSelected={(paxId: number | undefined) => {
-                const updatedFilter = {
+              events={events}
+              selectedPaxEventOrType={filter?.paxType}
+              eventSelected={(paxEventId: PAXEventId|undefined) => {
+                const updatedFilter: PinListFilter = {
                   ...filter,
-                  paxId,
+                  paxEventId,
                 };
                 onChange(updatedFilter);
               }}
@@ -181,7 +183,7 @@ export const PinSearchFilterDisplay = ({
   );
 };
 
-export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
+export const isPinFiltered = (pin: Pin, filter?: PinListFilter, events?: PAXEvent[]): boolean => {
   if (!filter) {
     return false;
   }
@@ -192,6 +194,13 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
     return true;
   }
   if (filter.pinSetId && pin.setId != filter.pinSetId) {
+    return true;
+  }
+  if (filter.paxEventId && pin.paxEventId != filter.paxEventId) {
+    return true;
+  }
+  if (filter.paxType && events && (
+    pin.paxEventId && !isPaxEventType(pin.paxEventId, filter.paxType, events))) {
     return true;
   }
 
@@ -207,11 +216,20 @@ export const isPinFiltered = (pin: Pin, filter?: PinListFilter): boolean => {
   return false;
 };
 
-const isPaxEventType = (eventId: PAXEventId | undefined, paxType: PaxType | undefined): boolean => {
-  return paxType !== undefined && eventId !== undefined;
+const getEventById = (eventId: PAXEventId | undefined, eventList: PAXEvent[]): PAXEvent | undefined => {
+  return eventList.find((event: PAXEvent) => event.id === eventId);
 };
 
-export const isPinSetFiltered = (pinSet: PinSet, pinsInSet: Pin[], filter?: PinListFilter): boolean => {
+export const isPaxEventType = (eventId: PAXEventId | undefined, paxType: PaxType | undefined, eventList: PAXEvent[]): boolean|undefined => {
+  const paxEvent = getEventById(eventId, eventList);
+
+  if (paxType === undefined || eventId === undefined) {
+    return undefined;
+  }
+  return paxEvent?.subType === paxType;
+};
+
+export const isPinSetFiltered = (pinSet: PinSet, pinsInSet: Pin[], filter?: PinListFilter, events?: PAXEvent[]): boolean => {
   if (!filter) {
     return false;
   }
@@ -221,7 +239,7 @@ export const isPinSetFiltered = (pinSet: PinSet, pinsInSet: Pin[], filter?: PinL
   if (filter.endYear && pinSet.year && pinSet.year > filter.endYear) {
     return true;
   }
-  const hasPinInFilteredPax = pinsInSet.some((pin: Pin) => isPaxEventType(pin.paxEventId, filter.paxType));
+  const hasPinInFilteredPax = events && pinsInSet.some((pin: Pin) => isPaxEventType(pin.paxEventId, filter.paxType, events));
   if (filter.paxType && !hasPinInFilteredPax) {
     return true;
   }
