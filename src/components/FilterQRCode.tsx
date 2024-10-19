@@ -34,10 +34,10 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
   };
 
   if (lanyard.availableIds === undefined) {
-    console.debug(`Lanyard passed to FilterQRCode had no availableIds array.`);
+    console.debug('Lanyard passed to FilterQRCode had no availableIds array.');
   }
   if (lanyard.wantedIds === undefined) {
-    console.debug(`Lanyard passed to FilterQRCode had no wantedIds array.`);
+    console.debug('Lanyard passed to FilterQRCode had no wantedIds array.');
   }
 
   return (
@@ -70,7 +70,6 @@ export const FilterQRCode = ({ lanyard }: FilterQRCodeProps): JSX.Element => {
             name="shareUrl"
             id="shareUrl"
             value={generatedQrCode}
-            defaultValue={generatedQrCode}
           />
         </div>
         <div className="shareUrlCopyIcon">

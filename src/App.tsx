@@ -225,7 +225,7 @@ const App = (): JSX.Element => {
                 <PinSearchFilterDisplay
                   isFilterEnabled={selectionFilterEnabled}
                   filter={filter}
-                  paxs={paxs}
+                  events={events}
                   pinSets={pinSets}
                   onChange={setFilter}
                 />

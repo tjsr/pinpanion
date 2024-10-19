@@ -156,7 +156,7 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
     };
     if (!pin.categoryIds || pin.categoryIds.length === 0) {
       if (!pin.eventId && !pin.groupId && !pin.setId) {
-        throw new PinnypalsPinDataError(`Pin has no EventID, GroupID, SetID or CategoryID`, pin);
+        throw new PinnypalsPinDataError('Pin has no EventID, GroupID, SetID or CategoryID', pin);
       }
       // if (outputPin.paxId) {
       //   if (!outputPin.categoryIds.includes(paxCategoryId)) {

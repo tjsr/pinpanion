@@ -79,6 +79,7 @@ export type PinListFilter = {
   setPinsOnly?: boolean;
   selectedPinsOnly?: boolean;
   paxType?: PaxType;
+  paxEventId?: PAXEventId;
   pinSetId?: PinSetId;
   filterText?: string;
 };
@@ -94,7 +95,7 @@ export type PAXEventDisplayTypes = {
   id: PAXId;
   description: string;
   cssClass: string;
-}
+};
 
 export type PAXEvent = {
   id: PAXEventId;
@@ -102,10 +103,10 @@ export type PAXEvent = {
   colour: HexColourCode;
   year: PublishYear;
   startDate: ISO8601Date;
-  type: Pinnypals3EventTypes,
-  subType: Pinnypals3EventSubtypes,
+  type: Pinnypals3EventTypes;
+  subType: PaxType;
   endDate: ISO8601Date;
-}
+};
 
 type PinSetVariant = [PinSetId, PublishYear];
 

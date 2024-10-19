@@ -1,15 +1,16 @@
-import { Pin, PinSelectionList } from './types';
+import { Pin, PinListFilter, PinSelectionList } from './types.js';
 import {
   compressArray,
+  countFilters,
   getMin,
   isEmpty,
   isEmptyList,
   isPinOnLanyard,
   sanitizeListElement,
   sanitizePinList
-} from './utils';
+} from './utils.js';
 
-import { ApplicationSettings } from './settingsStorage';
+import { ApplicationSettings } from './settingsStorage.js';
 
 describe('getMin', () => {
   test('Should get only element in array', () => {
@@ -97,9 +98,7 @@ describe('isPinOnLanyard', () => {
 
 describe('isEmptyList', () => {
   test('Should return true if no lists are present.', () => {
-    const emptyLanyard: PinSelectionList = {
-
-    } as PinSelectionList;
+    const emptyLanyard: PinSelectionList = {} as PinSelectionList;
     expect(isEmptyList(emptyLanyard)).toBe(true);
   });
 
@@ -135,7 +134,7 @@ describe('isEmptyList', () => {
 });
 
 describe('sanitizeListElement', () => {
-  let tmpConsoleError = ():void => {};
+  let tmpConsoleError = (): void => {};
   beforeEach(() => {
     // Capture console.err output
     tmpConsoleError = console.error;
@@ -172,7 +171,7 @@ describe('sanitizeListElement', () => {
 });
 
 describe('sanitizePinList', () => {
-  let tmpConsoleError = ():void => {};
+  let tmpConsoleError = (): void => {};
   beforeEach(() => {
     // Capture console.err output
     tmpConsoleError = console.error;
@@ -191,7 +190,9 @@ describe('sanitizePinList', () => {
       wantedIds: [1, 4, 7, 9],
       wantedSetIds: [77, 42, 12, 21],
     } as any as PinSelectionList;
-    sanitizePinList(emptyLanyard, { localUserId: 'o123' } as any as ApplicationSettings);
+    sanitizePinList(emptyLanyard, {
+      localUserId: 'o123',
+    } as any as ApplicationSettings);
     expect(emptyLanyard.availableIds).toEqual([]);
     expect(emptyLanyard.availableSetIds).toEqual([5, 8, 22]);
     expect(emptyLanyard.wantedIds).toEqual([1, 4, 7, 9]);
@@ -214,5 +215,94 @@ describe('isEmpty', () => {
 
   test('Should return false if a string contains a word', () => {
     expect(isEmpty('blahhh')).toBe(false);
+  });
+});
+
+describe('countFilters', () => {
+  it('Should count year filters', () => {
+    const pinFilter: PinListFilter = {
+      endYear: 2021,
+      startYear: 2019,
+    };
+
+    expect(countFilters(pinFilter)).toBe(2);
+  });
+
+  it('Should count set pins only filter', () => {
+    const pinFilter: PinListFilter = {
+      setPinsOnly: true,
+    };
+
+    expect(countFilters(pinFilter)).toBe(0);
+
+    pinFilter.setPinsOnly = false;
+    expect(countFilters(pinFilter)).toBe(0);
+
+    pinFilter.setPinsOnly = undefined;
+    expect(countFilters(pinFilter)).toBe(0);
+  });
+
+  it('Should count selected pins only filter', () => {
+    const pinFilter: PinListFilter = {
+      selectedPinsOnly: true,
+    };
+
+    // Selected pins only should not count as a filter for the count of filters.
+    expect(countFilters(pinFilter)).toBe(0);
+
+    pinFilter.selectedPinsOnly = false;
+    expect(countFilters(pinFilter)).toBe(0);
+
+    pinFilter.selectedPinsOnly = undefined;
+    expect(countFilters(pinFilter)).toBe(0);
+  });
+
+  it('Should count filter by event id', () => {
+    const pinFilter: PinListFilter = {
+      paxEventId: 123,
+    };
+
+    expect(countFilters(pinFilter)).toBe(1);
+
+    pinFilter.paxEventId = undefined;
+    expect(countFilters(pinFilter)).toBe(0);
+  });
+
+  it('Should count filter by event subtype', () => {
+    const pinFilter: PinListFilter = {
+      paxType: 'PAX_EAST',
+    };
+
+    expect(countFilters(pinFilter)).toBe(1);
+
+    pinFilter.paxType = undefined;
+    expect(countFilters(pinFilter)).toBe(0);
+  });
+
+  it('Should count eventId and subtype filters as a single filter', () => {
+    const pinFilter: PinListFilter = {
+      paxEventId: 123,
+      paxType: 'PAX_EAST',
+    };
+
+    expect(countFilters(pinFilter)).toBe(1);
+
+    pinFilter.paxType = undefined;
+    expect(countFilters(pinFilter)).toBe(1);
+
+    pinFilter.paxType = 'PAX_WEST';
+    pinFilter.paxEventId = undefined;
+    expect(countFilters(pinFilter)).toBe(1);
+
+    pinFilter.paxType = undefined;
+    pinFilter.paxEventId = undefined;
+    expect(countFilters(pinFilter)).toBe(0);
+
+    pinFilter.paxType = 'PAX_AUS';
+    pinFilter.paxEventId = 20;
+    pinFilter.endYear = 2022;
+    expect(countFilters(pinFilter)).toBe(2);
+    pinFilter.startYear = 2018;
+    expect(countFilters(pinFilter)).toBe(3);
   });
 });

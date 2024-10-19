@@ -81,12 +81,12 @@ describe('isValidWin32Path', () => {
   });
 
   it('Should reject a path that contains a portion of a URL when assuming a Win32 path', () => {
-    const invalidPath = `C:\\temp\\http:/test`;
+    const invalidPath = 'C:\\temp\\http:/test';
     expect(isValidWin32Path(invalidPath)).toEqual(false);
   });
 
   it('Should reject a path that contains a portion of a URL when assuming a nix path', () => {
-    const invalidPath = `/var/tmp/http:/test`;
+    const invalidPath = '/var/tmp/http:/test';
     expect(isValidWin32Path(invalidPath)).toEqual(false);
   });
 
