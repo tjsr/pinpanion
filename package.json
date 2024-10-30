@@ -21,7 +21,7 @@
     "react-window": "^1.8.10",
     "sparse-bit-string": "^0.2.3",
     "use-hash-param": "^0.3.0",
-    "uuid": "^10.0.0"
+    "uuid": "^11.0.2"
   },
   "scripts": {
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
