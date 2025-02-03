@@ -136,6 +136,15 @@ export const convertPinnypals3ItemDataGroupToPinGroup = (group: Pinnypals3ItemDa
   }
 );
 
+const applyKnownFixes = (pin: Pin): boolean => {
+  if (pin.id == 1648) {
+    pin.paxEventId = 0;
+    console.warn(`Pin ${pin.id} has missing category/event, so applying to 0.`);
+    return true;
+  }
+  return false;
+};
+
 export const convertPinnypals3ItemDataPinsDataToPins = (
   pins: Pinnypals3ItemDataPin[],
   groups: Pinnypals3ItemDataGroup[]
@@ -156,7 +165,11 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
     };
     if (!pin.categoryIds || pin.categoryIds.length === 0) {
       if (!pin.eventId && !pin.groupId && !pin.setId) {
-        throw new PinnypalsPinDataError('Pin has no EventID, GroupID, SetID or CategoryID', pin);
+        if (applyKnownFixes(outputPin)) {
+          console.log(`Pin ${pin.id} had a pre-identified fix applied.`);
+        } else {
+          throw new PinnypalsPinDataError('Pin has no EventID, GroupID, SetID or CategoryID', pin);
+        }
       }
       // if (outputPin.paxId) {
       //   if (!outputPin.categoryIds.includes(paxCategoryId)) {
