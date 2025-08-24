@@ -1,0 +1,1177 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "PinnyPals API",
+    "version": "1.1.2",
+    "description": "This documents the API endpoints available for use on the PinnyPals\n          website. This API is likely to change over time, possibly without any\n          prior notice. Any use of this API is at your own risk and results are\n          not guaranteed!"
+  },
+  "servers": [
+    {
+      "url": "https://api.pinnypals.dev/api",
+      "description": "PinnyPals Test API"
+    },
+    {
+      "url": "https://api.pinnypals.com/api",
+      "description": "PinnyPals Production API"
+    }
+  ],
+  "components": {
+    "schemas": {
+      "CategoryDto": {
+        "description": "A pin category",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The category id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The category name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "CHARACTER",
+              "COMPANY",
+              "GAME",
+              "PERSON",
+              "SERIES",
+              "OTHER"
+            ],
+            "description": "The category type"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Aliases for the category"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The category's unique url slug"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "slug"
+        ],
+        "examples": [
+          {
+            "id": 1,
+            "type": "COMPANY",
+            "name": "Penny Arcade",
+            "slug": "penny-arcade"
+          }
+        ]
+      },
+      "EventDto": {
+        "description": "An event (e.g. a PAX)",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The event id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The event name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PAX",
+              "PAX_ONLINE"
+            ],
+            "description": "The event type"
+          },
+          "subType": {
+            "type": "string",
+            "enum": [
+              "PAX_WEST",
+              "PAX_EAST",
+              "PAX_AUS",
+              "PAX_SOUTH",
+              "PAX_UNPLUGGED",
+              "PAX_ONLINE"
+            ],
+            "description": "The event sub type"
+          },
+          "colour": {
+            "type": "string",
+            "description": "The event colour hex code"
+          },
+          "year": {
+            "type": "integer",
+            "description": "The event year"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The event start date (YYYY-MM-DD)"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The event end date (YYYY-MM-DD)"
+          },
+          "timezone": {
+            "type": "string",
+            "description": "The event timezone"
+          },
+          "startTime": {
+            "type": "string",
+            "description": "The event start time (HH:MM:SS)"
+          },
+          "endTime": {
+            "type": "string",
+            "description": "The event end time (HH:MM:SS)"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageDto"
+            },
+            "description": "Images for the event"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The event's unique url slug"
+          },
+          "startTimestamp": {
+            "type": "integer",
+            "description": "The event start timestamp"
+          },
+          "endTimestamp": {
+            "type": "string",
+            "description": "The event end timestamp"
+          },
+          "eventInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventInfoDto"
+            },
+            "description": "Array of event infos"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "subType",
+          "year",
+          "startDate",
+          "endDate",
+          "timezone",
+          "startTime",
+          "endTime",
+          "images",
+          "slug",
+          "startTimestamp",
+          "endTimestamp",
+          "eventInfo"
+        ],
+        "examples": [
+          {
+            "id": 1,
+            "name": "PAX Prime 2013",
+            "type": "PAX",
+            "subType": "PAX_WEST",
+            "colour": "#007dbb",
+            "year": 2013,
+            "startDate": "2013-08-30",
+            "endDate": "2013-09-02",
+            "timeZone": "America/Los_Angeles",
+            "startTime": "10:00:00",
+            "endTime": "23:59:59",
+            "images": [],
+            "slug": "pax-prime-2013",
+            "startTimestamp": 1377882000000,
+            "endTimestamp": 1378191599000,
+            "eventInfo": []
+          }
+        ]
+      },
+      "EventSummaryDto": {
+        "description": "An event summary",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The event id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The event name"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "PAX",
+              "PAX_ONLINE"
+            ],
+            "description": "The event type"
+          },
+          "subType": {
+            "type": "string",
+            "enum": [
+              "PAX_WEST",
+              "PAX_EAST",
+              "PAX_AUS",
+              "PAX_SOUTH",
+              "PAX_UNPLUGGED",
+              "PAX_ONLINE"
+            ],
+            "description": "The event sub type"
+          },
+          "colour": {
+            "type": "string",
+            "description": "The event colour hex code"
+          },
+          "year": {
+            "type": "integer",
+            "description": "The event year"
+          },
+          "startDate": {
+            "type": "string",
+            "description": "The event start date (YYYY-MM-DD)"
+          },
+          "endDate": {
+            "type": "string",
+            "description": "The event end date (YYYY-MM-DD)"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The primary image url for the event"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The event's unique url slug"
+          },
+          "startTimestamp": {
+            "type": "integer",
+            "description": "The event start timestamp"
+          },
+          "endTimestamp": {
+            "type": "string",
+            "description": "The event end timestamp"
+          },
+          "eventInfo": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventInfoDto"
+            },
+            "description": "Array of event infos"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "subType",
+          "year",
+          "startDate",
+          "endDate",
+          "slug",
+          "startTimestamp",
+          "endTimestamp",
+          "eventInfo"
+        ],
+        "examples": [
+          {
+            "id": 1,
+            "name": "PAX Prime 2013",
+            "type": "PAX",
+            "subType": "PAX_WEST",
+            "colour": "#007dbb",
+            "year": 2013,
+            "startDate": "2013-08-30",
+            "endDate": "2013-09-02",
+            "slug": "pax-prime-2013",
+            "startTimestamp": 1377882000000,
+            "endTimestamp": 1378191599000,
+            "eventInfo": []
+          }
+        ]
+      },
+      "EventInfoDto": {
+        "description": "Additional info for an event",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The info text"
+          },
+          "url": {
+            "type": "string",
+            "description": "The optional info url"
+          },
+          "children": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventInfoDto"
+            },
+            "description": "Array of child event infos"
+          }
+        },
+        "required": [
+          "name",
+          "children"
+        ],
+        "examples": [
+          {
+            "name": "Pin Quest",
+            "url": "https://example.com/",
+            "children": []
+          }
+        ]
+      },
+      "ImageDto": {
+        "description": "An image",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The image id"
+          },
+          "primary": {
+            "type": "boolean",
+            "description": "Whether this is a primary image"
+          },
+          "versions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageVersionDto"
+            },
+            "description": "The image versions"
+          }
+        },
+        "required": [
+          "id",
+          "primary",
+          "versions"
+        ]
+      },
+      "ImageVersionDto": {
+        "description": "An image version",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The image version id"
+          },
+          "width": {
+            "type": "integer",
+            "description": "The image width"
+          },
+          "height": {
+            "type": "integer",
+            "description": "The image height"
+          },
+          "mimeType": {
+            "type": "string",
+            "description": "The image mime type"
+          },
+          "versionType": {
+            "type": "string",
+            "enum": [
+              "FULL",
+              "THUMBNAIL"
+            ],
+            "description": "The image version type"
+          },
+          "url": {
+            "type": "string",
+            "description": "The image version url"
+          }
+        },
+        "required": [
+          "id",
+          "mimeType",
+          "versionType",
+          "url"
+        ]
+      },
+      "ItemDataDto": {
+        "description": "Item data",
+        "type": "object",
+        "properties": {
+          "pins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PinSummaryDto"
+            }
+          },
+          "sets": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SetSummaryDto"
+            }
+          },
+          "categories": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CategoryDto"
+            }
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PinGroupSummaryDto"
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EventSummaryDto"
+            }
+          }
+        },
+        "required": [
+          "pins",
+          "sets",
+          "categories",
+          "groups",
+          "events"
+        ]
+      },
+      "PinDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The pin id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The pin name"
+          },
+          "year": {
+            "type": "integer",
+            "description": "The \"main\" year stamp for the pin"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the pin"
+          },
+          "released": {
+            "type": "string",
+            "description": "Date that the pin was first released (YYYY-MM-DD)"
+          },
+          "setId": {
+            "type": "integer",
+            "description": "The id of the set that the pin belongs to"
+          },
+          "groupId": {
+            "type": "integer",
+            "description": "The id of the group that the pin belongs to"
+          },
+          "eventId": {
+            "type": "integer",
+            "description": "The id of the event that the pin belongs to"
+          },
+          "variantYears": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Any variant years for the pin"
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The ids of any categories that the pin belongs to"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageDto"
+            },
+            "description": "Images of the pin"
+          },
+          "lePrintRun": {
+            "type": "integer",
+            "description": "LE print run for this pin, if applicable"
+          },
+          "blindBoxOdds": {
+            "type": "string",
+            "description": "Advertised blind box odds for this pin, if applicable"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemLinkDto"
+            },
+            "description": "Any links for the pin"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "year",
+          "variantYears",
+          "categoryIds",
+          "images",
+          "links"
+        ],
+        "description": "A pin",
+        "examples": [
+          {
+            "id": 1,
+            "name": "Flesh Reaper",
+            "year": 2013,
+            "variantYears": [
+              2012
+            ],
+            "setId": 1,
+            "links": []
+          }
+        ]
+      },
+      "PinDtoArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PinDto"
+        },
+        "description": "Array of PinDto"
+      },
+      "PinSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The pin id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The pin name"
+          },
+          "year": {
+            "type": "integer",
+            "description": "The \"main\" year stamp for the pin"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the pin"
+          },
+          "released": {
+            "type": "string",
+            "description": "Date that the pin was first released (YYYY-MM-DD)"
+          },
+          "setId": {
+            "type": "integer",
+            "description": "The id of the set that the pin belongs to"
+          },
+          "groupId": {
+            "type": "integer",
+            "description": "The id of the group that the pin belongs to"
+          },
+          "eventId": {
+            "type": "integer",
+            "description": "The id of the event that the pin belongs to"
+          },
+          "variantYears": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "Any variant years for the pin"
+          },
+          "categoryIds": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "The ids of any categories that the pin belongs to"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The primary image url for the pin"
+          },
+          "lePrintRun": {
+            "type": "integer",
+            "description": "LE print run for this pin, if applicable"
+          },
+          "blindBoxOdds": {
+            "type": "string",
+            "description": "Advertised blind box odds for this pin, if applicable"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemLinkDto"
+            },
+            "description": "Any links for the pin"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "year",
+          "variantYears",
+          "categoryIds",
+          "links"
+        ],
+        "description": "A pin",
+        "examples": [
+          {
+            "id": 1,
+            "name": "Flesh Reaper",
+            "year": 2013,
+            "variantYears": [
+              2012
+            ],
+            "setId": 1,
+            "imageUrl": "https://d3smst7texv2dk.cloudfront.net/pins/2013-pax-core-flesh-reaper.webp",
+            "links": []
+          }
+        ]
+      },
+      "PinGroupDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The pin group id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The pin group name"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the pin group"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "STAFF",
+              "BLINDBOX",
+              "OTHER"
+            ],
+            "description": "The pin group type"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageDto"
+            },
+            "description": "Images of the pin group"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type",
+          "images"
+        ],
+        "description": "A pin group",
+        "examples": [
+          {
+            "id": 9,
+            "name": "Staff Heads",
+            "type": "STAFF",
+            "images": []
+          }
+        ]
+      },
+      "PinGroupDtoArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/PinGroupDto"
+        },
+        "description": "Array of PinGroupDto"
+      },
+      "PinGroupSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The pin group id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The pin group name"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the pin group"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "STAFF",
+              "BLINDBOX",
+              "OTHER"
+            ],
+            "description": "The pin group type"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The primary image url for the pin group"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "type"
+        ],
+        "description": "A pin group",
+        "examples": [
+          {
+            "id": 9,
+            "name": "Staff Heads",
+            "type": "STAFF"
+          }
+        ]
+      },
+      "SetDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The set id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The set name"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the set"
+          },
+          "images": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImageDto"
+            },
+            "description": "Images of the set"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemLinkDto"
+            },
+            "description": "Any links for the set"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "images",
+          "links"
+        ],
+        "description": "A set",
+        "examples": [
+          {
+            "id": 1,
+            "name": "Core",
+            "images": [
+              {
+                "id": 1506,
+                "primary": true,
+                "versions": [
+                  {
+                    "id": 1506,
+                    "width": 410,
+                    "height": 410,
+                    "mimeType": "image/webp",
+                    "versionType": "FULL",
+                    "url": "https://d3as7he2eybtni.cloudfront.net/sets/2013-core_410.webp"
+                  }
+                ]
+              }
+            ],
+            "links": []
+          }
+        ]
+      },
+      "SetDtoArray": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SetDto"
+        },
+        "description": "Array of SetDto"
+      },
+      "SetSummaryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "description": "The set id"
+          },
+          "name": {
+            "type": "string",
+            "description": "The set name"
+          },
+          "notes": {
+            "type": "string",
+            "description": "Any notes for the set"
+          },
+          "imageUrl": {
+            "type": "string",
+            "description": "The primary image url for the set"
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ItemLinkDto"
+            },
+            "description": "Any links for the pin"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "links"
+        ],
+        "description": "A set",
+        "examples": [
+          {
+            "id": 1,
+            "name": "Core",
+            "imageUrl": "https://d3as7he2eybtni.cloudfront.net/sets/2013-core_410.webp",
+            "links": []
+          }
+        ]
+      },
+      "ItemLinkDto": {
+        "description": "A link for an item",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The link name"
+          },
+          "url": {
+            "type": "string",
+            "description": "The link url"
+          }
+        },
+        "required": [
+          "name",
+          "url"
+        ],
+        "examples": [
+          {
+            "name": "Pinnypals",
+            "url": "https://pinnypals.com/"
+          }
+        ]
+      }
+    }
+  },
+  "paths": {
+    "/events/{id}": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get an event by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The event id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The event",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Event not found"
+          }
+        }
+      }
+    },
+    "/groups/{id}/pins": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get all pins for a pin group",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The pin group id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The pins in the pin group",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PinDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pin group not found"
+          }
+        }
+      }
+    },
+    "/groups/{id}": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get a pin group by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The pin group id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The pin group",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinGroupDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pin group not found"
+          }
+        }
+      }
+    },
+    "/item-data": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get all item data",
+        "responses": {
+          "200": {
+            "description": "The item data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ItemDataDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/pins/{id}": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get a pin by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The pin id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The pin",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PinDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Pin not found"
+          }
+        }
+      }
+    },
+    "/pins": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get all pins",
+        "responses": {
+          "200": {
+            "description": "All pins",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PinDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sets/{id}/pins": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get all pins for a set",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The set id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The pins in the set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PinDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Set not found"
+          }
+        }
+      }
+    },
+    "/sets/{id}": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get a set by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "The set id"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SetDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Set not found"
+          }
+        }
+      }
+    },
+    "/sets": {
+      "get": {
+        "tags": [
+          "Item Data"
+        ],
+        "description": "Get all sets",
+        "responses": {
+          "200": {
+            "description": "All sets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SetDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/version": {
+      "get": {
+        "tags": [
+          "General"
+        ],
+        "description": "Get API version",
+        "responses": {
+          "200": {
+            "description": "API version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "version": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "tags": []
+}
