@@ -1,18 +1,17 @@
-import { ALL_PINS_URL3, PINNYPALS3_IMAGE_PREFIX } from '../defaults.js';
-import { ConfigType, Pin, PinnypalsPinsRequest } from '../types.js';
-import { InvalidPathError, validateOutputPath } from './pathUtils.js';
-import { PinCollectionData, requestToDataSet } from '../pinnypals/pinnypals3convertor.js';
-import {
-  PinCollectionData as V2PinCollectionData,
-  requestToDataSet as pp2requestToDataSet
-} from '../pinnypals/pinnypals2convertor.js';
+import { ALL_PINS_URL3, PINNYPALS3_IMAGE_PREFIX } from '../defaults.ts';
+import type { ConfigType, Pin, PinnypalsPinsRequest } from '../types.ts';
+import { InvalidPathError, validateOutputPath } from './pathUtils.ts';
 import fetch, { Response } from 'node-fetch';
 
-import { Pinnypals2PinsRequest } from '../pinnypals/pinnypals2types.js';
-import { Pinnypals3ItemDataRequest } from '../pinnypals/pinnypals3types.js';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
+import type { Pinnypals2PinsRequest } from '../pinnypals/pinnypals2types.ts';
+import type { Pinnypals3ItemDataRequest } from '../pinnypals/pinnypals3types.ts';
+import type { PinCollectionData as V2PinCollectionData } from '../pinnypals/pinnypals2convertor.ts';
 import fs from 'fs';
 import path from 'path';
-import { stripPathFromImageLocation } from '../utils.js';
+import { requestToDataSet as pp2requestToDataSet } from '../pinnypals/pinnypals2convertor.ts';
+import { requestToDataSet as pp3requestToDataSet } from '../pinnypals/pinnypals3convertor.ts';
+import { stripPathFromImageLocation } from '../utils.ts';
 
 const DOWNLOAD_ALL = true;
 // import configJson from '../config.json';
@@ -59,21 +58,23 @@ if (process.argv && process.argv.length > 1 && process.argv[2] !== undefined) {
 globalDestinationPath = path.resolve(globalDestinationPath);
 const PINNYPALS_VERSION = process.env.PINNYPALS_VERSION ? parseInt(process.env.PINNYPALS_VERSION) : 3;
 
-const versionFields = [{
-  imagePrefix: 'pinnypals1ImagePrefix',
-  requestUrl: 'pinnypals1',
-  version: 1,
-},
-{
-  imagePrefix: 'pinnypals2ImagePrefix',
-  requestUrl: 'pinnypals2',
-  version: 2,
-},
-{
-  imagePrefix: 'pinnypals3ImagePrefix',
-  requestUrl: 'pinnypals3',
-  version: 3,
-}];
+const versionFields = [
+  {
+    imagePrefix: 'pinnypals1ImagePrefix',
+    requestUrl: 'pinnypals1',
+    version: 1,
+  },
+  {
+    imagePrefix: 'pinnypals2ImagePrefix',
+    requestUrl: 'pinnypals2',
+    version: 2,
+  },
+  {
+    imagePrefix: 'pinnypals3ImagePrefix',
+    requestUrl: 'pinnypals3',
+    version: 3,
+  },
+];
 
 const versionFieldsToUse = versionFields.filter((p) => p.version === PINNYPALS_VERSION)[0];
 const pinnypalsPinRequestUrl: string = (config as any)[versionFieldsToUse.requestUrl] || ALL_PINS_URL3;
@@ -98,22 +99,28 @@ const parsePinnypalData = (data: unknown): Pin[] => {
     const pp2d: V2PinCollectionData = pp2requestToDataSet(data as Pinnypals2PinsRequest);
     if (LIMIT_IMAGE_DOWNLOADS > -1) {
       pins = pp2d.pins.filter((p) => p.id < LIMIT_IMAGE_DOWNLOADS);
-      console.warn('Pinnypals V2',
-        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp2d.pins.length} total`);
+      console.warn(
+        'Pinnypals V2',
+        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp2d.pins.length} total`
+      );
     } else {
-      console.log('Pinnypals V2',
+      console.log(
+        'Pinnypals V2',
         `Pin data contained ${pp2d.pins.length} pins, ${pp2d.sets.length} sets and ${pp2d.pax.length} PAX events`
       );
       pins = pp2d.pins;
     }
   } else {
-    const pp3d: PinCollectionData = requestToDataSet(data as Pinnypals3ItemDataRequest);
+    const pp3d: PinCollectionData = pp3requestToDataSet(data as Pinnypals3ItemDataRequest);
     if (LIMIT_IMAGE_DOWNLOADS > -1) {
       pins = pp3d.pins.filter((p) => p.id < LIMIT_IMAGE_DOWNLOADS);
-      console.warn('Pinnypals V3',
-        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp3d.pins.length} total`);
+      console.warn(
+        'Pinnypals V3',
+        `Pin image downloads limited to first ${LIMIT_IMAGE_DOWNLOADS} pins - ${pp3d.pins.length} total`
+      );
     } else {
-      console.log('Pinnypals V3',
+      console.log(
+        'Pinnypals V3',
         `Pin data contained ${pp3d.pins.length} pins, ${pp3d.sets.length} sets and ${pp3d.pax.length} PAX events`
       );
       pins = pp3d.pins;
@@ -137,27 +144,28 @@ const fetchAndCachePinnypalData = async (): Promise<Pin[]> => {
 
   const pinnypalPinData: string = JSON.stringify(data);
   fs.writeFileSync(PINNYPALS_PINS_CACHE_FILE, pinnypalPinData, 'utf-8');
-  console.log('Pinnypals cache data',
-    `Wrote ${pinnypalPinData.length} bytes of updated JSON to ${PINNYPALS_PINS_CACHE_FILE}`);
+  console.log(
+    'Pinnypals cache data',
+    `Wrote ${pinnypalPinData.length} bytes of updated JSON to ${PINNYPALS_PINS_CACHE_FILE}`
+  );
 
-  const pp3d: PinCollectionData = requestToDataSet(data as Pinnypals3ItemDataRequest);
+  const pp3d: PinCollectionData = pp3requestToDataSet(data as Pinnypals3ItemDataRequest);
   const pinpanionData: string = JSON.stringify(pp3d);
   fs.writeFileSync(PINPANION_PINS_CACHE_FILE, pinpanionData, 'utf-8');
-  console.log('Pinpanion cache data',
-    `Wrote ${pinpanionData.length} bytes of updated JSON to ${PINPANION_PINS_CACHE_FILE}`);
+  console.log(
+    'Pinpanion cache data',
+    `Wrote ${pinpanionData.length} bytes of updated JSON to ${PINPANION_PINS_CACHE_FILE}`
+  );
   return pins;
 };
 
 const downloadPinImageFromPinpanion = (pinpanionUrl: string, outputFilePath: string): Promise<boolean> => {
-  console.debug('Pinpanion data',
-    `Downloading ${pinpanionUrl} to ${outputFilePath}`);
+  console.debug('Pinpanion data', `Downloading ${pinpanionUrl} to ${outputFilePath}`);
 
-  return downloadFile(pinpanionUrl, outputFilePath)
-    .then(() => {
-      console.log('Pinpanion data',
-        `Downloaded ${pinpanionUrl} to ${outputFilePath}`);
-      return true;
-    });
+  return downloadFile(pinpanionUrl, outputFilePath).then(() => {
+    console.log('Pinpanion data', `Downloaded ${pinpanionUrl} to ${outputFilePath}`);
+    return true;
+  });
 };
 
 const downloadPinImageFromPinnypals = (pinnypalsUrl: string, outputFilePath: string): Promise<boolean> => {
@@ -172,7 +180,7 @@ const downloadPinImageFromPinnypals = (pinnypalsUrl: string, outputFilePath: str
     });
 };
 
-type DownloadSource = 'cache'|'pinpanion'|'pinnypals'|undefined;
+type DownloadSource = 'cache' | 'pinpanion' | 'pinnypals' | undefined;
 
 const downloadImageForPin = async (
   pinpanionImageLocationPrefix: string,
@@ -202,15 +210,16 @@ const downloadImageForPin = async (
     return Promise.resolve('cache');
   }
 
-  const pinpanionUrl: string = pinpanionImageLocationPrefix + '/'+ pinImageFilename;
+  const pinpanionUrl: string = pinpanionImageLocationPrefix + '/' + pinImageFilename;
   return downloadPinImageFromPinpanion(pinpanionUrl, outputFilePath)
-    .then((success) => success ? 'pinpanion' : undefined)
+    .then((success) => (success ? 'pinpanion' : undefined))
     .catch((downloadError) => {
       const pinnypalsUrl: string = pinnypalsImageLocationPrefix + '/' + pinImageFilename;
 
-      console.warn(`Didn't find pin image at pinpanion prod host ${pinpanionUrl}, trying pinnypals...`, downloadError);
-      return downloadPinImageFromPinnypals(pinnypalsUrl, outputFilePath)
-        .then((success) => success ? 'pinnypals' : undefined);
+      console.warn(`Didn't find pin image at pinpanion prod host ${pinpanionUrl}, trying pinnypals...`, downloadError.message);
+      return downloadPinImageFromPinnypals(pinnypalsUrl, outputFilePath).then((success) =>
+        success ? 'pinnypals' : undefined
+      );
     });
 };
 
@@ -226,21 +235,24 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
     throw new Error(`Failed creating destination directory ${globalDestinationPath}`);
   }
 
-  const promises: Promise<DownloadSource>[] = pinsToDownload.filter((pin) => pin.image_name).map((p) =>
-    downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
+  const promises: Promise<DownloadSource>[] = pinsToDownload
+    .filter((pin) => pin.image_name)
+    .map((p) => downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
 
-  return Promise.allSettled(promises).then((results: PromiseSettledResult<DownloadSource>[]) => {
-    const hadErrors = results.filter((pr) => pr.status === 'rejected').length > 0;
+  return Promise.allSettled(promises)
+    .then((results: PromiseSettledResult<DownloadSource>[]) => {
+      const hadErrors = results.filter((pr) => pr.status === 'rejected').length > 0;
 
-    if (hadErrors) {
-      console.error('Errors occurred while downloading');
-      throw new Error('Errors occurred while downloading');
-    }
-    console.log(`Finished downloading ${results.length} images`);
-  }).catch((err) => {
-    console.error('Error downloading images:', err);
-    throw err;
-  });
+      if (hadErrors) {
+        console.error('Errors occurred while downloading');
+        throw new Error('Errors occurred while downloading');
+      }
+      console.log(`Finished downloading ${results.length} images`);
+    })
+    .catch((err) => {
+      console.error('Error downloading images:', err);
+      throw err;
+    });
 };
 
 const useLocal = false;

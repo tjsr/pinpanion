@@ -1,6 +1,6 @@
-import { SizesType, UserId } from './types';
+import type { SizesType, UserId } from './types.ts';
 
-import { generateUserId } from './fixture';
+import { generateUserId } from './fixture.ts';
 
 let userId: UserId;
 
@@ -16,11 +16,11 @@ export const getUserId = (): UserId => {
 };
 
 export type ApplicationSettings = {
-  splitActiveAndWanted: boolean;
   descendingAge: boolean;
   displaySize: SizesType;
-  userDisplayName: string|undefined;
-  localUserId: string,
+  localUserId: string;
+  splitActiveAndWanted: boolean;
+  userDisplayName: string | undefined;
 };
 
 const DEFAULT_SETTINGS: ApplicationSettings = {
@@ -54,8 +54,9 @@ const DEFAULT_SETTINGS: ApplicationSettings = {
 // };
 export const loadSettings = (): ApplicationSettings => {
   const existingSettingsString: string | null = localStorage.getItem('settings');
-  const existingSettings: ApplicationSettings = existingSettingsString ?
-    JSON.parse(existingSettingsString) : DEFAULT_SETTINGS;
+  const existingSettings: ApplicationSettings = existingSettingsString
+    ? JSON.parse(existingSettingsString)
+    : DEFAULT_SETTINGS;
   if (existingSettings.localUserId === undefined) {
     existingSettings.localUserId = getUserId();
   }
@@ -65,6 +66,6 @@ export const loadSettings = (): ApplicationSettings => {
   return existingSettings;
 };
 
-export const saveSettings = (settings:ApplicationSettings) => {
+export const saveSettings = (settings: ApplicationSettings) => {
   localStorage.setItem('settings', JSON.stringify(settings));
 };

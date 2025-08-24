@@ -1,4 +1,4 @@
-import { PinListFilter, PinSelectionList, UserId } from './types';
+import type { PinListFilter, PinSelectionList, UserId } from './types.ts';
 import { v4 as uuidv4, v5 as uuidv5 } from 'uuid';
 
 export const EMPTY_FILTER: PinListFilter = {};

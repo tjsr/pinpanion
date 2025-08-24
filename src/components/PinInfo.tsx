@@ -1,6 +1,6 @@
 import '../css/pincolours.css';
 
-import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.js';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.ts';
 
 import { PinSash } from './PinSash.js';
 import React from 'react';

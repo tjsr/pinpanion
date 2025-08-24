@@ -13,7 +13,7 @@ import {
   SizesType,
   UserId,
   YearAndIdComparable
-} from '../types.js';
+} from '../types.ts';
 import React, { useEffect, useRef } from 'react';
 import { compareYearThenId, removeOrAddId } from '../listutils.js';
 

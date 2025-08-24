@@ -3,8 +3,8 @@ import './css/pins.css';
 
 import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
 import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.js';
-import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types';
+import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter.tsx';
 import React, { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';

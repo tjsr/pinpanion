@@ -1,9 +1,11 @@
-import { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from './types';
+import type { Pin, PinListFilter, PinSelectionList, PinSet, SizesType, UserId } from './types.ts';
 
-import { ApplicationSettings } from './settingsStorage';
+import type { ApplicationSettings } from './settingsStorage.ts';
+import type { Pinnypals3ItemDataEvent } from './pinnypals/pinnypals3types.ts';
+import { PinnypalsEventSubtypeError } from './pinnypals/pinnypalsDataErrors.ts';
 
 export const PinSetKeys = ['availableIds', 'wantedIds', 'availableSetIds', 'wantedSetIds'] as const;
-export type PinSetKey = typeof PinSetKeys[number];
+export type PinSetKey = (typeof PinSetKeys)[number];
 
 export const isEmpty = (value: string | undefined): boolean => {
   return value === undefined || value.trim() == '';
@@ -24,10 +26,7 @@ export const countFilters = (filter: PinListFilter, filteredSetsOnly = false): n
   if (!isEmpty(filter.filterText)) {
     filters++;
   }
-  if (
-    !filteredSetsOnly &&
-    (filter?.paxType !== undefined || filter.paxEventId !== undefined)
-  ) {
+  if (!filteredSetsOnly && (filter?.paxType !== undefined || filter.paxEventId !== undefined)) {
     filters++;
   }
   if (filteredSetsOnly && filter?.pinSetId !== undefined && filter?.pinSetId > 0) {
@@ -58,7 +57,7 @@ export const getMin = (input: number[]): number => {
 
 export const compressArray = (input: number[]): number[] => {
   const min: number = getMin(input);
-  return input.map((v) => v-min);
+  return input.map((v) => v - min);
 };
 
 export const isPinOnLanyard = (pin: Pin, lanyard: PinSelectionList): boolean => {
@@ -110,6 +109,12 @@ export const stripPathFromImageLocation = (inputLocation: string): string => {
 };
 
 export const toProperCase = (str: string): string =>
-  str.replace(/\w\S*/g, (txt) =>
-    txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase()
-  );
+  str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
+export const checkEventSubtype = (inputEvent: Pinnypals3ItemDataEvent): void => {
+  if (
+    inputEvent.subType === undefined ||
+    !['PAX_WEST', 'PAX_EAST', 'PAX_AUS', 'PAX_SOUTH', 'PAX_UNPLUGGED', 'PAX_ONLINE'].includes(inputEvent.subType)
+  ) {
+    throw new PinnypalsEventSubtypeError(inputEvent.subType, inputEvent);
+  }
+};

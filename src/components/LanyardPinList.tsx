@@ -1,6 +1,6 @@
 /* eslint-disable operator-linebreak */
 
-import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.js';
+import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType, YearAndIdComparable } from '../types.ts';
 
 import { PinInfo } from './PinInfo.js';
 import { PinSetInfo } from './PinSetInfo.js';

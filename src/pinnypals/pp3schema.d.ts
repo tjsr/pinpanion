@@ -430,18 +430,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description A pin category summary */
-        CategorySummaryDto: {
+        /** @description A pin category */
+        CategoryDto: {
             /** @description The category id */
             id: number;
             /** @description The category name */
             name: string;
-            /** @description The category type */
-            type?: string;
-            /** @description The category colour hex code */
-            colour?: string;
-            /** @description The primary image url for the category */
-            imageUrl?: string;
+            /**
+             * @description The category type
+             * @enum {string}
+             */
+            type: "CHARACTER" | "COMPANY" | "GAME" | "PERSON" | "SERIES" | "OTHER";
+            /** @description Aliases for the category */
+            aliases?: string[];
+            /** @description The category's unique url slug */
+            slug: string;
         };
         /** @description An event (e.g. a PAX) */
         EventDto: {
@@ -467,8 +470,22 @@ export interface components {
             startDate: string;
             /** @description The event end date (YYYY-MM-DD) */
             endDate: string;
+            /** @description The event timezone */
+            timezone: string;
+            /** @description The event start time (HH:MM:SS) */
+            startTime: string;
+            /** @description The event end time (HH:MM:SS) */
+            endTime: string;
             /** @description Images for the event */
             images: components["schemas"]["ImageDto"][];
+            /** @description The event's unique url slug */
+            slug: string;
+            /** @description The event start timestamp */
+            startTimestamp: number;
+            /** @description The event end timestamp */
+            endTimestamp: string;
+            /** @description Array of event infos */
+            eventInfo: components["schemas"]["EventInfoDto"][];
         };
         /** @description An event summary */
         EventSummaryDto: {
@@ -496,6 +513,23 @@ export interface components {
             endDate: string;
             /** @description The primary image url for the event */
             imageUrl?: string;
+            /** @description The event's unique url slug */
+            slug: string;
+            /** @description The event start timestamp */
+            startTimestamp: number;
+            /** @description The event end timestamp */
+            endTimestamp: string;
+            /** @description Array of event infos */
+            eventInfo: components["schemas"]["EventInfoDto"][];
+        };
+        /** @description Additional info for an event */
+        EventInfoDto: {
+            /** @description The info text */
+            name: string;
+            /** @description The optional info url */
+            url?: string;
+            /** @description Array of child event infos */
+            children: components["schemas"]["EventInfoDto"][];
         };
         /** @description An image */
         ImageDto: {
@@ -528,7 +562,7 @@ export interface components {
         ItemDataDto: {
             pins: components["schemas"]["PinSummaryDto"][];
             sets: components["schemas"]["SetSummaryDto"][];
-            categories: components["schemas"]["CategorySummaryDto"][];
+            categories: components["schemas"]["CategoryDto"][];
             groups: components["schemas"]["PinGroupSummaryDto"][];
             events: components["schemas"]["EventSummaryDto"][];
         };
@@ -556,7 +590,15 @@ export interface components {
             categoryIds: number[];
             /** @description Images of the pin */
             images: components["schemas"]["ImageDto"][];
+            /** @description LE print run for this pin, if applicable */
+            lePrintRun?: number;
+            /** @description Advertised blind box odds for this pin, if applicable */
+            blindBoxOdds?: string;
+            /** @description Any links for the pin */
+            links: components["schemas"]["ItemLinkDto"][];
         };
+        /** @description Array of PinDto */
+        PinDtoArray: components["schemas"]["PinDto"][];
         /** @description A pin */
         PinSummaryDto: {
             /** @description The pin id */
@@ -581,6 +623,12 @@ export interface components {
             categoryIds: number[];
             /** @description The primary image url for the pin */
             imageUrl?: string;
+            /** @description LE print run for this pin, if applicable */
+            lePrintRun?: number;
+            /** @description Advertised blind box odds for this pin, if applicable */
+            blindBoxOdds?: string;
+            /** @description Any links for the pin */
+            links: components["schemas"]["ItemLinkDto"][];
         };
         /** @description A pin group */
         PinGroupDto: {
@@ -598,6 +646,8 @@ export interface components {
             /** @description Images of the pin group */
             images: components["schemas"]["ImageDto"][];
         };
+        /** @description Array of PinGroupDto */
+        PinGroupDtoArray: components["schemas"]["PinGroupDto"][];
         /** @description A pin group */
         PinGroupSummaryDto: {
             /** @description The pin group id */
@@ -624,7 +674,11 @@ export interface components {
             notes?: string;
             /** @description Images of the set */
             images: components["schemas"]["ImageDto"][];
+            /** @description Any links for the set */
+            links: components["schemas"]["ItemLinkDto"][];
         };
+        /** @description Array of SetDto */
+        SetDtoArray: components["schemas"]["SetDto"][];
         /** @description A set */
         SetSummaryDto: {
             /** @description The set id */
@@ -635,6 +689,15 @@ export interface components {
             notes?: string;
             /** @description The primary image url for the set */
             imageUrl?: string;
+            /** @description Any links for the pin */
+            links: components["schemas"]["ItemLinkDto"][];
+        };
+        /** @description A link for an item */
+        ItemLinkDto: {
+            /** @description The link name */
+            name: string;
+            /** @description The link url */
+            url: string;
         };
     };
     responses: never;

@@ -9,7 +9,7 @@ import {
   PinGroupId,
   PinSet,
   PinSetId
-} from '../types.js';
+} from '../types.ts';
 import {
   convertEventSubtypeToCssName,
   getCategoryCssClass,

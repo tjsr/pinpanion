@@ -1,4 +1,4 @@
-import { PAXEvent, Pin, PinId } from '../types.js';
+import { PAXEvent, Pin, PinId } from '../types.ts';
 import { PaxEventSash, PinCategorySash, PinSash } from './PinSash.js';
 import { queryByText, render } from '@testing-library/react';
 

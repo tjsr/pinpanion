@@ -1,7 +1,7 @@
-import { PinCollectionData, requestToDataSet } from './pinnypals2convertor.js';
-
-import { Pin } from '../types.js';
-import { Pinnypals2PinsRequest } from './pinnypals2types.js';
+import type { Pin } from '../types.ts';
+import type { PinCollectionData } from './pinnypals2convertor.js';
+import type { Pinnypals2PinsRequest } from './pinnypals2types.ts';
+import { requestToDataSet } from './pinnypals2convertor.js';
 import v2testData from '../../test/pinsv2.json';
 
 describe('Should read Pinnypals V2 data in JSON block', () => {

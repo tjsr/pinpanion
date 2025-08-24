@@ -1,13 +1,13 @@
-import { PAX, PAXId, Pin, PinSet, PinSetId } from '../types.js';
-import {
+import type { PAX, PAXId, Pin, PinSet, PinSetId } from '../types.ts';
+import type {
   Pinnypals2EventsArray,
   Pinnypals2PaxIdentifier,
   Pinnypals2PinIdentifier,
   Pinnypals2PinsArray,
   Pinnypals2PinsRequest,
   Pinnypals2SetIdentifier,
-  Pinnypals2SetsArray
-} from './pinnypals2types.js';
+  Pinnypals2SetsArray,
+} from './pinnypals2types.ts';
 
 export interface PinCollectionData {
   pax: PAX[];
@@ -44,7 +44,7 @@ const extractPAXs = (paxArray: Pinnypals2EventsArray): PAX[] =>
 
 interface Pinnypals2PinData {
   pax_id: PAXId;
-  sub_set_id: PinSetId|null;
+  sub_set_id: PinSetId | null;
 }
 
 const extractPins = (pinArray: Pinnypals2PinsArray): Pin[] =>

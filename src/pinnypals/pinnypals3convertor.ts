@@ -1,35 +1,25 @@
-import {
-  GroupTypes,
-  PAX,
-  PAXEvent,
-  PAXId,
-  Pin,
-  PinCategory,
-  PinCategoryId,
-  PinGroup,
-  PinSet,
-  PublishYear
-} from '../types.js';
-import {
+import type { GroupTypes, PAX, PAXEvent, PAXId, Pin, PinCategory, PinGroup, PinSet, PublishYear } from '../types.ts';
+import type {
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
   Pinnypals3ItemDataPin,
   Pinnypals3ItemDataRequest,
   Pinnypals3ItemDataSet,
-  PinnypalsDataError,
-  PinnypalsPinDataError,
-  checkEventSubtype
-} from './pinnypals3types.js';
+} from './pinnypals3types.ts';
 
-import { stripPathFromImageLocation } from '../utils.js';
+import { PinnypalsPinDataError } from './pinnypalsDataErrors.ts';
+import { checkEventSubtype } from '../utils.ts';
+import { stripPathFromImageLocation } from '../utils.ts';
+
+const STRICT_IMPORT_ERRORS = false;
 
 export interface PinCollectionData {
   categories: PinCategory[];
-  pax: PAX[];
   events: PAXEvent[];
+  groups: PinGroup[];
+  pax: PAX[];
   pins: Pin[];
   sets: PinSet[]; // Optional<PinSet, 'isPackagedSet' | 'isReprint' | 'image_name' | 'variants'>[];
-  groups: PinGroup[];
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -63,7 +53,7 @@ const pax: PAX[] = [
 
 const paxIdMap: Map<PAXId, PAX> = new Map<PAXId, PAX>(pax.map((p) => [p.id, p]));
 
-export const getPaxById = (id: PAXId): PAX|undefined => {
+export const getPaxById = (id: PAXId): PAX | undefined => {
   return paxIdMap.get(id);
 };
 
@@ -117,24 +107,27 @@ export const convertPinnypals3ItemDataEventsToPAXEvent = (events: Pinnypals3Item
 //   return event.paxId;
 // };
 
-const stringToEnum = <T extends { [s: string]: unknown; } | ArrayLike<unknown>>(
-  enumObj: T, value: string): T[keyof T] | undefined => {
-  return (Object.values(enumObj) as unknown as string[]).includes(value) ? value as T[keyof T] : undefined;
-};
+// const stringToEnum = <T extends { [s: string]: unknown } | ArrayLike<unknown>>(
+//   enumObj: T,
+//   value: string
+// ): T[keyof T] | undefined => {
+//   return (Object.values(enumObj) as unknown as string[]).includes(value) ? (value as T[keyof T]) : undefined;
+// };
 
 const groupTypeStringToGroupType = (value: string): GroupTypes | undefined => {
-  return stringToEnum(GroupTypes, value);
+  if (!['STAFF', 'SHOW', 'BLINDBOX', 'OTHER'].includes(value)) {
+    return undefined;
+  }
+  return value as GroupTypes;
 };
 
-export const convertPinnypals3ItemDataGroupToPinGroup = (group: Pinnypals3ItemDataGroup): PinGroup => (
-  {
-    id: group.id,
-    imageUrl: group.imageUrl,
-    name: group.name,
-    notes: group.notes,
-    type: groupTypeStringToGroupType(group.type),
-  }
-);
+export const convertPinnypals3ItemDataGroupToPinGroup = (group: Pinnypals3ItemDataGroup): PinGroup => ({
+  id: group.id,
+  imageUrl: group.imageUrl,
+  name: group.name,
+  notes: group.notes,
+  type: groupTypeStringToGroupType(group.type),
+});
 
 const applyKnownFixes = (pin: Pin): boolean => {
   if (pin.id == 1648) {
@@ -149,49 +142,57 @@ export const convertPinnypals3ItemDataPinsDataToPins = (
   pins: Pinnypals3ItemDataPin[],
   groups: Pinnypals3ItemDataGroup[]
 ): Pin[] => {
-  return pins.map((pin: Pinnypals3ItemDataPin) => {
-    groups.find((g) => g.id === pin.groupId);
-    const outputPin: Pin = {
-      alternate: undefined,
-      categoryIds: [...pin.categoryIds],
-      groupId: pin.groupId,
-      id: pin.id,
-      image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
-      name: pin.name,
-      paxEventId: pin.eventId,
-      // paxId: paxIdFromEventId(pin.eventId, events),
-      setId: pin.setId ?? null,
-      year: pin.year,
-    };
-    if (!pin.categoryIds || pin.categoryIds.length === 0) {
-      if (!pin.eventId && !pin.groupId && !pin.setId) {
-        if (applyKnownFixes(outputPin)) {
-          console.log(`Pin ${pin.id} had a pre-identified fix applied.`);
-        } else {
-          throw new PinnypalsPinDataError('Pin has no EventID, GroupID, SetID or CategoryID', pin);
+  return pins
+    .map((pin: Pinnypals3ItemDataPin) => {
+      groups.find((g) => g.id === pin.groupId);
+      const outputPin: Pin = {
+        alternate: undefined,
+        categoryIds: [...pin.categoryIds],
+        groupId: pin.groupId,
+        id: pin.id,
+        image_name: pin.imageUrl ? stripPathFromImageLocation(pin.imageUrl) : null,
+        name: pin.name,
+        paxEventId: pin.eventId,
+        // paxId: paxIdFromEventId(pin.eventId, events),
+        setId: pin.setId ?? null,
+        year: pin.year,
+      };
+      if (!pin.categoryIds || pin.categoryIds.length === 0) {
+        if (!pin.eventId && !pin.groupId && !pin.setId) {
+          if (applyKnownFixes(outputPin)) {
+            console.log(`Pin ${pin.id} had a pre-identified fix applied.`);
+          } else {
+            const errMsg = `Pin ${pin.id} has no CategoryIDs, EventID, GroupID or SetID`;
+            if (STRICT_IMPORT_ERRORS) {
+              throw new PinnypalsPinDataError(errMsg, pin);
+            }
+            console.error(errMsg, pin);
+            return undefined;
+          }
         }
+        // if (outputPin.paxId) {
+        //   if (!outputPin.categoryIds.includes(paxCategoryId)) {
+        //     outputPin.categoryIds.push(paxCategoryId);
+        //   }
+        // } else
+        // if (!pin.groupId) {
+        //   throw new PinnypalsPinDataError(`Pin ${pin.id} must have at least one cateogryId`, pin);
+        // }
       }
-      // if (outputPin.paxId) {
-      //   if (!outputPin.categoryIds.includes(paxCategoryId)) {
-      //     outputPin.categoryIds.push(paxCategoryId);
-      //   }
-      // } else
-      // if (!pin.groupId) {
-      //   throw new PinnypalsPinDataError(`Pin ${pin.id} must have at least one cateogryId`, pin);
-      // }
-    }
-    if (pin.variantYears.filter((y) => y != pin.year).length > 1) {
-      console.warn(`Pin ${pin.id} has multiple years: ${pin.variantYears.join(', ')}`);
-    }
-    return outputPin;
-  });
+      if (pin.variantYears.filter((y) => y != pin.year).length > 1) {
+        console.warn(`Pin ${pin.id} has multiple years: ${pin.variantYears.join(', ')}`);
+      }
+      return outputPin;
+    })
+    .filter((p): p is Pin => p !== undefined);
 };
 
 export const convertPinnypals3ItemDataSetsDataToSets = (
-  sets: Pinnypals3ItemDataSet[], pins: Pinnypals3ItemDataPin[]
+  sets: Pinnypals3ItemDataSet[],
+  pins: Pinnypals3ItemDataPin[]
 ): PinSet[] => {
   return sets.map((set: Pinnypals3ItemDataSet) => {
-    const setYear: PublishYear|undefined = pins.find((pin) => pin.setId === set.id)?.year ?? undefined;
+    const setYear: PublishYear | undefined = pins.find((pin) => pin.setId === set.id)?.year ?? undefined;
     const outputSet: Partial<PinSet> = {
       id: set.id,
       name: set.name,
@@ -203,10 +204,12 @@ export const convertPinnypals3ItemDataSetsDataToSets = (
 };
 
 export const requestToDataSet = (json: Pinnypals3ItemDataRequest): PinCollectionData => {
-  const paxCategoryId: PinCategoryId|undefined = json.categories.find((c) => c.name === 'PAX')?.id;
-  if (!paxCategoryId) {
-    throw new PinnypalsDataError('Pinnypals input data must include a category for PAX events');
-  }
+  // const paxCategory = json.categories.find((c) => c.name === 'PAX');
+  // const paxCategoryId: PinCategoryId | undefined = paxCategory?.id;
+  // if (!paxCategoryId) {
+  //   console.error('Available categories: ', json.categories);
+  //   throw new PinnypalsDataError('Pinnypals input data must include a category for PAX events');
+  // }
   const events: PAXEvent[] = convertPinnypals3ItemDataEventsToPAXEvent(json.events);
   const pins: Pin[] = convertPinnypals3ItemDataPinsDataToPins(json.pins, json.groups);
   const sets: PinSet[] = convertPinnypals3ItemDataSetsDataToSets(json.sets, json.pins);

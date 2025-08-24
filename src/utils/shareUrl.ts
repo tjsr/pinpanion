@@ -1,4 +1,4 @@
-import { PinSelectionList } from '../types.js';
+import { PinSelectionList } from '../types.ts';
 import { encodePinSelectionHash } from './encodePinSelectionList.js';
 
 const devIp = '127.0.0.1';
@@ -6,10 +6,10 @@ const devIp = '127.0.0.1';
 export const findShareGaps = (values: number[], minSize = 28): [number, number][] => {
   const sorted: number[] = [0, ...values.sort((a, b) => a - b)];
   const output: [number, number][] = [];
-  for (let index = 0;index < values.length-2;index++) {
-    const gap = sorted[index+1] - sorted[index];
-    if (gap > minSize+1) {
-      output.push([sorted[index]+1, sorted[index+1]-1]);
+  for (let index = 0; index < values.length - 2; index++) {
+    const gap = sorted[index + 1] - sorted[index];
+    if (gap > minSize + 1) {
+      output.push([sorted[index] + 1, sorted[index + 1] - 1]);
     }
   }
   return output;

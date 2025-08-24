@@ -1,5 +1,5 @@
 import { ByRoleMatcher, ByRoleOptions, act, fireEvent, getByText, render, waitForOptions } from '@testing-library/react';
-import { PAXEventId, PaxType } from '../types.js';
+import { PAXEventId, PaxType } from '../types.ts';
 
 import { Container } from 'react-dom';
 import { PAXEventSelector } from './PAXFilter.js';

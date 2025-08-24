@@ -1,6 +1,6 @@
 import '../css/pins.css';
 
-import { PAXEvent, PAXEventId, PaxType } from '../types.js';
+import { PAXEvent, PAXEventId, PaxType } from '../types.ts';
 import React, { useEffect } from 'react';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 

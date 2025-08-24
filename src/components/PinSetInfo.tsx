@@ -1,6 +1,6 @@
 import '../css/pinSetInfo.css';
 
-import { PAX, Pin, PinSet, SizesType } from '../types.js';
+import { PAX, Pin, PinSet, SizesType } from '../types.ts';
 
 import React from 'react';
 import config from '../config.json';

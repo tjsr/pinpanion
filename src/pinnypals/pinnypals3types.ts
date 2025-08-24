@@ -56,7 +56,7 @@ export interface Pinnypals3ItemDataRequestOld {
   groups: Pinnypals3Group[];
 }
 
-import { components, paths } from './pp3schema';
+import type { components, paths } from './pp3schema.d.ts';
 
 export type Pinnypals3ItemDataRequest = paths['/item-data']['get']['responses'][200]['content']['application/json'];
 export type Pinnypals3SetCollectionRequest = paths['/sets']['get']['responses'][200]['content']['application/json'];
@@ -70,35 +70,4 @@ export type Pinnypals3Set = paths['/sets']['get']['responses'][200]['content']['
 export type Pinnypals3EventDTO = components['schemas']['EventDto'];
 export type Pinnypals3EventTypes = Pinnypals3EventDTO['type'];
 export type Pinnypals3EventSubtypes = Pinnypals3EventDTO['subType'];
-export type Pinnypald3PinCategory = components['schemas']['CategorySummaryDto'];
-
-export class PinnypalsDataError extends Error {
-  constructor(message: string) {
-    super(message);
-  }
-}
-
-export class PinnypalsPinDataError extends PinnypalsDataError {
-  _inputPin: Pinnypals3ItemDataPin;
-  constructor(message: string, inputPin: Pinnypals3ItemDataPin) {
-    super(message);
-    this._inputPin = inputPin;
-  }
-}
-
-export class PinnypalsEventSubtypeError extends PinnypalsDataError {
-  _inputEvent: Pinnypals3ItemDataEvent;
-  _subtype: string;
-  constructor(subtype: string, inputEvent: Pinnypals3ItemDataEvent) {
-    super('Invalid event subtype: ' + subtype);
-    this._inputEvent = inputEvent;
-    this._subtype = subtype;
-  }
-}
-
-export const checkEventSubtype = (inputEvent: Pinnypals3ItemDataEvent): void => {
-  if (inputEvent.subType === undefined ||
-    !['PAX_WEST', 'PAX_EAST', 'PAX_AUS', 'PAX_SOUTH', 'PAX_UNPLUGGED', 'PAX_ONLINE'].includes(inputEvent.subType)) {
-    throw new PinnypalsEventSubtypeError(inputEvent.subType, inputEvent);
-  }
-};
+export type Pinnypals3PinCategory = components['schemas']['CategoryDto'];

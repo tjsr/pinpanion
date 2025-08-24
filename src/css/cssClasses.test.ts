@@ -1,6 +1,7 @@
-import { getCategoryCssClass, getCssNameForEventId } from './cssClasses.js';
+import { getCategoryCssClass, getCssNameForEventId } from './cssClasses.ts';
 
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
+import { PinCategory } from '../types.ts';
+import { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 
 describe('Event lookup', () => {
@@ -15,10 +16,12 @@ describe('Event lookup', () => {
 describe('getCategoryCssClass', () => {
   it('Should return correct class for Limited Edition category', () => {
     const category = {
-      colour: '#000000',
+      // colour: '#000000',
       id: 6,
       name: 'Limited',
-    };
+      slug: 'limited',
+      type: 'OTHER',
+    } as PinCategory;
     const categoryCssClass = getCategoryCssClass(category);
     expect(categoryCssClass).toEqual('categoryLimited');
   });

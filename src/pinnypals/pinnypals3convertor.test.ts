@@ -1,23 +1,23 @@
-import { GroupTypes, Pin } from '../types.js';
 import {
   PinCollectionData,
   convertPinnypals3ItemDataEventToPAXEvent,
   convertPinnypals3ItemDataGroupToPinGroup,
   convertPinnypals3ItemDataPinsDataToPins,
-  requestToDataSet
-} from './pinnypals3convertor.js';
+  requestToDataSet,
+} from './pinnypals3convertor.ts';
 import {
   Pinnypals3Event,
   Pinnypals3EventSubtypes,
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
-  Pinnypals3ItemDataRequest
-} from './pinnypals3types.js';
+  Pinnypals3ItemDataRequest,
+} from './pinnypals3types.ts';
 
-import { findTestPin } from '../../test/testutils.js';
+import { Pin } from '../types.ts';
+import { findTestPin } from '../../test/testutils.ts';
 import pinsv3json from '../../test/pinsv3.json';
 
-const v3testData: Pinnypals3ItemDataRequest = pinsv3json as Pinnypals3ItemDataRequest;
+const v3testData: Pinnypals3ItemDataRequest = pinsv3json as unknown as Pinnypals3ItemDataRequest;
 
 describe('Should read Pinnypals V3 data in JSON block', () => {
   const data: PinCollectionData = requestToDataSet(v3testData as Pinnypals3ItemDataRequest);
@@ -46,11 +46,10 @@ describe('Should read Pinnypals V3 data in JSON block', () => {
   });
 
   it('Should not have any pins that lack set, event or group IDs', () => {
-    const pinsWithNoLinkedData = data.pins.filter((p: Pin) =>
-      !p.setId && !p.paxEventId && !p.groupId && (!p.categoryIds || p.categoryIds.length === 0));
-    expect(
-      pinsWithNoLinkedData.length, pinsWithNoLinkedData.map((p) => JSON.stringify(p)).join(',')
-    ).toBe(0);
+    const pinsWithNoLinkedData = data.pins.filter(
+      (p: Pin) => !p.setId && !p.paxEventId && !p.groupId && (!p.categoryIds || p.categoryIds.length === 0)
+    );
+    expect(pinsWithNoLinkedData.length, pinsWithNoLinkedData.map((p) => JSON.stringify(p)).join(',')).toBe(0);
   });
 });
 
@@ -58,14 +57,12 @@ describe('convertPinnypals3PinDataToPin', () => {
   // const paxCategoryId: PinCategoryId = 4;
   test('V3 - Should accept pin if it has no Pax ID', () => {
     // const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
-    expect(() => convertPinnypals3ItemDataPinsDataToPins(
-      v3testData.pins, v3testData.groups)).not.toThrow();
+    expect(() => convertPinnypals3ItemDataPinsDataToPins(v3testData.pins, v3testData.groups)).not.toThrow();
   });
 
   test('Should have a collection for staff pins', () => {
     // const eventData = convertPinnypals3ItemDataEventsToPAXEvent(v3testData.events as Pinnypals3ItemDataEvent[]);
-    const pinData = convertPinnypals3ItemDataPinsDataToPins(
-      v3testData.pins, v3testData.groups);
+    const pinData = convertPinnypals3ItemDataPinsDataToPins(v3testData.pins, v3testData.groups);
     const securityPin: Pin = findTestPin(pinData, 'PAX Space Security', 1276);
 
     expect(securityPin.groupId).toEqual(136);
@@ -86,7 +83,7 @@ describe(convertPinnypals3ItemDataGroupToPinGroup, () => {
     expect(group.imageUrl).toBe('http://example.com');
     expect(group.name).toBe('Test Group');
     expect(group.notes).toBe('Test notes');
-    expect(group.type).toBe(GroupTypes.STAFF);
+    expect(group.type).toBe('STAFF');
   });
 });
 
@@ -112,9 +109,9 @@ describe('convertPinnypals3EventToPAXEvent', () => {
       type: 'PAX',
       year: 2023,
     };
-    expect(
-      () => convertPinnypals3ItemDataEventToPAXEvent(badEvent as Pinnypals3ItemDataEvent))
-      .toThrow('Invalid event subtype: PAX_BAD');
+    expect(() => convertPinnypals3ItemDataEventToPAXEvent(badEvent as Pinnypals3ItemDataEvent)).toThrow(
+      'Invalid event subtype: PAX_BAD'
+    );
   });
 
   // test('V3 - Should convert PAX event type to PAX ID', () => {
@@ -133,13 +130,12 @@ describe('convertPinnypals3EventToPAXEvent', () => {
   // });
 
   test('Should reject an event with no type', () => {
-    const badEvent = { ...sampleTestEvent,
-      subType: 'PAX_SOUTH',
-    } as Pinnypals3Event;
+    const badEvent = { ...sampleTestEvent, subType: 'PAX_SOUTH' } as Pinnypals3Event;
     delete (badEvent as any).type;
 
-    expect(() => convertPinnypals3ItemDataEventToPAXEvent(badEvent as Pinnypals3ItemDataEvent))
-      .toThrow('Missing PAX type property on Pinnypals3Event element');
+    expect(() => convertPinnypals3ItemDataEventToPAXEvent(badEvent as Pinnypals3ItemDataEvent)).toThrow(
+      'Missing PAX type property on Pinnypals3Event element'
+    );
   });
 });
 
@@ -154,7 +150,6 @@ describe('convertPinnypals3SetDataToSet', () => {
   });
 
   it('Should specify whether a set is a reprint', () => {
-
     // convertPinnypals3SetDataToSet();
   });
 });

@@ -2,7 +2,7 @@ import '../css/pins.css';
 import '../css/search.css';
 import '../css/App.css';
 
-import { PAXEvent, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.js';
+import { PAXEvent, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.ts';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
