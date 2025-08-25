@@ -5,11 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 
 export const getPinFromTestData = (pins: Pin[], pinId: number): Pin | undefined => {
-  return pins.find((pin) => pin.id === pinId);
+  return pins.find((pin) => pin?.id === pinId);
 };
 
 export const findPinByName = (pins: Pin[], name: string): Pin | undefined => {
-  return pins.find((pin) => pin.name === name);
+  return pins.find((pin) => pin?.name === name);
 };
 
 export const findTestPin = (pins: Pin[], pinName: string, pinId: number): Pin => {
