@@ -566,6 +566,13 @@ export interface components {
             groups: components["schemas"]["PinGroupSummaryDto"][];
             events: components["schemas"]["EventSummaryDto"][];
         };
+        /** @description A link related to an item */
+        ItemLinkDto: {
+            /** @description The link type */
+            type: string;
+            /** @description The link url */
+            url: string;
+        };
         /** @description A pin */
         PinDto: {
             /** @description The pin id */
@@ -691,13 +698,6 @@ export interface components {
             imageUrl?: string;
             /** @description Any links for the pin */
             links: components["schemas"]["ItemLinkDto"][];
-        };
-        /** @description A link for an item */
-        ItemLinkDto: {
-            /** @description The link name */
-            name: string;
-            /** @description The link url */
-            url: string;
         };
     };
     responses: never;

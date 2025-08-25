@@ -49,7 +49,9 @@ program
 
     const schemaFileName = `pinnypals-openapi-${version}-public.json`;
     const url = `${options.host}/${schemaFileName}`;
-    const outputPath = `${options.path}/${schemaFileName}`;
+    const outputPath = options.version
+      ? `${options.path}/${schemaFileName}`
+      : `${options.path}/pinnypals-openapi-latest-public.json`;
     downloadFile(url, outputPath)
       .then(() => console.log(`Downloaded ${url} to ${outputPath}`))
       .catch((err) => {
