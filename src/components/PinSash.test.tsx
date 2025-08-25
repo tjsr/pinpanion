@@ -150,7 +150,8 @@ describe('PinInfo.CategorySash', () => {
 describe('PinSash.PinCategorySash', () => {
   const pinData: PinCollectionData = pinpanionTestData as PinCollectionData;
 
-  it('Should display a limited edition cateogry sash', async () => {
+  it('Should display a limited edition category sash', async () => {
+    expect(pinData.pins).not.toBeNull();
     const nySash = assertPinSash(pinData, 1508, 'New Year 2024', 'Limited');
     expect(nySash, nySash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
     expect(nySash, nySash?.innerHTML).toHaveClass('category categoryLimited');
