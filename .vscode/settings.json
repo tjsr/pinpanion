@@ -2,7 +2,6 @@
   "jest.enable": false,
   "vitest.nodeEnv": {
     "SOME_VALUE": "test",
-    // "PROJECT_ROOT": "${workspaceFolder}",
     "VITEST_VSCODE_LOG": "verbose"
   },
   "vitest.logLevel": "verbose"
