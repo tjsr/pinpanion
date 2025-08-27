@@ -33,7 +33,6 @@
     "build:amplify": "npm run ppschema && npm run download:amplify && npm run build:vite",
     "ppschema:prod": "node src/utils/dlschema.ts && npx openapi-typescript ./src/pinnypals/pinnypals-openapi-latest-public.json -o ./src/pinnypals/pp3schema.d.ts",
     "ppschema": "node src/utils/dlschema.ts -h https://api.pinnypals.dev && npx openapi-typescript ./src/pinnypals/pinnypals-openapi-latest-public.json -o ./src/pinnypals/pp3schema.d.ts",
-    "download:ppschema": "node src/utils/dlschema.ts -l",
     "dev": "vite dev",
     "download": "cross-env IMAGES_CACHE_DIR=images node --trace-warnings ./src/utils/pindownload.ts",
     "download:test": "cross-env TEST_MODE=true node ./src/utils/pindownload.ts",
