@@ -12,7 +12,6 @@ export default defineConfig({
     },
     environment: 'jsdom',
     globals: true,
-    projects: ['./test'],
     setupFiles: [setupPath],
     testTimeout: (process.env['VITEST_VSCODE'] !== undefined ? 120 : 3) * 1000,
   },

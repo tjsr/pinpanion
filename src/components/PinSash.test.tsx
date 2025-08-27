@@ -1,7 +1,8 @@
 import { PAXEvent, Pin, PinId } from '../types.ts';
-import { PaxEventSash, PinCategorySash, PinSash } from './PinSash.js';
+import { PaxEventSash, PinSash } from './PinSash.js';
 import { queryByText, render } from '@testing-library/react';
 
+import { PinCategorySash } from './PinCategorySash.tsx';
 import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
 import { PinInfo } from './PinInfo.js';
 import { findTestPin } from '../../test/testutils.js';
@@ -9,6 +10,10 @@ import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 
 const failureMessage = (pin: Pin, html?: string): string => {
   return `Pin ${JSON.stringify(pin)} failed to render properly: ${html}`;
+};
+
+const sashFailureMessage = (pin: Pin, sash: string, html?: string): string => {
+  return `Pin ${JSON.stringify(pin)} expected sash '${sash}' but failed to render properly: ${html}`;
 };
 
 const assertPinInfoSash = (
@@ -44,10 +49,7 @@ const assertPinSash = (
   pinData: PinCollectionData, pinId: PinId, pinName: string, expectedSash: string
 ): HTMLElement => {
   const pin: Pin = findTestPin(pinData.pins, pinName, pinId);
-  if (!pin) {
-    throw new Error(`Pin not found with id ${pinId}`);
-  }
-
+  expect(pin, `Pin not found with id ${pinId}`).not.toBeNull();
   expect(pin.name).toEqual(pinName);
 
   const { container, queryByText } = render(
@@ -56,13 +58,13 @@ const assertPinSash = (
       paxs={pinData.pax}
       sets={pinData.sets}
       groups={pinData.groups}
-      events={pinData.events}
+      events={pinData.events} 
       categories={pinData.categories}
     />
   );
   const element = queryByText(expectedSash);
 
-  expect(element, failureMessage(pin, container?.innerHTML)).not.toBeNull();
+  expect(element, sashFailureMessage(pin, expectedSash, container?.innerHTML)).not.toBeNull();
   expect(element).toBeInTheDocument();
   expect(element).toBeVisible();
   return container.children[0] as HTMLElement;

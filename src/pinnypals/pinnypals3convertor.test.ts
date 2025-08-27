@@ -1,20 +1,29 @@
 import {
+  CATEGORY_ID_REORDER,
+  CATEGORY_TYPE_ORDER,
   PinCollectionData,
+  compareIdIndex,
+  compareTypeIndex,
   convertPinnypals3ItemDataEventToPAXEvent,
   convertPinnypals3ItemDataGroupToPinGroup,
   convertPinnypals3ItemDataPinsDataToPins,
+  processPinnypals3CategoryData,
   requestToDataSet,
 } from './pinnypals3convertor.ts';
 import {
+  Pinnypals3CategoryType,
   Pinnypals3Event,
   Pinnypals3EventSubtypes,
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
   Pinnypals3ItemDataRequest,
+  Pinnypals3PinCategory,
 } from './pinnypals3types.ts';
 
 import { Pin } from '../types.ts';
+import categoriesJson from '../../test/categories.json';
 import { findTestPin } from '../../test/testutils.ts';
+import pinpanionJson from '../../test/pinpanion-pin-data.json';
 import pinsv3json from '../../test/pinsv3.json';
 
 const v3testData: Pinnypals3ItemDataRequest = pinsv3json as unknown as Pinnypals3ItemDataRequest;
@@ -151,5 +160,51 @@ describe('convertPinnypals3SetDataToSet', () => {
 
   it('Should specify whether a set is a reprint', () => {
     // convertPinnypals3SetDataToSet();
+  });
+});
+
+describe('processPinnypals3CategoryData', () => {
+  test('Should bring category ID#100 to the front.', () => {
+    const allCategories = pinpanionJson.categories.filter((c) =>
+      [1, 12, 38, 100, 101].includes(c.id)
+    ) as Pinnypals3PinCategory[];
+    const sortedList = processPinnypals3CategoryData(allCategories);
+    expect(sortedList[0].id).toBe(100);
+    expect(sortedList[1].id).toBe(1);
+    expect(sortedList[2].id).toBe(12);
+    expect(sortedList[3].id).toBe(38);
+    expect(sortedList[4].id).toBe(101);
+    console.log(sortedList);
+  });
+});
+
+describe('compareTypeIndex', () => {
+  test('Should place "OTHER" pins first in list', () => {
+    const testDataSet = categoriesJson.filter((c) =>
+      [1, 12, 38, 100, 101].includes(c.id)
+    ) as unknown as Pinnypals3PinCategory[];
+    // const keys: Pinnypals3CategoryType[] = [...CATEGORY_TYPE_ORDER];
+    const keys: Pinnypals3CategoryType[] = CATEGORY_TYPE_ORDER;
+    expect(compareTypeIndex(testDataSet[4], testDataSet[1], keys)).toEqual(1);
+    expect(compareTypeIndex(testDataSet[1], testDataSet[4], keys)).toEqual(-1);
+    console.log(testDataSet);
+  });
+});
+
+describe('compareIdIndex', () => {
+  test('Should place cat#100" pins first in list', () => {
+    const testDataSet = categoriesJson.filter((c) =>
+      [1, 12, 38, 100, 101].includes(c.id)
+    ) as unknown as Pinnypals3PinCategory[];
+    const keys: number[] = CATEGORY_ID_REORDER;
+
+    expect(
+      compareIdIndex(testDataSet[3], testDataSet[1], keys),
+      `a=${testDataSet[4].id}:b=${testDataSet[1].id}`
+    ).toEqual(1);
+    expect(compareIdIndex(testDataSet[1], testDataSet[3], keys)).toEqual(-88);
+    expect(compareIdIndex(testDataSet[2], testDataSet[4], keys)).toEqual(-63);
+    expect(compareIdIndex(testDataSet[4], testDataSet[2], keys)).toEqual(63);
+    console.log(testDataSet);
   });
 });

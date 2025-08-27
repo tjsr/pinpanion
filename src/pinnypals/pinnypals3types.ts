@@ -9,37 +9,39 @@ type HexColourCode = string;
 type ISO8601Date = string;
 
 export interface Pinnypals3PinData {
-  id: PinId;
-  name: string;
-  year: number;
-  setId?: SetId;
-  eventId?: PaxEventId;
-  variantYears: Year[];
   categoryIds: CategoryId[];
+  eventId?: PaxEventId;
+  id: PinId;
   imageUrl: ImageLocation;
+  name: string;
+  setId?: SetId;
+  variantYears: Year[];
+  year: number;
 }
 
 export interface Pinnypals3PinSet {
   id: SetId;
-  name: string;
   imageUrl: ImageLocation;
+  name: string;
 }
 
-export interface Pinnypals3Category {
-  id: CategoryId;
-  name: string;
-  colour: HexColourCode;
-}
+// export interface Pinnypals3Category {
+//   colour: HexColourCode;
+//   id: CategoryId;
+//   name: string;
+//   slug: string;
+//   type: Pinnypals3CategoryType;
+// }
 
 export interface Pinnypals3Event {
+  colour: HexColourCode;
+  endDate: ISO8601Date;
   id: PaxEventId;
   name: string;
-  type: Pinnypals3EventTypes;
-  subType: Pinnypals3EventSubtypes;
-  colour: HexColourCode;
-  year: Year;
   startDate: ISO8601Date;
-  endDate: ISO8601Date;
+  subType: Pinnypals3EventSubtypes;
+  type: Pinnypals3EventTypes;
+  year: Year;
 }
 
 export interface Pinnypals3Group {
@@ -49,11 +51,11 @@ export interface Pinnypals3Group {
 }
 
 export interface Pinnypals3ItemDataRequestOld {
+  categories: Pinnypals3PinCategory[];
+  events: Pinnypals3Event[];
+  groups: Pinnypals3Group[];
   pins: Pinnypals3PinData[];
   sets: Pinnypals3PinSet[];
-  categories: Pinnypals3Category[];
-  events: Pinnypals3Event[]
-  groups: Pinnypals3Group[];
 }
 
 import type { components, paths } from './pp3schema.d.ts';
@@ -71,3 +73,4 @@ export type Pinnypals3EventDTO = components['schemas']['EventDto'];
 export type Pinnypals3EventTypes = Pinnypals3EventDTO['type'];
 export type Pinnypals3EventSubtypes = Pinnypals3EventDTO['subType'];
 export type Pinnypals3PinCategory = components['schemas']['CategoryDto'];
+export type Pinnypals3CategoryType = Pinnypals3PinCategory['type'];
