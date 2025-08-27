@@ -1,0 +1,179 @@
+[
+  {
+    "id": 1,
+    "name": "Annarchy",
+    "type": "CHARACTER",
+    "slug": "annarchy"
+  },
+  {
+    "id": 3,
+    "name": "Carl",
+    "type": "CHARACTER",
+    "slug": "carl"
+  },
+  {
+    "id": 23,
+    "name": "Bethesda",
+    "type": "COMPANY",
+    "slug": "bethesda"
+  },
+  {
+    "id": 24,
+    "name": "Blizzard",
+    "type": "COMPANY",
+    "slug": "blizzard"
+  },
+  {
+    "id": 49,
+    "name": "Among Us",
+    "type": "GAME",
+    "slug": "among-us"
+  },
+  {
+    "id": 79,
+    "name": "Super Mario 64",
+    "type": "GAME",
+    "aliases": [
+      "SM64"
+    ],
+    "slug": "super-mario-64"
+  },
+  {
+    "id": 80,
+    "name": "Super Mario Bros.",
+    "type": "GAME",
+    "aliases": [
+      "SMB1"
+    ],
+    "slug": "super-mario-bros"
+  },
+  {
+    "id": 87,
+    "name": "Team Fortress 2",
+    "type": "GAME",
+    "slug": "team-fortress-2"
+  },
+  {
+    "id": 92,
+    "name": "8-bit",
+    "type": "OTHER",
+    "slug": "8bit"
+  },
+  {
+    "id": 93,
+    "name": "Blind Box",
+    "type": "OTHER",
+    "slug": "blind-box"
+  },
+  {
+    "id": 94,
+    "name": "Blindfold",
+    "type": "OTHER",
+    "aliases": [
+      "DSB"
+    ],
+    "slug": "blindfold"
+  },
+  {
+    "id": 95,
+    "name": "Case Bonus",
+    "type": "OTHER",
+    "slug": "case-bonus"
+  },
+  {
+    "id": 99,
+    "name": "Kickstarter",
+    "type": "OTHER",
+    "slug": "kickstarter"
+  },
+  {
+    "id": 100,
+    "name": "Limited",
+    "type": "OTHER",
+    "slug": "limited"
+  },
+  {
+    "id": 101,
+    "name": "New Years",
+    "type": "OTHER",
+    "aliases": [
+      "NYE"
+    ],
+    "slug": "new-years"
+  },
+  {
+    "id": 103,
+    "name": "PAX Explorers League",
+    "type": "OTHER",
+    "aliases": [
+      "PEL"
+    ],
+    "slug": "pax-explorers-league"
+  },
+  {
+    "id": 104,
+    "name": "PAX LE",
+    "type": "OTHER",
+    "slug": "pax-le"
+  },
+  {
+    "id": 105,
+    "name": "PAX Merch Reward",
+    "type": "OTHER",
+    "slug": "pax-merch-reward"
+  },
+  {
+    "id": 110,
+    "name": "Katie Rice",
+    "type": "PERSON",
+    "slug": "katie-rice"
+  },
+  {
+    "id": 111,
+    "name": "Kris Straub",
+    "type": "PERSON",
+    "slug": "kris-straub"
+  },
+  {
+    "id": 113,
+    "name": "Scott Kurtz",
+    "type": "PERSON",
+    "slug": "scott-kurtz"
+  },
+  {
+    "id": 114,
+    "name": "Acquisitions Incorporated",
+    "type": "SERIES",
+    "aliases": [
+      "Acq Inc"
+    ],
+    "slug": "acquisitions-incorporated"
+  },
+  {
+    "id": 115,
+    "name": "Adventure Time",
+    "type": "SERIES",
+    "slug": "adventure-time"
+  },
+  {
+    "id": 116,
+    "name": "Animal Crossing",
+    "type": "SERIES",
+    "slug": "animal-crossing"
+  },
+  {
+    "id": 134,
+    "name": "Melbourne International Games Week",
+    "type": "SERIES",
+    "aliases": [
+      "MIGW"
+    ],
+    "slug": "melbourne-international-games-week"
+  },
+  {
+    "id": 135,
+    "name": "PAX Aus Roadshow",
+    "type": "SERIES",
+    "slug": "pax-aus-roadshow"
+  }
+]
