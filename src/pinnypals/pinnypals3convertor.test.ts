@@ -1,9 +1,11 @@
 import {
   CATEGORY_ID_REORDER,
   CATEGORY_TYPE_ORDER,
-  PinCollectionData,
   compareIdIndex,
   compareTypeIndex,
+} from './pinnypals3categorySort.ts';
+import {
+  PinCollectionData,
   convertPinnypals3ItemDataEventToPAXEvent,
   convertPinnypals3ItemDataGroupToPinGroup,
   convertPinnypals3ItemDataPinsDataToPins,

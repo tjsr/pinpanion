@@ -1,17 +1,5 @@
+import type { GroupTypes, PAX, PAXEvent, PAXId, Pin, PinCategory, PinGroup, PinSet, PublishYear } from '../types.ts';
 import type {
-  GroupTypes,
-  PAX,
-  PAXEvent,
-  PAXId,
-  Pin,
-  PinCategory,
-  PinCategoryId,
-  PinGroup,
-  PinSet,
-  PublishYear,
-} from '../types.ts';
-import type {
-  Pinnypals3CategoryType,
   Pinnypals3ItemDataEvent,
   Pinnypals3ItemDataGroup,
   Pinnypals3ItemDataPin,
@@ -22,6 +10,7 @@ import type {
 
 import { PinnypalsPinDataError } from './pinnypalsDataErrors.ts';
 import { checkEventSubtype } from '../utils.ts';
+import { sortPinnypals3CategoryData } from './pinnypals3categorySort.ts';
 import { stripPathFromImageLocation } from '../utils.ts';
 
 const STRICT_IMPORT_ERRORS = false;
@@ -216,66 +205,8 @@ export const convertPinnypals3ItemDataSetsDataToSets = (
   });
 };
 
-export const CATEGORY_ID_REORDER: PinCategoryId[] = [100];
-export const CATEGORY_TYPE_ORDER: Pinnypals3CategoryType[] = ['OTHER'];
-
-const compareKeyIndex = <ObjectType extends object, KeyType>(
-  a: ObjectType,
-  b: ObjectType,
-  key: keyof ObjectType,
-  keyOrder: KeyType[]
-): number => {
-  const va = a[key] as keyof ObjectType & KeyType;
-  const vb = b[key] as keyof ObjectType & KeyType;
-  // for (const currentOrderedKey of keyOrder) {
-  const ia = keyOrder.indexOf(va);
-  const ib = keyOrder.indexOf(vb);
-
-  return ia - ib;
-};
-
-export const compareIdIndex = (
-  a: Pinnypals3PinCategory,
-  b: Pinnypals3PinCategory,
-  idOrder: PinCategoryId[]
-): number => {
-  if (idOrder.includes(a.id) || !idOrder.includes(b.id)) {
-    const compared = compareKeyIndex(a, b, 'id', idOrder);
-    if (compared !== 0) {
-      return compared;
-    }
-  }
-  return a.id - b.id;
-};
-
-export const compareTypeIndex = (
-  a: Pinnypals3PinCategory,
-  b: Pinnypals3PinCategory,
-  typeOrder: Pinnypals3CategoryType[]
-): number => {
-  if (typeOrder.includes(a.type) || typeOrder.includes(b.type)) {
-    const compared = compareKeyIndex(a, b, 'type', typeOrder);
-    if (compared !== 0) {
-      return compared;
-    }
-  }
-  return a.type?.localeCompare(b.type);
-};
-
-export const processPinnypals3CategoryData = (categories: Pinnypals3PinCategory[]): Pinnypals3PinCategory[] => {
-  return categories.sort((a: Pinnypals3PinCategory, b: Pinnypals3PinCategory) => {
-    const id = compareIdIndex(a, b, CATEGORY_ID_REORDER);
-    if (id !== 0) {
-      return id;
-    }
-
-    const t = compareTypeIndex(a, b, CATEGORY_TYPE_ORDER);
-    if (id !== 0) {
-      return t;
-    }
-
-    return a.id - b.id;
-  });
+export const processPinnypals3CategoryData = (categoryList: Pinnypals3PinCategory[]): PinCategory[] => {
+  return sortPinnypals3CategoryData(categoryList);
 };
 
 export const requestToDataSet = (json: Pinnypals3ItemDataRequest): PinCollectionData => {
