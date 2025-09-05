@@ -1,19 +1,19 @@
-import { ByRoleMatcher, ByRoleOptions, act, fireEvent, getByText, render, waitForOptions } from '@testing-library/react';
-import { Pin, PinListFilter } from '../types.ts';
+import {
+  type ByRoleMatcher,
+  type ByRoleOptions,
+  act,
+  fireEvent,
+  getByText,
+  render,
+  type waitForOptions
+} from '@testing-library/react';
+import type { Pin, PinListFilter } from '../types.ts';
 import { PinSearchFilterDisplay, isPaxEventType, isPinFiltered } from './PinSearchFilter.js';
 
-import { Container } from 'react-dom';
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
+import type { Container } from 'react-dom';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pindata from '../../test/pinpanion-pin-data.json';
 import userEvent from '@testing-library/user-event';
-
-// import { PinListFilter } from '../types.ts';
-
-
-
-
-
-
 
 describe('PinsSearchFilter', () => {
   const data = pindata as PinCollectionData;

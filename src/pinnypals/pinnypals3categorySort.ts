@@ -1,6 +1,6 @@
-import { Pinnypals3CategoryType, Pinnypals3PinCategory } from "./pinnypals3types.ts";
+import type { Pinnypals3CategoryType, Pinnypals3PinCategory } from './pinnypals3types.ts';
 
-import { PinCategoryId } from "../types.ts";
+import type { PinCategoryId } from '../types.ts';
 
 export const CATEGORY_ID_REORDER: PinCategoryId[] = [100];
 export const CATEGORY_TYPE_ORDER: Pinnypals3CategoryType[] = ['OTHER'];
@@ -114,4 +114,3 @@ export const sortPinnypals3CategoryData = (
 
 //   return a.id - b.id;
 // };
-

@@ -1,5 +1,5 @@
-import { PinSelectionList } from '../types';
-import { encodePinSelectionHash } from './encodePinSelectionList';
+import type { PinSelectionList } from '../types.ts';
+import { encodePinSelectionHash } from './encodePinSelectionList.ts';
 
 describe('encodePinSelectionHash', () => {
   test('Should create an encoded string from a PSL for offline mode', () => {

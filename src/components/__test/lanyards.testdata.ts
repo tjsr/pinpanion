@@ -1,4 +1,4 @@
-import { PinSelectionList } from '../../types';
+import type { PinSelectionList } from '../../types.ts';
 
 export const activeLanyard: PinSelectionList = {
   availableIds: [1001, 1003, 1005],

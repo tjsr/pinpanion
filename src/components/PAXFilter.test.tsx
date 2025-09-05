@@ -1,9 +1,19 @@
-import { ByRoleMatcher, ByRoleOptions, act, fireEvent, getByText, render, waitForOptions } from '@testing-library/react';
-import { PAXEventId, PaxType } from '../types.ts';
+import type {
+  ByRoleMatcher,
+  ByRoleOptions,
+  waitForOptions
+} from '@testing-library/react';
+import type { PAXEventId, PaxType } from '../types.ts';
+import {
+  act,
+  fireEvent,
+  getByText,
+  render,
+} from '@testing-library/react';
 
-import { Container } from 'react-dom';
-import { PAXEventSelector } from './PAXFilter.js';
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
+import type { Container } from 'react-dom';
+import { PAXEventSelector } from './PAXFilter.tsx';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pindata from '../../test/pinpanion-pin-data.json';
 import userEvent from '@testing-library/user-event';
 

@@ -1,4 +1,4 @@
-import { Pin } from '../src/types.ts';
+import type { Pin } from '../src/types.ts';
 import { PinpanionDataError } from '../src/errors.js';
 import fs from 'node:fs';
 import os from 'node:os';

@@ -1,8 +1,8 @@
-import { PinSetKey, PinSetKeys } from '../utils';
+import { type PinSetKey, PinSetKeys } from '../utils.ts';
 import { generateCompressedStringWithHeader, numberArrayToEncodedString } from 'sparse-bit-string';
 
-import { PinSelectionList } from '../types';
-import { findShareGaps } from './shareUrl';
+import type { PinSelectionList } from '../types.ts';
+import { findShareGaps } from './shareUrl.ts';
 
 const ENABLE_COMPRESSED_LISTS = true;
 
@@ -22,10 +22,10 @@ const paramKeys = {
 
 export const encodePinSelectionHash = (psl: PinSelectionList, offlineMode = false): string => {
   const outputParams: any = {
-    'id': psl.id,
-    'n': psl.name,
-    'o': psl.ownerId,
-    'r': psl.revision.toString(),
+    id: psl.id,
+    n: psl.name,
+    o: psl.ownerId,
+    r: psl.revision.toString(),
   };
 
   PinSetKeys.forEach((key: PinSetKey) => {

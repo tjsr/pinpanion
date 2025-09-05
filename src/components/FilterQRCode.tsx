@@ -4,13 +4,13 @@ import './FilterQRCode.css';
 import Alert from '@mui/material/Alert';
 import CopyIcon from '@mui/icons-material/ContentCopy';
 import IconButton from '@mui/material/IconButton';
-import { PinSelectionList } from '../types';
+import type { PinSelectionList } from '../types.ts';
 import QRCode from 'react-qr-code';
 import { QR_CODE_SIZE } from '../globals';
 import Snackbar from '@mui/material/Snackbar';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
-import { createShareUrl } from '../utils/shareUrl';
+import { createShareUrl } from '../utils/shareUrl.ts';
 import { useState } from 'react';
 
 export type FilterQRCodeProps = {

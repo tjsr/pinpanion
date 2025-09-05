@@ -1,5 +1,3 @@
-type CSSMock = {
+type CSSMock = unknown;
 
-};
-
-export default CSSMock;
+export type { CSSMock };

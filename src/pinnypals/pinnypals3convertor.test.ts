@@ -4,15 +4,7 @@ import {
   compareIdIndex,
   compareTypeIndex,
 } from './pinnypals3categorySort.ts';
-import {
-  PinCollectionData,
-  convertPinnypals3ItemDataEventToPAXEvent,
-  convertPinnypals3ItemDataGroupToPinGroup,
-  convertPinnypals3ItemDataPinsDataToPins,
-  processPinnypals3CategoryData,
-  requestToDataSet,
-} from './pinnypals3convertor.ts';
-import {
+import type {
   Pinnypals3CategoryType,
   Pinnypals3Event,
   Pinnypals3EventSubtypes,
@@ -21,8 +13,16 @@ import {
   Pinnypals3ItemDataRequest,
   Pinnypals3PinCategory,
 } from './pinnypals3types.ts';
+import {
+  convertPinnypals3ItemDataEventToPAXEvent,
+  convertPinnypals3ItemDataGroupToPinGroup,
+  convertPinnypals3ItemDataPinsDataToPins,
+  processPinnypals3CategoryData,
+  requestToDataSet,
+} from './pinnypals3convertor.ts';
 
-import { Pin } from '../types.ts';
+import type { Pin } from '../types.ts';
+import type { PinCollectionData } from './pinnypals3convertor.ts';
 import categoriesJson from '../../test/categories.json';
 import { findTestPin } from '../../test/testutils.ts';
 import pinpanionJson from '../../test/pinpanion-pin-data.json';

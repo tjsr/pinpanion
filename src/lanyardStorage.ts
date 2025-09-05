@@ -1,7 +1,8 @@
-import { ApplicationSettings, getUserId, loadSettings } from './settingsStorage';
+import { getUserId, loadSettings } from './settingsStorage.ts';
 
-import { PinSelectionList } from './types';
-import { sanitizePinList } from './utils';
+import type { ApplicationSettings } from './settingsStorage.ts';
+import type { PinSelectionList } from './types.ts';
+import { sanitizePinList } from './utils.ts';
 
 const hasNewerVersionStored = (listId: string, revision: number): boolean => {
   const stored: string | null = localStorage.getItem(`lanyard.${listId}`);
@@ -29,7 +30,7 @@ export const getStoredLanyards = (): PinSelectionList[] => {
   return lanyards;
 };
 
-export const getStoredLanyard = (lanyardId: string, settings: ApplicationSettings): PinSelectionList| undefined => {
+export const getStoredLanyard = (lanyardId: string, settings: ApplicationSettings): PinSelectionList | undefined => {
   const data: string | null = localStorage.getItem(`lanyard.${lanyardId}`);
   if (null === data) {
     return undefined;
@@ -41,9 +42,7 @@ export const getStoredLanyard = (lanyardId: string, settings: ApplicationSetting
 
 export const saveListToLocal = (list: PinSelectionList): void => {
   if (!list.id) {
-    throw Error(
-      'List does not have an ID so can not be saved to local storage.'
-    );
+    throw Error('List does not have an ID so can not be saved to local storage.');
   }
   if (hasNewerVersionStored(list.id, list.revision)) {
     throw Error('Already have a newer version of this list stored.');
@@ -59,7 +58,7 @@ export const setActiveLanyardId = (id: string) => {
   localStorage.setItem('latestLanyard', id);
 };
 
-export const getActiveLanyardId = ():string|undefined => {
+export const getActiveLanyardId = (): string | undefined => {
   const id: string | null = localStorage.getItem('latestLanyard');
   if (null === id) {
     return undefined;
@@ -67,8 +66,8 @@ export const getActiveLanyardId = ():string|undefined => {
   return id;
 };
 
-export const getActiveLanyard = (): PinSelectionList|undefined => {
-  const id: string|undefined = getActiveLanyardId();
+export const getActiveLanyard = (): PinSelectionList | undefined => {
+  const id: string | undefined = getActiveLanyardId();
   const settings: ApplicationSettings = loadSettings();
   if (id) {
     return getStoredLanyard(id, settings);

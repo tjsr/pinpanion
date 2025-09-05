@@ -1,14 +1,15 @@
-import { PinSelectionList, UserId } from '../types';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import type { PinSelectionList, UserId } from '../types.ts';
 
 import FormControl from '@mui/material/FormControl';
 import { InputAdornment } from '@mui/material';
 import InputLabel from '@mui/material/InputLabel';
 import LockPerson from '@mui/icons-material/LockPerson';
 import MenuItem from '@mui/material/MenuItem';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
-import { getStoredLanyards } from '../lanyardStorage';
-import { isEmptyList } from '../utils';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
+import { getStoredLanyards } from '../lanyardStorage.ts';
+import { isEmptyList } from '../utils.ts';
 
 type LanyardSelectionDropdownProps = {
   lanyardSelected: (lanyardId: string) => void;

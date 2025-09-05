@@ -23,6 +23,7 @@
     "jsx": "react-jsx",
     "types": ["vitest/globals", "@testing-library/jest-dom/vitest", "@testing-library/react"],
     "sourceMap": true,
+    "verbatimModuleSyntax": true,
   },
   "include": [
     "src",

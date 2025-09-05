@@ -1,6 +1,11 @@
-import { CATEGORY_TYPE_ORDER, compareIdIndex, compareTypeIndex, sortPinnypals3CategoryData } from './pinnypals3categorySort.ts';
+import {
+  CATEGORY_TYPE_ORDER,
+  compareIdIndex,
+  compareTypeIndex,
+  sortPinnypals3CategoryData,
+} from './pinnypals3categorySort.ts';
 
-import { Pinnypals3PinCategory } from './pinnypals3types.ts';
+import type { Pinnypals3PinCategory } from './pinnypals3types.ts';
 import pinpanionJson from '../../test/pinpanion-pin-data.json';
 
 describe('compareIdIndex', () => {
@@ -59,7 +64,7 @@ describe('pinnypals3CategorySort', () => {
     ) as Pinnypals3PinCategory[];
     const sortedList = sortPinnypals3CategoryData(allCategories);
     const expectedOrder = [101, 1, 12, 38];
-    expect(sortedList.map(i => i.id)).toEqual(expectedOrder);
+    expect(sortedList.map((i) => i.id)).toEqual(expectedOrder);
   });
 
   test('Should return company pins ahead of game pins non-prioritized comparison', () => {
@@ -70,7 +75,7 @@ describe('pinnypals3CategorySort', () => {
 
     const sortedList = sortPinnypals3CategoryData(testDataList);
     const expectedOrder = [40, 50];
-    expect(sortedList.map(i => i.id)).toEqual(expectedOrder);
+    expect(sortedList.map((i) => i.id)).toEqual(expectedOrder);
   });
 
   test('Should return company pins ahead of game pins non-prioritized comparison', () => {
@@ -81,7 +86,7 @@ describe('pinnypals3CategorySort', () => {
 
     const sortedList = sortPinnypals3CategoryData(testDataList);
     const expectedOrder = [49, 50];
-    expect(sortedList.map(i => i.id)).toEqual(expectedOrder);
+    expect(sortedList.map((i) => i.id)).toEqual(expectedOrder);
   });
 
   test('Should bring category ID#100 then OTHER types to the front.', () => {
@@ -90,9 +95,8 @@ describe('pinnypals3CategorySort', () => {
     ) as Pinnypals3PinCategory[];
     const sortedList = sortPinnypals3CategoryData(allCategories);
     const expectedOrder = [100, 1, 12, 38];
-    expect(sortedList.map(i => i.id)).toEqual(expectedOrder);
+    expect(sortedList.map((i) => i.id)).toEqual(expectedOrder);
   });
-
 
   test('Should bring category ID#100 then OTHER types to the front.', () => {
     const allCategories = pinpanionJson.categories.filter((c) =>
@@ -100,6 +104,6 @@ describe('pinnypals3CategorySort', () => {
     ) as Pinnypals3PinCategory[];
     const sortedList = sortPinnypals3CategoryData(allCategories);
     const expectedOrder = [100, 101, 103, 1, 12, 38];
-    expect(sortedList.map(i => i.id)).toEqual(expectedOrder);
+    expect(sortedList.map((i) => i.id)).toEqual(expectedOrder);
   });
 });

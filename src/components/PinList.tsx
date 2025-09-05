@@ -1,7 +1,7 @@
 import '../css/pins.css';
 
-import { BUTTON_SIZES, InfoSize, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints.js';
-import {
+import { BUTTON_SIZES, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints.ts';
+import type {
   PAX,
   PAXEvent,
   Pin,
@@ -15,17 +15,18 @@ import {
   YearAndIdComparable
 } from '../types.ts';
 import React, { useEffect, useRef } from 'react';
-import { compareYearThenId, removeOrAddId } from '../listutils.js';
+import { compareYearThenId, removeOrAddId } from '../listutils.ts';
 
-import { FilterQRCode } from './FilterQRCode.js';
+import { FilterQRCode } from './FilterQRCode.tsx';
 import { FixedSizeGrid as Grid } from 'react-window';
-import { MemoizedPinInfo } from './PinInfo.js';
-import { MemoizedPinSetInfo } from './PinSetInfo.js';
-import { PinListButtons } from './PinButtons.js';
-import { getUserId } from '../settingsStorage.js';
-import { isEditable } from '../utils.js';
-import { newSelectionList } from '../fixture.js';
-import useWindowDimensions from '../utils/useWindowDimensions.js';
+import type { InfoSize } from '../utils/sizingHints.ts';
+import { MemoizedPinInfo } from './PinInfo.tsx';
+import { MemoizedPinSetInfo } from './PinSetInfo.tsx';
+import { PinListButtons } from './PinButtons.tsx';
+import { getUserId } from '../settingsStorage.ts';
+import { isEditable } from '../utils.ts';
+import { newSelectionList } from '../fixture.ts';
+import useWindowDimensions from '../utils/useWindowDimensions.ts';
 
 interface PinListPropTypes {
   activePinSet?: PinSelectionList;

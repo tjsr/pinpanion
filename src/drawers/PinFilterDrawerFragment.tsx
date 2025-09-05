@@ -1,11 +1,11 @@
 import '../css/pins.css';
 
-import React, { ReactElement } from 'react';
+import React, { type ReactElement } from 'react';
 
-import { DrawerFragment } from '../components/DrawerFragment';
-import { PinListFilter } from '../types';
-import { PinListFilterDisplayProps } from '../components/PinSearchFilter';
-import { countFilters } from '../utils';
+import { DrawerFragment } from '../components/DrawerFragment.tsx';
+import type { PinListFilter } from '../types.ts';
+import type { PinListFilterDisplayProps } from '../components/PinSearchFilter.tsx';
+import { countFilters } from '../utils.ts';
 
 type PinFilterDrawerFragmentProps = {
   filter: PinListFilter;

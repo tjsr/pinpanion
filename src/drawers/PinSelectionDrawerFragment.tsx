@@ -1,10 +1,10 @@
 import '../css/pins.css';
 
-import React, { ReactElement } from 'react';
+import React, { type ReactElement } from 'react';
 
-import { DrawerFragment } from '../components/DrawerFragment';
-import { PinSelectionFilterProps } from '../components/PinSelectionFilter';
-import { PinSelectionList } from '../types';
+import { DrawerFragment } from '../components/DrawerFragment.tsx';
+import type { PinSelectionFilterProps } from '../components/PinSelectionFilter.tsx';
+import type { PinSelectionList } from '../types.ts';
 
 type PinSelectionDrawerFragmentProps = {
   isSelectionActive: boolean;

@@ -1,13 +1,14 @@
 import '../css/pins.css';
 
-import { PAXEvent, PAXEventId, PaxType } from '../types.ts';
+import type { PAXEvent, PAXEventId, PaxType } from '../types.ts';
 import React, { useEffect } from 'react';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
 
 type PAXSelectorProps = {
   id: string;

@@ -1,7 +1,8 @@
-import { PinSetKey, PinSetKeys } from '../utils';
 import { extractCompressedBitstring, stringToNumberArray } from 'sparse-bit-string';
 
-import { PinSelectionList } from '../types';
+import type { PinSelectionList } from '../types.ts';
+import type { PinSetKey } from '../utils.ts';
+import { PinSetKeys } from '../utils.ts';
 
 const decodeQueryParam = (p: string): string => {
   return decodeURIComponent(p.replace(/\+/g, ' '));
@@ -9,11 +10,10 @@ const decodeQueryParam = (p: string): string => {
 
 const urlParamsToMap = (hashString: string): Map<string, string> => {
   const params: Map<string, string> = new Map();
-  hashString.split('&').forEach(
-    (pair) => {
-      const pairArr = pair.split('=');
-      params.set(pairArr[0], decodeQueryParam(decodeURIComponent(pairArr[1])));
-    } );
+  hashString.split('&').forEach((pair) => {
+    const pairArr = pair.split('=');
+    params.set(pairArr[0], decodeQueryParam(decodeURIComponent(pairArr[1])));
+  });
   return params;
 };
 
@@ -57,7 +57,7 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
 
   PinSetKeys.forEach((key: PinSetKey) => {
     const paramKey: string = paramKeys[key];
-    let value: string|undefined = undefined;
+    let value: string | undefined = undefined;
     try {
       if (params.has(paramKey.toUpperCase())) {
         value = params.get(paramKey.toUpperCase())!;

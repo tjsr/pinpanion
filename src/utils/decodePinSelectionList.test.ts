@@ -1,7 +1,7 @@
 import { extractCompressedBitstring, stringToNumberArray } from 'sparse-bit-string';
 
-import { PinSelectionList } from '../types';
-import { decodePinSelectionHash } from './decodePinSelectionList';
+import type { PinSelectionList } from '../types.ts';
+import { decodePinSelectionHash } from './decodePinSelectionList.ts';
 
 describe('decodePinSelectionHash', () => {
   test('Should create an encoded string from a PSL', () => {

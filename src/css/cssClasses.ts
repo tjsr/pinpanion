@@ -1,9 +1,17 @@
-import { PAXEvent, PAXEventDisplayTypes, PAXEventId, PAXId, PinCategory, PinCategoryId, PinGroup } from '../types.ts';
+import type {
+  PAXEvent,
+  PAXEventDisplayTypes,
+  PAXEventId,
+  PAXId,
+  PinCategory,
+  PinCategoryId,
+  PinGroup,
+} from '../types.ts';
 
-import { Pinnypals3EventSubtypes } from '../pinnypals/pinnypals3types.ts';
+import type { Pinnypals3EventSubtypes } from '../pinnypals/pinnypals3types.ts';
 import { PinnypalsDataError } from '../pinnypals/pinnypalsDataErrors.ts';
 import eventDisplayTypes from '../static/eventDisplayTypes.json';
-import { toProperCase } from '../utils.js';
+import { toProperCase } from '../utils.ts';
 
 type CSSClassName = string | undefined;
 

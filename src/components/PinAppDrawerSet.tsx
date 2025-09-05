@@ -1,17 +1,17 @@
 import '../css/App.css';
 
-import { PinListFilter, PinSelectionList } from '../types';
-import React, { ReactElement } from 'react';
+import type { PinListFilter, PinSelectionList } from '../types.ts';
+import React, { type ReactElement } from 'react';
 
-import { AppSettingsDrawerFragment } from '../drawers/AppSettingsDrawFragment';
-import { AppSettingsPanelProps } from './AppSettingsPanel';
-import { FeedbackDrawerFragment } from '../drawers/FeedbackDrawerFragment';
-import { FilterQRCodeProps } from './FilterQRCode';
-import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment';
-import { PinListFilterDisplayProps } from './PinSearchFilter';
-import { PinSelectionDrawerFragment } from '../drawers/PinSelectionDrawerFragment';
-import { PinSelectionFilterProps } from './PinSelectionFilter';
-import { ShareDrawerFragment } from '../drawers/ShareDrawerFragment';
+import { AppSettingsDrawerFragment } from '../drawers/AppSettingsDrawFragment.tsx';
+import { type AppSettingsPanelProps } from './AppSettingsPanel.tsx';
+import { FeedbackDrawerFragment } from '../drawers/FeedbackDrawerFragment.tsx';
+import { type FilterQRCodeProps } from './FilterQRCode.tsx';
+import { PinFilterDrawerFragment } from '../drawers/PinFilterDrawerFragment.tsx';
+import { type PinListFilterDisplayProps } from './PinSearchFilter.tsx';
+import { PinSelectionDrawerFragment } from '../drawers/PinSelectionDrawerFragment.tsx';
+import { type PinSelectionFilterProps } from './PinSelectionFilter.tsx';
+import { ShareDrawerFragment } from '../drawers/ShareDrawerFragment.tsx';
 
 type PinAppDrawerSetProps = {
   appSettingsPanel: ReactElement<AppSettingsPanelProps>;

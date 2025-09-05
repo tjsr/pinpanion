@@ -1,23 +1,23 @@
 import './css/App.css';
 import './css/pins.css';
 
-import { ApplicationSettings, loadSettings, saveSettings } from './settingsStorage';
-import { EMPTY_FILTER, newSelectionList } from './fixture';
-import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types';
+import {type ApplicationSettings, loadSettings, saveSettings } from './settingsStorage.ts';
+import { EMPTY_FILTER, newSelectionList } from './fixture.ts';
+import type { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.ts';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter.tsx';
 import React, { useEffect, useState } from 'react';
-import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils';
-import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage';
+import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils.ts';
+import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage.ts';
 
-import { AppSettingsPanel } from './components/AppSettingsPanel';
-import { FilterQRCode } from './components/FilterQRCode';
-import { LanyardPinList } from './components/LanyardPinList';
-import { PinAppDrawerSet } from './components/PinAppDrawerSet';
-import { PinCollectionData } from './pinnypals/pinnypals3convertor';
-import { PinList } from './components/PinList';
-import { PinSelectionListEditor } from './components/PinSelectionFilter';
-import { decodePinSelectionHash } from './utils/decodePinSelectionList';
-import { generateRandomName } from './namegenerator';
+import { AppSettingsPanel } from './components/AppSettingsPanel.tsx';
+import { FilterQRCode } from './components/FilterQRCode.tsx';
+import { LanyardPinList } from './components/LanyardPinList.tsx';
+import { PinAppDrawerSet } from './components/PinAppDrawerSet.tsx';
+import type { PinCollectionData } from './pinnypals/pinnypals3convertor.ts';
+import { PinList } from './components/PinList.tsx';
+import { PinSelectionListEditor } from './components/PinSelectionFilter.tsx';
+import { decodePinSelectionHash } from './utils/decodePinSelectionList.ts';
+import { generateRandomName } from './namegenerator.ts';
 
 // import { PinCollectionData } from './pinnypals/pinnypals3convertor';
 

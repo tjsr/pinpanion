@@ -1,9 +1,9 @@
-import Select, { SelectChangeEvent } from '@mui/material/Select';
-
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
+import Select from '@mui/material/Select';
+import type { SelectChangeEvent } from '@mui/material/Select';
 import config from '../config.json';
 
 type YearSelectorProps = {

@@ -1,11 +1,11 @@
 import '../css/pincolours.css';
 
-import { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.ts';
+import type { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.ts';
 
-import { PinSash } from './PinSash.js';
+import { PinSash } from './PinSash.tsx';
 import React from 'react';
 import config from '../config.json';
-import { getPinClassForSize } from '../utils.js';
+import { getPinClassForSize } from '../utils.ts';
 
 type PinInfoPropTypes = {
   categories: PinCategory[];

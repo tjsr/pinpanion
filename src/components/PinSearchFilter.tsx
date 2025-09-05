@@ -2,20 +2,20 @@ import '../css/pins.css';
 import '../css/search.css';
 import '../css/App.css';
 
-import { PAXEvent, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.ts';
+import type { PAXEvent, PAXEventId, PaxType, Pin, PinListFilter, PinSet } from '../types.ts';
 
 import Button from '@mui/material/Button';
 import ClearIcon from '@mui/icons-material/Clear';
-import { EMPTY_FILTER } from '../fixture.js';
+import { EMPTY_FILTER } from '../fixture.ts';
 import FormControl from '@mui/material/FormControl';
-import { PAXEventSelector } from './PAXFilter.js';
-import { PinSetSelector } from './PinSetSelector.js';
-import { SEARCH_CONTROL_WIDTH } from '../globals.js';
+import { PAXEventSelector } from './PAXFilter.tsx';
+import { PinSetSelector } from './PinSetSelector.tsx';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
 import TextField from '@mui/material/TextField';
-import { YearSelector } from './YearSelector.js';
+import { YearSelector } from './YearSelector.tsx';
 import config from '../config.json';
 import fuzzy from 'fuzzy';
-import { isEmpty } from '../utils.js';
+import { isEmpty } from '../utils.ts';
 
 export type PinListFilterDisplayProps = {
   filter?: PinListFilter;

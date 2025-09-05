@@ -1,14 +1,15 @@
 import '../css/settings.css';
 
-import { SEARCH_CONTROL_WIDTH, TEXT_INPUT_WIDTH } from '../globals';
-import SvgIcon, { SvgIconProps } from '@mui/material/SvgIcon';
+import { SEARCH_CONTROL_WIDTH, TEXT_INPUT_WIDTH } from '../globals.ts';
 
-import { ApplicationSettings } from '../settingsStorage';
+import type { ApplicationSettings } from '../settingsStorage.ts';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import InputLabel from '@mui/material/InputLabel';
 import React from 'react';
-import { SizesType } from '../types';
+import type { SizesType } from '../types.ts';
+import  SvgIcon from '@mui/material/SvgIcon';
+import type { SvgIconProps } from '@mui/material/SvgIcon';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
 import ToggleButton from '@mui/material/ToggleButton';

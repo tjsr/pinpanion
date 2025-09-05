@@ -1,4 +1,4 @@
-import { Pin, PinListFilter, PinSelectionList } from './types.ts';
+import type { Pin, PinListFilter, PinSelectionList } from './types.ts';
 import {
   compressArray,
   countFilters,
@@ -8,9 +8,9 @@ import {
   isPinOnLanyard,
   sanitizeListElement,
   sanitizePinList,
-} from './utils.js';
+} from './utils.ts';
 
-import { ApplicationSettings } from './settingsStorage.ts';
+import type { ApplicationSettings } from './settingsStorage.ts';
 
 describe('getMin', () => {
   test('Should get only element in array', () => {

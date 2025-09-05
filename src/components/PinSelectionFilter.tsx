@@ -1,14 +1,14 @@
-import { PinSelectionList, UserId } from '../types';
+import type { PinSelectionList, UserId } from '../types.ts';
 
 import Alert from '@mui/material/Alert';
 import FormControl from '@mui/material/FormControl';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
+import { LanyardSelectionDropdown } from './LanyardSelectionDropdown.tsx';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
 import Switch from '@mui/material/Switch';
 import TextField from '@mui/material/TextField';
-import { filterStringToIds } from '../listutils';
-import { isEmptyList } from '../utils';
+import { filterStringToIds } from '../listutils.ts';
+import { isEmptyList } from '../utils.ts';
 
 type PinSelectionProps = {
   activeLanyard: PinSelectionList;

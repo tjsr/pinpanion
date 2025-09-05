@@ -1,4 +1,4 @@
-import {
+import type {
   PAX,
   PAXEvent,
   PAXEventId,
@@ -13,7 +13,7 @@ import {
   convertEventSubtypeToCssName,
   getCssNameForEventId,
   getGroupCssClass
-} from '../css/cssClasses.js';
+} from '../css/cssClasses.ts';
 
 import { PinCategorySash } from './PinCategorySash.tsx';
 

@@ -1,7 +1,7 @@
 import { getCategoryCssClass, getCssNameForEventId } from './cssClasses.ts';
 
-import { PinCategory } from '../types.ts';
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
+import type { PinCategory } from '../types.ts';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 
 describe('Event lookup', () => {

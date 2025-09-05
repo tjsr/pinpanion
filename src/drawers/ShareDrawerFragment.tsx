@@ -1,9 +1,9 @@
 import '../css/pins.css';
 
-import React, { ReactElement } from 'react';
+import React, { type ReactElement } from 'react';
 
-import { DrawerFragment } from '../components/DrawerFragment';
-import { FilterQRCodeProps } from '../components/FilterQRCode';
+import { DrawerFragment } from '../components/DrawerFragment.tsx';
+import type { FilterQRCodeProps } from '../components/FilterQRCode.tsx';
 
 type ShareDrawerFragmentProps = {
   qrCode: ReactElement<FilterQRCodeProps>;

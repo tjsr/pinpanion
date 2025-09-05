@@ -1,7 +1,7 @@
 import { PinCategorySash, findFirstFromTargetList } from "./PinCategorySash.tsx";
 
-import { PinCollectionData } from "../pinnypals/pinnypals3convertor.ts";
-import { Pinnypals3PinCategory } from "../pinnypals/pinnypals3types.ts";
+import { type PinCollectionData } from "../pinnypals/pinnypals3convertor.ts";
+import { type Pinnypals3PinCategory } from "../pinnypals/pinnypals3types.ts";
 import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 import { render } from "@testing-library/react";
 

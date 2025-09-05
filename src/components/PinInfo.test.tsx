@@ -1,4 +1,4 @@
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 
 describe('PinInfo.General', () => {

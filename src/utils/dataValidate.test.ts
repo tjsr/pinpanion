@@ -1,5 +1,5 @@
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
-import { PinSet } from '../types.ts';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
+import type { PinSet } from '../types.ts';
 import testData from '../../test/pinpanion-pin-data.json';
 
 describe('Pinnypals3DataConversionValidation', () => {

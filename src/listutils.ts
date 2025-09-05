@@ -1,4 +1,4 @@
-import { YearAndIdComparable } from './types';
+import type { YearAndIdComparable } from './types.ts';
 
 export const addIdToList = (data: string, id: number): string => {
   const existingIds: number[] = data
@@ -30,16 +30,11 @@ export const filterStringToIds = (data: string): number[] => {
     .sort();
 };
 
-export const removeOrAddId = (
-  idList: number[] | undefined,
-  id: number
-): number[] => {
+export const removeOrAddId = (idList: number[] | undefined, id: number): number[] => {
   if (idList === undefined) {
     return <number[]>[+id];
   }
-  const updatedIds: number[] | undefined = idList.filter(
-    (setId) => +id !== +setId
-  );
+  const updatedIds: number[] | undefined = idList.filter((setId) => +id !== +setId);
   if (updatedIds.length === idList.length) {
     updatedIds.push(+id);
   }
@@ -58,4 +53,3 @@ export const compareYearThenId = (a: YearAndIdComparable, b: YearAndIdComparable
   }
   return descending ? (b.year ?? 0) - (a.year ?? 0) : (a.year ?? 0) - (b.year ?? 0);
 };
-

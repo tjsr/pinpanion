@@ -3,7 +3,7 @@ import '../css/pins.css';
 import Button from '@mui/material/Button';
 import Drawer from '@mui/material/Drawer';
 import React from 'react';
-import { VariantType } from '../types';
+import type { VariantType } from '../types.ts';
 
 type DrawerFragmentPropTypes = {
   active?: boolean;

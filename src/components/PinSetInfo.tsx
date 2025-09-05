@@ -1,10 +1,10 @@
 import '../css/pinSetInfo.css';
 
-import { PAX, Pin, PinSet, SizesType } from '../types.ts';
+import type { PAX, Pin, PinSet, SizesType } from '../types.ts';
 
 import React from 'react';
 import config from '../config.json';
-import { getPinSetClassForSize } from '../utils.js';
+import { getPinSetClassForSize } from '../utils.ts';
 
 type PinSetInfoPropTypes = {
   displaySize: SizesType;

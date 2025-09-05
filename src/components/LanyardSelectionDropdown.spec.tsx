@@ -1,11 +1,11 @@
 import '@testing-library/jest-dom';
 
-import { activeLanyard, storedLanyardList } from './__test/lanyards.testdata';
+import { activeLanyard, storedLanyardList } from './__test/lanyards.testdata.ts';
 
 import { LanyardSelectionDropdown } from './LanyardSelectionDropdown';
-import { Mock } from 'vitest';
+import type { Mock } from 'vitest';
 import { render } from '@testing-library/react';
-import { switchToLanyard } from './__test/lanyards.utils';
+import { switchToLanyard } from './__test/lanyards.utils.ts';
 
 describe('LanyardSelctionDropdown', () => {
   let mockCallback: Mock;

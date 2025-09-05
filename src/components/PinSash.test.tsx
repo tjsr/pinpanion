@@ -1,11 +1,11 @@
-import { PAXEvent, Pin, PinId } from '../types.ts';
-import { PaxEventSash, PinSash } from './PinSash.js';
+import type { PAXEvent, Pin, PinId } from '../types.ts';
+import { PaxEventSash, PinSash } from './PinSash.tsx';
 import { queryByText, render } from '@testing-library/react';
 
 import { PinCategorySash } from './PinCategorySash.tsx';
-import { PinCollectionData } from '../pinnypals/pinnypals3convertor.js';
-import { PinInfo } from './PinInfo.js';
-import { findTestPin } from '../../test/testutils.js';
+import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
+import { PinInfo } from './PinInfo.tsx';
+import { findTestPin } from '../../test/testutils.ts';
 import pinpanionTestData from '../../test/pinpanion-pin-data.json';
 
 const failureMessage = (pin: Pin, html?: string): string => {

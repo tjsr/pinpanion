@@ -1,5 +1,5 @@
-import { PinSelectionList } from '../types.ts';
-import { encodePinSelectionHash } from './encodePinSelectionList.js';
+import type { PinSelectionList } from '../types.ts';
+import { encodePinSelectionHash } from './encodePinSelectionList.ts';
 
 const devIp = '127.0.0.1';
 

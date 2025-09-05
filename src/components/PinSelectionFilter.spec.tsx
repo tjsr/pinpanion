@@ -1,16 +1,16 @@
-import { PinSelectionEditor, PinSelectionListEditor } from './PinSelectionFilter';
-import { PinSelectionList, UserId } from '../types';
+import { PinSelectionEditor, PinSelectionListEditor } from './PinSelectionFilter.tsx';
+import type { PinSelectionList, UserId } from '../types.ts';
 import {
   alternativeLanyard2,
   newlyCreatedEmpty,
   nonEditableList,
   storedLanyardList,
   activeLanyard as testLanyard
-} from './__test/lanyards.testdata';
+} from './__test/lanyards.testdata.ts';
 import { render, screen } from '@testing-library/react';
 
 import React from 'react';
-import { isEmptyList } from '../utils';
+import { isEmptyList } from '../utils.ts';
 import { switchToLanyard } from './__test/lanyards.utils';
 
 /* eslint-disable comma-dangle */

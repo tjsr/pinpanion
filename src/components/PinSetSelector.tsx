@@ -1,10 +1,10 @@
-import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Select, { type SelectChangeEvent } from '@mui/material/Select';
 
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import { PinSet } from '../types';
-import { SEARCH_CONTROL_WIDTH } from '../globals';
+import type { PinSet } from '../types.ts';
+import { SEARCH_CONTROL_WIDTH } from '../globals.ts';
 
 type PinSetSelectorProps = {
   id: string;

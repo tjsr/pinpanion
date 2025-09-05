@@ -1,6 +1,6 @@
-import { AppSettingsPanelProps } from '../components/AppSettingsPanel';
-import { DrawerFragment } from '../components/DrawerFragment';
-import { ReactElement } from 'react';
+import type { AppSettingsPanelProps } from '../components/AppSettingsPanel.tsx';
+import { DrawerFragment } from '../components/DrawerFragment.tsx';
+import type { ReactElement } from 'react';
 
 type AppSettingsDrawerFragmentProps = {
   appSettingsPanel: ReactElement<AppSettingsPanelProps>;

@@ -1,6 +1,6 @@
-import { PinCategory, PinCategoryId } from '../types';
+import type { PinCategory, PinCategoryId } from '../types.ts';
 
-import { getCategoryCssClass } from '../css/cssClasses';
+import { getCategoryCssClass } from '../css/cssClasses.ts';
 
 export const findFirstFromTargetList = (needles: PinCategoryId[], prioritizedHaystack: PinCategory[]): PinCategory | null => {
   return prioritizedHaystack.find((category) => needles.includes(category.id)) || null;
