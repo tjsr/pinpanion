@@ -179,9 +179,7 @@ describe('processPinnypals3CategoryData', () => {
 
 describe('compareTypeIndex', () => {
   test('Should place "OTHER" pins first in list', () => {
-    const testDataSet = categoriesJson.filter((c) =>
-      [1, 12, 38, 100, 101].includes(c.id)
-    ) as unknown as Pinnypals3PinCategory[];
+    const testDataSet = categoriesJson.filter((c) => [1, 12, 38, 100, 101].includes(c.id)) as Pinnypals3PinCategory[];
     // const keys: Pinnypals3CategoryType[] = [...CATEGORY_TYPE_ORDER];
     const keys: Pinnypals3CategoryType[] = CATEGORY_TYPE_ORDER;
     expect(compareTypeIndex(testDataSet[4], testDataSet[1], keys)).toEqual(-1);
@@ -191,7 +189,7 @@ describe('compareTypeIndex', () => {
 
 describe('compareIdIndex', () => {
   test('Should place cat#100" pins first in list', () => {
-    const testDataSet = categoriesJson.filter((c) => [1, 12, 38, 100, 101].includes(c.id));
+    const testDataSet = categoriesJson.filter((c) => [1, 12, 38, 100, 101].includes(c.id)) as Pinnypals3PinCategory[];
     const keys: number[] = CATEGORY_ID_REORDER;
 
     expect(
