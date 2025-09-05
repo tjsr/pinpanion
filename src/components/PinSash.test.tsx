@@ -84,7 +84,7 @@ describe('PinSash', () => {
   });
 
   it('Should get a show set pin sash', async () => {
-    const southContainer = assertPinSash(pinData, 199, 'Hotstepper Gabe', 'South Core');
+    const southContainer = assertPinSash(pinData, 199, 'Hotstepper Gabe', 'South Core 2015');
     expect(southContainer).toHaveAttribute('data-pin-set-id', '28');
     expect(southContainer).toHaveClass('set paxSouth');
 
@@ -95,7 +95,7 @@ describe('PinSash', () => {
 
   it('Should get a limited edition sash', async () => {
     const leContainer = assertPinSash(pinData, 1508, 'New Year 2024', 'Limited');
-    expect(leContainer).toHaveAttribute('data-pin-category-id', '6');
+    expect(leContainer).toHaveAttribute('data-pin-category-id', '100');
     expect(leContainer).toHaveClass('category categoryLimited');
   });
 });
@@ -137,14 +137,14 @@ describe('PinInfo.CategorySash', () => {
   it('Should display NY limited edition pin info category sash', async () => {
     const nyPin = assertPinInfoSash(pinData, 1508, 'New Year 2024', 'Limited');
     const nyPinSash = queryByText(nyPin, 'Limited');
-    expect(nyPinSash, nyPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(nyPinSash, nyPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '100');
     expect(nyPinSash, nyPinSash?.innerHTML).toHaveClass('category categoryLimited');
   });
 
   it('Should display AI limited edition pin info category sash', async () => {
     const aiPin = assertPinInfoSash(pinData, 1549, 'Acquisitions Incorporated Series 2 Kickstarter', 'Limited');
     const aiPinSash = queryByText(aiPin, 'Limited');
-    expect(aiPinSash, aiPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(aiPinSash, aiPinSash?.innerHTML).toHaveAttribute('data-pin-category-id', '100');
     expect(aiPinSash, aiPinSash?.innerHTML).toHaveClass('category categoryLimited');
   });
 });
@@ -155,7 +155,7 @@ describe('PinSash.PinCategorySash', () => {
   it('Should display a limited edition category sash', async () => {
     expect(pinData.pins).not.toBeNull();
     const nySash = assertPinSash(pinData, 1508, 'New Year 2024', 'Limited');
-    expect(nySash, nySash?.innerHTML).toHaveAttribute('data-pin-category-id', '6');
+    expect(nySash, nySash?.innerHTML).toHaveAttribute('data-pin-category-id', '100');
     expect(nySash, nySash?.innerHTML).toHaveClass('category categoryLimited');
   });
 });

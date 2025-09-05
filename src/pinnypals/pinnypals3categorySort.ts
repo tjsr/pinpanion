@@ -25,12 +25,27 @@ export const compareIdIndex = (
   b: Pinnypals3PinCategory,
   idOrder: PinCategoryId[]
 ): number => {
-  if (idOrder.includes(a.id) || !idOrder.includes(b.id)) {
+  assert(a.id, `Category ${a} is missing an ID`);
+  assert(b.id, `Category ${b} is missing an ID`);
+  if (idOrder.includes(a.id) || idOrder.includes(b.id)) {
     const compared = compareKeyIndex(a, b, 'id', idOrder);
     if (compared !== 0) {
       return compared;
     }
   }
+
+  // if (idOrder.includes(a.id)) {
+  //   if (idOrder.includes(b.id)) {
+  //     const compared = compareKeyIndex(a, b, 'id', idOrder);
+  //     if (compared !== 0) {
+  //       return compared;
+  //     }
+  //   } else {
+  //     return -1;
+  //   }
+  // } else if (idOrder.includes(b.id)) {
+  //   return 1;
+  // }
   return a.id - b.id;
 };
 

@@ -8,7 +8,7 @@ describe('compareIdIndex', () => {
     const catA = { id: 100, type: 'OTHER' } as Pinnypals3PinCategory;
     const catB = { id: 60, type: 'OTHER' } as Pinnypals3PinCategory;
     expect(compareIdIndex(catA, catB, [100])).toBe(-1);
-    expect(compareIdIndex(catB, catA, [100])).toBe(-40);
+    expect(compareIdIndex(catB, catA, [100])).toBe(1);
   });
 
   test('Should ignore type and return by id order', () => {

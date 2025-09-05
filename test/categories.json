@@ -12,6 +12,12 @@
     "slug": "carl"
   },
   {
+    "id": 12,
+    "name": "Kemper",
+    "type": "CHARACTER",
+    "slug": "kemper"
+  },
+  {
     "id": 23,
     "name": "Bethesda",
     "type": "COMPANY",
@@ -22,6 +28,12 @@
     "name": "Blizzard",
     "type": "COMPANY",
     "slug": "blizzard"
+  },
+  {
+    "id": 38,
+    "name": "Penny Arcade",
+    "type": "COMPANY",
+    "slug": "penny-arcade"
   },
   {
     "id": 49,

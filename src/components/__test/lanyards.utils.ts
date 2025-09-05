@@ -29,8 +29,8 @@ export const switchToLanyard = async (
 
   await act(() => {
     const options: HTMLElement[] = listbox.getAllByRole('option');
-    const lanyardIndex: number = lanyardId === 'new' ? 0 :
-      expectedAvailableLanyards.findIndex((l) => l.id === lanyardId) + 1;
+    const lanyardIndex: number = lanyardId === 'new' ? 0
+      : expectedAvailableLanyards.findIndex((l) => l.id === lanyardId) + 1;
     fireEvent.mouseDown(options[lanyardIndex]);
     options[lanyardIndex].click();
   });
