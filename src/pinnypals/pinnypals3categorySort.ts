@@ -63,7 +63,7 @@ export const compareTypeIndex = (
   return 0;
 };
 
-const comparePrioritizedCategories = (
+const _comparePrioritizedCategories = (
   a: Pinnypals3PinCategory,
   b: Pinnypals3PinCategory,
   priorityIds: PinCategoryId[],

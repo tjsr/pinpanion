@@ -39,7 +39,7 @@ export const decodePinSelectionHash = (hashString: string): PinSelectionList => 
       const rev: number = parseInt(params.get('r')!);
       outputSet.revision = rev;
     } catch (err) {
-      throw new Error('Provided revision number was not a numeric value');
+      throw new Error('Provided revision number was not a numeric value', { cause: err });
     }
   }
 
