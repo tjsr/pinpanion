@@ -1,3 +1,4 @@
+import { cloudflare } from '@cloudflare/vite-plugin';
 import { defineConfig } from 'vite';
 import { findFileUpwards } from './test/testutils.ts';
 import react from '@vitejs/plugin-react';
@@ -8,7 +9,7 @@ export default defineConfig({
   build: {
     outDir: 'build',
   },
-  plugins: [react()],
+  plugins: [react(), cloudflare()],
   server: {
     watch: {
       usePolling: true,
