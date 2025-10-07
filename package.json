@@ -27,7 +27,7 @@
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
     "start": "cross-env BROWSER='chrome',BROWSER_ARGS='--remote-debugging-port=9222',PORT=5173,GENERATE_SOURCEMAP=false vite dev",
     "chrome-remote-debug": "chrome --remote-debugging-port=9222'",
-    "build": "tsc && npm run ppschema && npm run download -- public/imgs && npm run build:vite",
+    "build": "tsc -b && npm run ppschema && npm run download -- public/imgs && npm run build:vite",
     "build:vite": "vite build",
     "build:preview": "vite build && vite preview",
     "build:amplify": "npm run ppschema && npm run download:amplify && npm run build:vite",

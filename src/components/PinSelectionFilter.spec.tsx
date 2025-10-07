@@ -126,7 +126,7 @@ describe('PinSelectionListEditor', () => {
       <PinSelectionListEditor
         storedLanyardList={props.lanyardList}
         activeLanyard={activeLanyard}
-        changeListDisplayed={function (id: string, display: boolean): void {
+        changeListDisplayed={function (_id: string, display: boolean): void {
           console.log('Toggled switch to ' + display);
         }}
         onlyShowSelectedPins={false}

@@ -10,6 +10,22 @@ div.pinInfoPadding {
   margin: 2px;
 }
 
+.pin-tiny div.pinInfo {
+  min-height: 100px;
+}
+
+.pin-sm div.pinInfo {
+  min-height: 120px;
+}
+
+.pin-normal div.pinInfo {
+  min-height: 142px;
+}
+
+.pin-large div.pinInfo {
+  min-height: 142px;
+}
+
 div.pinInfo h3 {
   margin-top: 0.2em;
   overflow: hidden;

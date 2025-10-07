@@ -211,12 +211,15 @@ const App = (): JSX.Element => {
           <>
             <PinAppDrawerSet
               appSettingsPanel={
-                <AppSettingsPanel settings={applicationSettings} updateSettings={(settings) => {
-                  if (settings.userDisplayName?.trim() === '') {
-                    settings.userDisplayName = undefined;
-                  }
-                  setApplicationSettings(settings);
-                }} />
+                <AppSettingsPanel
+                  settings={applicationSettings}
+                  updateSettings={(settings) => {
+                    if (settings.userDisplayName?.trim() === '') {
+                      settings.userDisplayName = undefined;
+                    }
+                    setApplicationSettings(settings);
+                  }}
+                />
               }
               filter={filter}
               isSelectionActive={selectionFilterEnabled}
@@ -235,7 +238,7 @@ const App = (): JSX.Element => {
                 <PinSelectionListEditor
                   onlyShowSelectedPins={selectionFilterEnabled}
                   onChange={selectionListUpdated}
-                  changeListDisplayed={(id: string, display: boolean) => {
+                  changeListDisplayed={(_id: string, display: boolean) => {
                     // When the switch checkbox is toggled, set the show only marked pins selection to match.
                     setSelectionFilterEnabled(display);
                   }}

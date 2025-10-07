@@ -6,6 +6,7 @@ import react from '@vitejs/plugin-react';
 const setupPath = findFileUpwards('test/vitest.setup.ts');
 
 export default defineConfig({
+  base: '/',
   build: {
     outDir: 'build',
   },
