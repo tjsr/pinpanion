@@ -14,12 +14,12 @@ div.pinInfoPadding {
 }
 
 div.pinInfo h3 {
-  margin-top: 0.2em;
-  overflow: hidden;
+  flex: 0 0 auto;
+  margin: 0.2em 0;
   font-size: 0.8em;
-  height: 1rem;
-  line-height: 1rem;
-  margin-block-end: 0.2em;
+  line-height: 1.25rem;
+  min-height: 1.25rem;
+  overflow-wrap: anywhere;
 }
 
 div.pinInfo {
@@ -27,11 +27,24 @@ div.pinInfo {
   flex: 1 1 auto;
   flex-direction: column;
   min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 div.pinSash {
-  flex: 0 0 1.2rem;
-  overflow: hidden;
+  flex: 0 0 auto;
+}
+
+div.pinSash > .pax,
+div.pinSash > .set,
+div.pinSash > .group,
+div.pinSash > .event,
+div.pinSash > .category {
+  box-sizing: border-box;
+  height: auto;
+  min-height: 1.2rem;
+  overflow: visible;
+  overflow-wrap: anywhere;
 }
 
 div.pinImageContainer {
@@ -40,6 +53,7 @@ div.pinImageContainer {
   align-items: center;
   justify-content: center;
   min-height: 0;
+  overflow: hidden;
 }
 
 .pin > div.listButtons {
