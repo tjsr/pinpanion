@@ -135,32 +135,43 @@ div.pinSet.set-tiny h3 {
   margin: 2px;
   background-color: #d0d0d0;
   border: 2px solid;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.pinSet div.setpins {
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.pinSet > div.listButtons {
+  flex: 0 0 auto;
+  padding-bottom: 2px;
+  text-align: center;
 }
 
 .set-tiny {
   max-width: 8rem;
-  min-height: 7.8em;
-  max-height: 10em;
+  height: 10em;
 }
 
 .set-sm {
   max-width: 10rem;
-  min-height: 9em;
-  max-height: 12.5em;
+  height: 12.5em;
   margin-bottom: 8;
   /* scale: 0.8; */
 }
 
 .set-normal {
-  min-height: 12.6rem;
-  max-height: 17.5rem;
+  height: 17.5rem;
   max-width: 16rem;
   /* scale: 1.0; */
 }
 
 .set-large {
-  min-height: 16.5rem;
-  max-height: 21.2rem;
+  height: 21.2rem;
   max-width: 24rem;
   /* scale: 1.25; */
 }

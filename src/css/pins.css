@@ -1,8 +1,11 @@
 .pin {
- display: inline-block;
+ display: inline-flex;
+ flex-direction: column;
  margin: 2px;
  background-color: #e1e1e1;
  border: 2px solid;
+ box-sizing: border-box;
+ overflow: hidden;
 }
 
 div.pinInfoPadding {
@@ -14,44 +17,65 @@ div.pinInfo h3 {
   margin-top: 0.2em;
   overflow: hidden;
   font-size: 0.8em;
-  max-height: 1rem;
+  height: 1rem;
+  line-height: 1rem;
   margin-block-end: 0.2em;
+}
+
+div.pinInfo {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+}
+
+div.pinSash {
+  flex: 0 0 1.2rem;
+  overflow: hidden;
+}
+
+div.pinImageContainer {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+}
+
+.pin > div.listButtons {
+  flex: 0 0 auto;
+  padding-bottom: 2px;
+  text-align: center;
 }
 
 .pin-tiny {
   width: 6rem;
+  height: 9rem;
+  --pin-image-size: 70px;
 }
 
 .pin-sm {
   width: 8rem;
+  height: 11.875rem;
+  --pin-image-size: 100px;
 }
 
 .pin-normal {
   width: 12rem;
+  height: 15.5rem;
+  --pin-image-size: 140px;
 }
 
 .pin-large {
   width: 14rem;
+  height: 21.75rem;
+  --pin-image-size: 240px;
 }
 
-.pin-tiny img.pinImage {
-  max-height: 70px;
-  max-width: 70px;
-}
-
-.pin-sm img.pinImage {
-  max-height: 100px;
-  max-width: 100px;
-}
-
-.pin-normal img.pinImage {
-  max-height: 140px;
-  max-width: 140px;
-}
-
-.pin-large img.pinImage {
-  max-height: 240px;
-  max-width: 240px;
+.pinImageContainer img.pinImage {
+  max-height: min(100%, var(--pin-image-size));
+  max-width: min(100%, var(--pin-image-size));
+  object-fit: contain;
 }
 
 div.filterQrCode { 
