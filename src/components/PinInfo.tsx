@@ -1,3 +1,5 @@
+// CSS is processed by the bundler; TypeScript does not have a declaration for it.
+// @ts-ignore
 import '../css/pincolours.css';
 
 import type { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.ts';
