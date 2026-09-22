@@ -11,7 +11,6 @@ import {
   render,
 } from '@testing-library/react';
 
-import type { Container } from 'react-dom';
 import { PAXEventSelector } from './PAXFilter.tsx';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pindata from '../../test/pinpanion-pin-data.json';
@@ -23,7 +22,7 @@ describe('PAXFilter', () => {
   const selectPaxEventFromFilter = async (
     filterAssertionFunction: (eventId: PAXEventId|PaxType|undefined) => void,
     paxEventSearch: RegExp | string): Promise<{
-    container: Container,
+    container: HTMLElement,
     findByRole: (
       role: ByRoleMatcher, options?: ByRoleOptions | undefined, waitForElementOptions?: waitForOptions | undefined
     ) => Promise<HTMLElement>

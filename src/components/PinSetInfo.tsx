@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/pinSetInfo.css';
 
 import type { PAX, Pin, PinSet, SizesType } from '../types.ts';

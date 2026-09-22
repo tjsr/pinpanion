@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/settings.css';
 
 import { SEARCH_CONTROL_WIDTH, TEXT_INPUT_WIDTH } from '../globals.ts';

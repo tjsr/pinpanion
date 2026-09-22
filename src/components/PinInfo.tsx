@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 // CSS is processed by the bundler; TypeScript does not have a declaration for it.
 // @ts-ignore
 import '../css/pincolours.css';

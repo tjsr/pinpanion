@@ -249,7 +249,7 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
       try {
         results[downloadIndex] = { status: 'fulfilled', value: await downloads[downloadIndex]() };
       } catch (reason) {
-        results[downloadIndex] = { status: 'rejected', reason };
+        results[downloadIndex] = { reason, status: 'rejected' };
       }
     }
   };

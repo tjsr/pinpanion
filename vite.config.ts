@@ -9,6 +9,9 @@ export default defineConfig({
     outDir: 'build',
   },
   plugins: [react()],
+  resolve: {
+    tsconfigPaths: true,
+  },
   server: {
     watch: {
       usePolling: true,

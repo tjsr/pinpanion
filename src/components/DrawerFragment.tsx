@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/pins.css';
 
 import Button from '@mui/material/Button';

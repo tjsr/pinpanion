@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/qr.css';
 import './FilterQRCode.css';
 

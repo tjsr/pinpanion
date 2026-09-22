@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/App.css';
 
 import type { PinListFilter, PinSelectionList } from '../types.ts';

@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/pins.css';
 
 import { BUTTON_SIZES, PIN_INFO_PANE_SIZES, SET_INFO_PANE_SIZES } from '../utils/sizingHints.ts';
@@ -18,7 +19,7 @@ import React, { useEffect, useRef } from 'react';
 import { compareYearThenId, removeOrAddId } from '../listutils.ts';
 
 import { FilterQRCode } from './FilterQRCode.tsx';
-import { FixedSizeGrid as Grid } from 'react-window';
+import { Grid } from 'react-window';
 import type { InfoSize } from '../utils/sizingHints.ts';
 import { MemoizedPinInfo } from './PinInfo.tsx';
 import { MemoizedPinSetInfo } from './PinSetInfo.tsx';
@@ -373,28 +374,36 @@ export const PinList = (props: PinListPropTypes): JSX.Element => {
             </div>
           }
           { showInSets ?
-            <Grid
+            <Grid<Record<string, never>>
+              cellComponent={GridPinSetRenderer}
+              cellProps={{}}
               columnCount={targetColumnCount}
               columnWidth={targetGridCelWidth}
-              height={windowHeight - buttonDivBottom}
+              defaultHeight={windowHeight - buttonDivBottom}
+              defaultWidth={windowWidth - 2}
               rowCount={targetPinSetRows}
               rowHeight={setRowHeight}
-              width={windowWidth - 2}
-              style={{ overflowY: 'scroll' }}
-            >
-              {GridPinSetRenderer}
-            </Grid> :
-            <Grid
+              style={{
+                height: windowHeight - buttonDivBottom,
+                overflowY: 'scroll',
+                width: windowWidth - 2,
+              }}
+            /> :
+            <Grid<Record<string, never>>
+              cellComponent={GridPinRenderer}
+              cellProps={{}}
               columnCount={targetColumnCount}
               columnWidth={targetGridCelWidth}
-              height={windowHeight - buttonDivBottom}
+              defaultHeight={windowHeight - buttonDivBottom}
+              defaultWidth={windowWidth - 2}
               rowCount={targetPinRows}
               rowHeight={rowHeight}
-              width={windowWidth - 2}
-              style={{ overflowY: 'scroll' }}
-            >
-              {GridPinRenderer}
-            </Grid>
+              style={{
+                height: windowHeight - buttonDivBottom,
+                overflowY: 'scroll',
+                width: windowWidth - 2,
+              }}
+            />
           }
         </>
       )}

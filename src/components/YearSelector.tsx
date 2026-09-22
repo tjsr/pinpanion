@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -32,9 +33,10 @@ export const YearSelector = (props: YearSelectorProps): JSX.Element => {
   }
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={props.id}>{props.label}</InputLabel>
+      <InputLabel id={`${props.id}-label`}>{props.label}</InputLabel>
       <Select
         id={props.id}
+        labelId={`${props.id}-label`}
         value={
           props.selectedYear !== undefined && !isNaN(props.selectedYear) ?
             props.selectedYear.toString() :
