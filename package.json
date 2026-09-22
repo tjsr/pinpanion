@@ -29,7 +29,7 @@
     "chrome-remote-debug": "chrome --remote-debugging-port=9222'",
     "build": "tsc && npm run ppschema && npm run download -- public/imgs && npm run build:vite",
     "build:vite": "vite build",
-    "build:preview": "vite build && vite preview",
+    "build:preview": "npm run ensure:preview-assets && vite build && vite preview",
     "build:amplify": "npm run ppschema && npm run download:amplify && npm run build:vite",
     "ppschema:prod": "node src/utils/dlschema.ts && npx openapi-typescript ./src/pinnypals/pinnypals-openapi-latest-public.json -o ./src/pinnypals/pp3schema.d.ts",
     "ppschema": "node src/utils/dlschema.ts -h https://api.pinnypals.dev && npx openapi-typescript ./src/pinnypals/pinnypals-openapi-latest-public.json -o ./src/pinnypals/pp3schema.d.ts",
@@ -38,6 +38,7 @@
     "download:test": "cross-env TEST_MODE=true node ./src/utils/pindownload.ts",
     "download:testData": "cross-env TEST_MODE=true SKIP_ALL_IMAGES=true PINNYPALS_PINS_CACHE_FILE=test/pinsv3.json PINPANION_PINS_CACHE_FILE=test/pinpanion-pin-data.json node ./src/utils/pindownload.ts",
     "download:amplify": "cross-env IMAGES_CACHE_DIR=images node ./src/utils/pindownload.ts",
+    "ensure:preview-assets": "node ./src/utils/ensurePreviewImageAssets.mjs",
     "test": "vitest --run && npm run lint",
     "lint": "eslint --fix \"./src/**/*.{ts,tsx}\"",
     "prettier": "prettier --single-quote --write \"./src/**/*.{ts,tsx}\"",
@@ -107,5 +108,8 @@
   "engines": {
     "node": ">=22.18.0",
     "npm": ">=11.5.2"
+  },
+  "allowScripts": {
+    "esbuild@0.25.4": true
   }
 }

@@ -19,6 +19,8 @@ const TEST_MODE = process.env.TEST_MODE == 'true' || process.env.NODE_ENV === 't
 const DEFAULT_IMAGE_LIMIT = TEST_MODE ? 10 : -1;
 const LIMIT_IMAGE_DOWNLOADS = TEST_MODE && !DOWNLOAD_ALL ? DEFAULT_IMAGE_LIMIT : -1;
 const skipImages = process.env.SKIP_ALL_IMAGES === 'true';
+const configuredImageDownloadConcurrency = Number.parseInt(process.env.IMAGE_DOWNLOAD_CONCURRENCY || '', 10);
+const IMAGE_DOWNLOAD_CONCURRENCY = configuredImageDownloadConcurrency > 0 ? configuredImageDownloadConcurrency : Infinity;
 
 const printSkipMessages = process.env.PRINT_SKIPPED_IMAGES == 'true';
 // const LIMIT_PINNYPALS_DOWNLOADS = 10;
@@ -235,12 +237,28 @@ const cachePinImages = async (destinationPath: string, pinsToDownload: Pin[]): P
     throw new Error(`Failed creating destination directory ${globalDestinationPath}`);
   }
 
-  const promises: Promise<DownloadSource>[] = pinsToDownload
+  const downloads: (() => Promise<DownloadSource>)[] = pinsToDownload
     .filter((pin) => pin.image_name)
-    .map((p) => downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
+    .map((p) => () => downloadImageForPin(pinpanionImagePrefix, pinnypalsImagePrefix, destinationPath, p));
 
-  return Promise.allSettled(promises)
-    .then((results: PromiseSettledResult<DownloadSource>[]) => {
+  const results: PromiseSettledResult<DownloadSource>[] = [];
+  let nextDownload = 0;
+  const worker = async (): Promise<void> => {
+    while (nextDownload < downloads.length) {
+      const downloadIndex = nextDownload++;
+      try {
+        results[downloadIndex] = { status: 'fulfilled', value: await downloads[downloadIndex]() };
+      } catch (reason) {
+        results[downloadIndex] = { status: 'rejected', reason };
+      }
+    }
+  };
+
+  const workerCount = Math.min(IMAGE_DOWNLOAD_CONCURRENCY, downloads.length);
+  const workers = Array.from({ length: workerCount }, worker);
+
+  return Promise.all(workers)
+    .then(() => {
       const hadErrors = results.filter((pr) => pr.status === 'rejected').length > 0;
 
       if (hadErrors) {
