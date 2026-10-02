@@ -87,6 +87,7 @@ describe(convertPinnypals3ItemDataGroupToPinGroup, () => {
       imageUrl: 'http://example.com',
       name: 'Test Group',
       notes: 'Test notes',
+      slug: 'test-group',
       type: 'STAFF',
     };
     const group = convertPinnypals3ItemDataGroupToPinGroup(testGroup);
