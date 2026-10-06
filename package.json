@@ -48,7 +48,13 @@
     "clean:all": "npm run clean && rimraf node_modules",
     "preview": "npm run build && vite preview",
     "deploy": "npm run build && wrangler deploy",
-    "cf-typegen": "wrangler types"
+    "build:guess": "vite build --config vite.guess.config.ts && node scripts/prepare-guess-data.mjs",
+    "deploy:guess:dev": "npm run build:guess && wrangler pages deploy build/guess --project-name pinpanion-guess-dev --branch main",
+    "deploy:guess": "npm run build:guess && wrangler pages deploy build/guess --project-name pinpanion-guess --branch main",
+    "cf-typegen": "wrangler types",
+    "build:pingo": "vite build --config vite.pingo.config.ts && node scripts/prepare-pingo-data.mjs && esbuild src/pingo/worker.ts --bundle --format=esm --platform=browser --target=es2022 --outfile=build/pingo/_worker.js",
+    "deploy:pingo:dev": "npm run build:pingo && node scripts/deploy-pingo.mjs dev",
+    "deploy:pingo": "npm run build:pingo && node scripts/deploy-pingo.mjs prod"
   },
   "eslintConfig": {
     "extends": [

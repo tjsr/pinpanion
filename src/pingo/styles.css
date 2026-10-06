@@ -1,0 +1,325 @@
+.pingo-board-heading { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+.pingo-board-scroll { overflow-x: auto; }
+.pingo-board {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.5rem;
+  min-width: 370px;
+}
+.pingo-cell {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 180px;
+  position: relative;
+  background: #f4f4f4;
+  border: 2px solid #777;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.pingo-cell.checked { background: #fff1f1; border-color: #c51c1c; }
+.pingo-cell.interactive { padding: 0; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pingo-cell.interactive:hover { border-color: #c51c1c; }
+.pingo-cell.interactive:focus-visible { outline: 3px solid #174f8a; outline-offset: 2px; }
+.pingo-cell.winner { outline: 4px solid #d4a017; outline-offset: -4px; }
+.pingo-cell > .pin-sm { box-sizing: border-box; width: 100%; min-width: 0; flex: 1; min-height: 0; margin: 0; border: 0; overflow: hidden; }
+.pingo-cell .pin-sm .pinInfo {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  padding: 0 0.25rem 0.35rem;
+  text-align: center;
+}
+.pingo-cell .pinInfo h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-height: 2.4em;
+  min-height: 2.4em;
+  margin: 0.1em 0;
+  font-size: 0.86rem;
+  line-height: 1.2;
+  padding: 0 0.3rem;
+  overflow-wrap: anywhere;
+}
+.pingo-cell img.pinImage {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  padding: 0.2rem;
+  object-fit: contain;
+  object-position: center;
+}
+.pingo-hunt-photo { position: relative; flex: 1; min-height: 0; overflow: hidden; }
+.pingo-hunt-photo img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.pingo-hunt-preview { display: flex; justify-content: center; align-items: center; }
+.pingo-hunt-preview-image { display: block; max-width: 100%; max-height: 70dvh; width: auto; height: auto; object-fit: contain; }
+.pingo-hunt-photo span {
+  position: absolute; inset: auto 0 0; padding: 0.25rem;
+  color: #fff; background: rgba(0, 0, 0, 0.75); text-align: center;
+  font-size: 0.8rem; font-weight: bold; overflow-wrap: anywhere;
+}
+.pingo-camera { display: block; width: 100%; max-height: 65vh; background: #111; object-fit: contain; }
+.pingo-crop-frame { position: relative; display: inline-block; max-width: 100%; line-height: 0; }
+.pingo-crop-frame > img { display: block; width: auto; height: auto; max-width: 100%; max-height: 60vh; }
+.pingo-crop-square {
+  position: absolute; box-sizing: border-box; border: 3px solid #fff;
+  outline: 2px solid #c51c1c; background: rgba(255, 255, 255, 0.08);
+  cursor: move; touch-action: none;
+}
+.pingo-crop-handle {
+  position: absolute; right: -10px; bottom: -10px; width: 26px; height: 26px;
+  border: 2px solid #fff; border-radius: 50%; background: #c51c1c;
+  cursor: nwse-resize; touch-action: none;
+}
+.pingo-cell-number {
+  flex: none; align-self: flex-start; z-index: 2;
+  border-radius: 3px; background: #fff; padding: 0 4px; font-weight: bold;
+}
+.pingo-check { position: absolute; inset: 0; z-index: 3; width: 100%; height: 100%; pointer-events: none; color: #cf1717; }
+.pingo-check path { fill: none; stroke: currentColor; stroke-width: 10; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.pingo-winner { padding: 1rem; text-align: center; background: #fff2be; }
+.pingo-caller-shell {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: 100%;
+  height: 100dvh;
+  overflow: hidden;
+}
+.pingo-caller-main { display: flex; flex-direction: column; min-height: 0; overflow: hidden; }
+.pingo-caller-display {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  gap: 0.5rem;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.pingo-caller-display > h1 { font-size: clamp(1.4rem, 2.4vw, 2.5rem); line-height: 1.15; }
+.pingo-caller-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding-inline: 0.4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  font-size: clamp(0.5rem, 1.3vw, 0.875rem);
+}
+.pingo-caller-footer .MuiTypography-root { font-size: inherit; white-space: nowrap; }
+.pingo-footer-admin { flex: none; }
+.pingo-caller-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  grid-template-areas: "join current" "recent current";
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 0.5rem;
+  height: 100%;
+  min-height: 0;
+  align-items: stretch;
+}
+.pingo-join-panel {
+  grid-area: join;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 0.2rem;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  text-align: center;
+}
+.pingo-join-code-space {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  container-type: size;
+}
+.pingo-join-code {
+  box-sizing: border-box;
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
+  max-width: 100%;
+  max-height: 100%;
+  aspect-ratio: 1;
+  padding: 0.35rem;
+  background: #fff;
+}
+.pingo-join-code svg { display: block; width: 100%; height: 100%; }
+.pingo-join-link { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 0.85rem; }
+.pingo-recent-panel { grid-area: recent; min-width: 0; align-self: end; }
+.pingo-check-panel { grid-area: check; min-width: 0; }
+.pingo-players-panel { grid-area: players; min-width: 0; }
+.pingo-player-list { display: grid; gap: 0.3rem; max-height: 15rem; overflow-y: auto; }
+.pingo-call-panel { grid-area: list; min-width: 0; }
+.pingo-recent {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+.pingo-recent > .pin-sm {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: clamp(72px, 16dvh, 185px);
+  margin: 0;
+  overflow: hidden;
+}
+.pingo-recent > p { grid-column: 1 / -1; text-align: center; }
+.pingo-recent .pin-sm .pinInfo,
+.pingo-current .pin-large .pinInfo {
+  box-sizing: border-box;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  text-align: center;
+}
+.pingo-recent .pin-sm .pinInfo {
+  grid-template-rows: 2.8rem 1.8rem minmax(0, 1fr);
+  padding: 0.15rem;
+}
+.pingo-recent .pinInfo h3,
+.pingo-current .pinInfo h3 {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
+  margin: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.15;
+}
+.pingo-recent .pinInfo h3 { font-size: 0.7rem; }
+.pingo-recent .pinInfo > :not(h3):not(img),
+.pingo-current .pinInfo > :not(h3):not(img) {
+  box-sizing: border-box;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  padding: 0 0.1rem;
+  overflow: hidden;
+  text-align: center;
+  line-height: 1.1;
+}
+.pingo-recent .pinInfo > :not(h3):not(img) { font-size: 0.6rem; }
+.pingo-recent .pin-sm img.pinImage,
+.pingo-current .pin-large img.pinImage {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  max-width: none;
+  max-height: none;
+  margin: 0;
+  object-fit: contain;
+  object-position: center;
+}
+.pingo-recent .pin-sm img.pinImage { padding: 0.35rem; }
+.pingo-current {
+  box-sizing: border-box;
+  grid-area: current;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: 0.75rem;
+  display: grid;
+  grid-template-rows: 2rem minmax(0, 1fr) 2.5rem 3rem;
+  gap: 0.45rem;
+  justify-items: center;
+  text-align: center;
+}
+.pingo-current > h6 { grid-row: 1; align-self: center; }
+.pingo-current .pin-large {
+  grid-row: 2;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+}
+.pingo-current .pin-large .pinInfo {
+  grid-template-rows: minmax(3.5rem, auto) 2.4rem minmax(0, 1fr);
+  padding: 0.5rem;
+}
+.pingo-current .pinInfo h3 { font-size: clamp(1.2rem, 2vw, 2rem); }
+.pingo-current .pin-large img.pinImage { padding: 1rem; }
+.pingo-current-timer {
+  grid-row: 3;
+  align-self: center;
+  white-space: nowrap;
+}
+.pingo-current .pingo-next-button {
+  grid-row: 4;
+  width: 12rem;
+  height: 3rem;
+  align-self: center;
+}
+.pingo-call-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.4rem; margin-top: 0.7rem; }
+.pingo-call-list button { justify-content: flex-start; text-align: left; }
+@media (max-width: 900px) {
+  .pingo-caller-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-template-areas: "join current" "recent recent";
+    grid-template-rows: minmax(0, 1fr) auto;
+  }
+  .pingo-recent > .pin-sm { height: clamp(55px, 11dvh, 120px); }
+}
+@media (max-width: 600px) {
+  .pingo-caller-main { padding-block: 0.3rem; }
+  .pingo-caller-display > h1 { font-size: clamp(1.15rem, 5vw, 1.6rem); }
+  .pingo-caller-layout { gap: 0.25rem; }
+  .pingo-join-panel, .pingo-current { padding: 0.35rem; }
+  .pingo-recent-panel { padding: 0.25rem; }
+  .pingo-recent { gap: 0.15rem; }
+  .pingo-recent > .pin-sm { height: clamp(48px, 10dvh, 85px); }
+  .pingo-recent .pin-sm .pinInfo { grid-template-rows: 1.1rem 0 minmax(0, 1fr); }
+  .pingo-recent .pinInfo h3 { font-size: 0.55rem; }
+  .pingo-recent .pinInfo > :not(h3):not(img) { font-size: 0; }
+  .pingo-current { grid-template-rows: 1.6rem minmax(0, 1fr) 1.8rem 2.4rem; gap: 0.25rem; }
+  .pingo-current > h6, .pingo-join-panel > h6 {
+    font-size: clamp(0.62rem, 2.7vw, 0.9rem);
+    white-space: nowrap;
+  }
+  .pingo-recent-panel > h6 { font-size: 0.95rem; }
+  .pingo-current-timer { font-size: 1rem; }
+  .pingo-current .pingo-next-button { width: 100%; max-width: 12rem; height: 2.4rem; font-size: 0.7rem; }
+  .pingo-join-panel > .MuiTypography-body2, .pingo-join-link { font-size: 0.62rem; }
+  .pingo-current .pin-large .pinInfo { grid-template-rows: minmax(2rem, auto) 1.4rem minmax(0, 1fr); padding: 0.2rem; }
+  .pingo-current .pinInfo h3 { font-size: 0.8rem; }
+  .pingo-current .pin-large img.pinImage { padding: 0.2rem; }
+  .pingo-board { gap: 0.2rem; }
+  .pingo-cell { height: 170px; }
+  .pingo-cell .pinInfo h3 { font-size: 0.68rem; min-height: 4.8em; max-height: 4.8em; }
+  .pingo-cell .set, .pingo-cell .event { display: none; }
+}
+@media (max-height: 650px) {
+  .pingo-caller-display > h1 { font-size: 1.25rem; }
+  .pingo-recent > .pin-sm { height: clamp(40px, 10dvh, 70px); }
+  .pingo-current { grid-template-rows: 1.5rem minmax(0, 1fr) 1.6rem 2.1rem; gap: 0.2rem; }
+  .pingo-current .pingo-next-button { height: 2.1rem; }
+}
