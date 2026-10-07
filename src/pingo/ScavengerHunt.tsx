@@ -93,7 +93,7 @@ function SquareEditor({ blob, onConfirm, busy }: {
     }, 'image/jpeg', 0.85);
   };
 
-  return <Stack spacing={1} alignItems="center">
+  return <Stack spacing={1} sx={{ alignItems: 'center' }}>
     <Typography>Drag the square over the pin. Drag its lower-right corner to expand or shrink it.</Typography>
     <Box ref={frameRef} className="pingo-crop-frame">
       {url && <img ref={imageRef} src={url} alt="Photo to crop" onLoad={event => {
@@ -177,7 +177,7 @@ function LiveCamera({ onCapture }: { onCapture: (blob: Blob, capturedAt: number)
     }, 'image/jpeg', 0.88);
   };
 
-  return <Stack spacing={1} alignItems="center">
+  return <Stack spacing={1} sx={{ alignItems: 'center' }}>
     <video ref={videoRef} className="pingo-camera" autoPlay muted playsInline
       onLoadedMetadata={() => {
         void videoRef.current?.play().catch(() => setError('Camera preview could not start.'));
