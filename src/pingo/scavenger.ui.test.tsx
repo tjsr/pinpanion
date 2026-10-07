@@ -110,11 +110,14 @@ describe('Pingo scavenger hunt board', () => {
     window.localStorage.setItem('pingo:board:ACDE:huntMode', 'true');
     vi.mocked(loadBoardPhotos).mockResolvedValue([{
       key: `ACDE:${pin.id}`, boardCode: 'ACDE', pinId: pin.id,
-      capturedAt: 1_001, blob: new Blob(['photo'], { type: 'image/jpeg' })
+      capturedAt: new Date(2026, 9, 7, 14, 5, 9).getTime(),
+      blob: new Blob(['photo'], { type: 'image/jpeg' })
     }]);
     render(<BoardPage code="ACDE" pins={pins} feed={feed} navigate={vi.fn()}
       onHuntModeChange={vi.fn()} />);
     const photo = await screen.findByRole('button', { name: `${pin.name}, view photo` });
+    await user.hover(photo);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Photo taken at 07/10/2026 14:05:09');
     await user.click(photo);
     const preview = screen.getByRole('dialog', { name: `Photo of ${pin.name}` });
     expect(within(preview).getByRole('img', { name: `Full photo of ${pin.name}` })).toBeInTheDocument();

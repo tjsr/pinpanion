@@ -1,3 +1,5 @@
+import { captureMetadataMatches } from './photoMetadata.ts';
+
 export type CropSquare = { x: number; y: number; size: number };
 
 export type HuntPhoto = {
@@ -6,6 +8,7 @@ export type HuntPhoto = {
   pinId: number;
   capturedAt: number;
   blob: Blob;
+  metadataVersion?: 1;
 };
 
 const DATABASE_NAME = 'pingo-scavenger-hunt';
@@ -68,12 +71,21 @@ function openDatabase(): Promise<IDBDatabase> {
 export async function loadBoardPhotos(boardCode: string): Promise<HuntPhoto[]> {
   const database = await openDatabase();
   try {
-    return await new Promise((resolve, reject) => {
+    const saved = await new Promise<HuntPhoto[]>((resolve, reject) => {
       const request = database.transaction(STORE_NAME, 'readonly')
         .objectStore(STORE_NAME).index('boardCode').getAll(boardCode);
       request.onsuccess = () => resolve(request.result as HuntPhoto[]);
       request.onerror = () => reject(request.error ?? new Error('Saved photos could not be read.'));
     });
+    const checked = await Promise.all(saved.map(async photo => {
+      if (photo.metadataVersion !== 1) return photo;
+      try {
+        return await captureMetadataMatches(photo.blob, photo.capturedAt) ? photo : null;
+      } catch {
+        return null;
+      }
+    }));
+    return checked.filter((photo): photo is HuntPhoto => photo !== null);
   } finally {
     database.close(); 
   }
@@ -81,7 +93,11 @@ export async function loadBoardPhotos(boardCode: string): Promise<HuntPhoto[]> {
 
 export async function saveBoardPhoto(boardCode: string, pinId: number,
   capturedAt: number, blob: Blob): Promise<HuntPhoto> {
-  const photo: HuntPhoto = { blob, boardCode, capturedAt, key: `${boardCode}:${pinId}`, pinId };
+  if (!await captureMetadataMatches(blob, capturedAt)) {
+    throw new Error('The photo timestamp could not be verified. Please retake the photo.');
+  }
+  const photo: HuntPhoto = { blob, boardCode, capturedAt, key: `${boardCode}:${pinId}`,
+    metadataVersion: 1, pinId };
   const database = await openDatabase();
   try {
     await new Promise<void>((resolve, reject) => {

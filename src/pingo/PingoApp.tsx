@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AppBar, Box, Button, Container, Dialog, DialogActions, DialogContent,
-  DialogTitle, Paper, Stack, TextField, Toolbar, Typography
+  DialogTitle, Paper, Stack, TextField, Toolbar, Tooltip, Typography
 } from '@mui/material';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import type { Pin } from '../types.ts';
@@ -14,6 +14,7 @@ import { BOARD_WITH_SETTINGS_LENGTH, DEFAULT_POOL_SIZE, DRAW_INTERVAL_SECONDS,
 import { HuntCaptureDialog, HuntPhotoCard, HuntPhotoPreview } from './ScavengerHunt.tsx';
 import { boardStartedAt, loadBoardPhotos, photoIsValid, saveBoardPhoto } from './scavenger.ts';
 import type { HuntPhoto } from './scavenger.ts';
+import { formatPhotoTakenAt } from './photoMetadata.ts';
 import { drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
 import { adminRequestAvailability, adminRequestWaitMessage,
   recordPingoResponse, reserveAdminRequest, reservePingoPoll,
@@ -170,22 +171,25 @@ function BoardGrid({ board, feed, checked = new Set<number>(), winning = [], onT
     onHuntClick?: (pin: Pin) => void }) {
   const winningCells = new Set(winning.flat());
   return <Box className="pingo-board-scroll"><Box className="pingo-board" aria-label="Pingo board">
-    {board.map((pin, index) => <Box key={`${pin.id}-${index}`}
-      component={onToggle || onHuntClick ? 'button' : 'div'}
-      type={onToggle || onHuntClick ? 'button' : undefined}
-      className={`pingo-cell${onToggle || onHuntClick ? ' interactive' : ''}${checked.has(pin.id) ? ' checked' : ''}${winningCells.has(index) ? ' winner' : ''}`}
-      aria-label={onHuntClick ? `${pin.name}, ${huntPhotos?.has(pin.id) ? 'view photo' : 'take photo'}` :
-        `${pin.name}, ${checked.has(pin.id) ? (onToggle ? 'marked' : 'called') : (onToggle ? 'unmarked' : 'not called')}`}
-      aria-pressed={onToggle ? checked.has(pin.id) : undefined}
-      onClick={onHuntClick ? () => onHuntClick(pin) : onToggle ? () => onToggle(pin.id) : undefined}>
-      <span className="pingo-cell-number">{index + 1}</span>
-      {huntPhotos?.get(pin.id) ? <HuntPhotoCard pin={pin} photo={huntPhotos.get(pin.id)!} /> :
-        <PinCard pin={pin} feed={feed} />}
-      {checked.has(pin.id) && <svg className="pingo-check" viewBox="0 0 100 100"
-        preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path d="M9 10 L91 90 M91 10 L9 90" />
-      </svg>}
-    </Box>)}
+    {board.map((pin, index) => <Tooltip describeChild key={`${pin.id}-${index}`}
+      title={huntPhotos?.get(pin.id) ? formatPhotoTakenAt(huntPhotos.get(pin.id)!.capturedAt) : ''}>
+      <Box
+        component={onToggle || onHuntClick ? 'button' : 'div'}
+        type={onToggle || onHuntClick ? 'button' : undefined}
+        className={`pingo-cell${onToggle || onHuntClick ? ' interactive' : ''}${checked.has(pin.id) ? ' checked' : ''}${winningCells.has(index) ? ' winner' : ''}`}
+        aria-label={onHuntClick ? `${pin.name}, ${huntPhotos?.has(pin.id) ? 'view photo' : 'take photo'}` :
+          `${pin.name}, ${checked.has(pin.id) ? (onToggle ? 'marked' : 'called') : (onToggle ? 'unmarked' : 'not called')}`}
+        aria-pressed={onToggle ? checked.has(pin.id) : undefined}
+        onClick={onHuntClick ? () => onHuntClick(pin) : onToggle ? () => onToggle(pin.id) : undefined}>
+        <span className="pingo-cell-number">{index + 1}</span>
+        {huntPhotos?.get(pin.id) ? <HuntPhotoCard pin={pin} photo={huntPhotos.get(pin.id)!} /> :
+          <PinCard pin={pin} feed={feed} />}
+        {checked.has(pin.id) && <svg className="pingo-check" viewBox="0 0 100 100"
+          preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M9 10 L91 90 M91 10 L9 90" />
+        </svg>}
+      </Box>
+    </Tooltip>)}
   </Box></Box>;
 }
 

@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Tooltip, Typography } from '@mui/material';
 import type { Pin } from '../types.ts';
 import { centeredSquare, moveSquare, resizeSquare } from './scavenger.ts';
 import type { CropSquare, HuntPhoto } from './scavenger.ts';
+import { addCaptureMetadata, captureMetadataMatches, formatPhotoTakenAt } from './photoMetadata.ts';
 
 function usePhotoUrl(blob: Blob): string {
   const [url, setUrl] = useState('');
@@ -24,8 +25,9 @@ export function HuntPhotoCard({ pin, photo }: { pin: Pin; photo: HuntPhoto }) {
 
 export function HuntPhotoPreview({ pin, photo }: { pin: Pin; photo: HuntPhoto }) {
   const url = usePhotoUrl(photo.blob);
-  return url ? <img className="pingo-hunt-preview-image" src={url}
-    alt={`Full photo of ${pin.name}`} /> : null;
+  return url ? <Tooltip describeChild title={formatPhotoTakenAt(photo.capturedAt)}>
+    <img className="pingo-hunt-preview-image" src={url} alt={`Full photo of ${pin.name}`} />
+  </Tooltip> : null;
 }
 
 type Drag = { mode: 'move' | 'resize'; x: number; y: number; square: CropSquare };
@@ -156,7 +158,11 @@ function LiveCamera({ onCapture }: { onCapture: (blob: Blob, capturedAt: number)
 
   const takePhoto = () => {
     const video = videoRef.current;
-    if (!video?.videoWidth || !video.videoHeight) return;
+    if (!video?.videoWidth || !video.videoHeight ||
+        !(video.srcObject as MediaStream | null)?.getVideoTracks().some(track => track.readyState === 'live')) {
+      setError('The camera is no longer live. Please reopen it and try again.');
+      return;
+    }
     const scale = Math.min(1, 1600 / Math.max(video.videoWidth, video.videoHeight));
     const canvas = document.createElement('canvas');
     canvas.width = Math.round(video.videoWidth * scale);
@@ -196,7 +202,14 @@ export function HuntCaptureDialog({ pin, startedAt, onClose, onSave }: {
       return;
     }
     setBusy(true);
-    try { await onSave(blob, capture.capturedAt); onClose(); }
+    try {
+      const datedPhoto = await addCaptureMetadata(blob, capture.capturedAt);
+      if (!await captureMetadataMatches(datedPhoto, capture.capturedAt)) {
+        throw new Error('The photo timestamp could not be verified. Please retake the photo.');
+      }
+      await onSave(datedPhoto, capture.capturedAt);
+      onClose();
+    }
     catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Photo could not be saved.');
       setBusy(false);
