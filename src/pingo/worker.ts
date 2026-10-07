@@ -1,5 +1,5 @@
 import { CODE_PATTERN, makeCode } from '../guess/game.ts';
-import { boardPins, DRAW_BATCH_SIZE, DRAW_INTERVAL_SECONDS, scheduledCount, usablePinsFrom, winningLines } from './game.ts';
+import { DRAW_BATCH_SIZE, DRAW_INTERVAL_SECONDS, boardPins, scheduledCount, usablePinsFrom, winningLines } from './game.ts';
 import {
   createTimedGameCode, drawIds, passwordMatches, pinCountSignatureIsValid,
   signPinCount, verifiedGameDetails, verifiedGameStart
@@ -22,7 +22,7 @@ interface Env {
 type JsonObject = Record<string, unknown>;
 
 function json(value: JsonObject, status = 200): Response {
-  return Response.json(value, { status, headers: { 'Cache-Control': 'no-store' } });
+  return Response.json(value, { headers: { 'Cache-Control': 'no-store' }, status });
 }
 
 async function limitedJson(request: Request): Promise<JsonObject> {
@@ -33,7 +33,7 @@ async function limitedJson(request: Request): Promise<JsonObject> {
   const parts: Uint8Array[] = [];
   let length = 0;
   try {
-    while (true) {
+    for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
       length += value.length;
@@ -45,7 +45,9 @@ async function limitedJson(request: Request): Promise<JsonObject> {
   }
   const bytes = new Uint8Array(length);
   let offset = 0;
-  for (const part of parts) { bytes.set(part, offset); offset += part.length; }
+  for (const part of parts) {
+    bytes.set(part, offset); offset += part.length; 
+  }
   const parsed: unknown = JSON.parse(new TextDecoder().decode(bytes));
   if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) throw new Error('Invalid JSON body.');
   return parsed as JsonObject;
@@ -75,8 +77,11 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
   }
   if (request.method !== 'PUT') return json({ error: 'GET or PUT required.' }, 405);
   let body: JsonObject;
-  try { body = await limitedJson(request); }
-  catch { return json({ error: 'Invalid request.' }, 400); }
+  try {
+    body = await limitedJson(request); 
+  } catch {
+    return json({ error: 'Invalid request.' }, 400); 
+  }
   const boardId = body.boardId;
   const gameCode = body.gameCode;
   const registrationId = body.registrationId;
@@ -85,7 +90,7 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
     typeof gameCode !== 'string' || verifiedGameStart(gameCode) === null ||
     verifiedGameStart(gameCode)! > Date.now() + 60_000 ||
     typeof registrationId !== 'string' || !/^[0-9a-f]{32}$/i.test(registrationId) ||
-    !playerName || playerName.length > 80 || /[\x00-\x1f\x7f]/.test(playerName)) {
+    !playerName || playerName.length > 80 || /\p{Cc}/u.test(playerName)) {
     return json({ error: 'Invalid player details.' }, 400);
   }
   const updatedAt = Date.now();
@@ -98,7 +103,7 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
 
 export function localDayFor(timestamp: number, timeZone: string): string {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone, year: 'numeric', month: '2-digit', day: '2-digit'
+    day: '2-digit', month: '2-digit', timeZone, year: 'numeric',
   }).formatToParts(new Date(timestamp));
   const part = (name: string) => parts.find(value => value.type === name)?.value;
   return `${part('year')}-${part('month')}-${part('day')}`;
@@ -108,8 +113,11 @@ async function scavengerRequest(request: Request, env: Env): Promise<Response> {
   if (request.method !== 'POST') return json({ error: 'POST required.' }, 405);
   if (!env.PINGO_PLAYERS) return json({ error: 'Scavenger storage is not configured.' }, 503);
   let body: JsonObject;
-  try { body = await limitedJson(request); }
-  catch { return json({ error: 'Invalid request.' }, 400); }
+  try {
+    body = await limitedJson(request); 
+  } catch {
+    return json({ error: 'Invalid request.' }, 400); 
+  }
   const gameCode = body.gameCode;
   const deviceId = body.deviceId;
   const nickname = typeof body.nickname === 'string' ? body.nickname.trim() : '';
@@ -117,12 +125,15 @@ async function scavengerRequest(request: Request, env: Env): Promise<Response> {
   if (typeof gameCode !== 'string' || verifiedGameStart(gameCode) === null ||
     verifiedGameStart(gameCode)! > Date.now() + 60_000 ||
     typeof deviceId !== 'string' || !/^[0-9a-f]{32}$/i.test(deviceId) ||
-    !nickname || nickname.length > 80 || /[\x00-\x1f\x7f]/.test(nickname) ||
+    !nickname || nickname.length > 80 || /\p{Cc}/u.test(nickname) ||
     typeof timeZone !== 'string' || timeZone.length > 64) {
     return json({ error: 'Invalid scavenger details.' }, 400);
   }
-  try { localDayFor(Date.now(), timeZone); }
-  catch { return json({ error: 'Invalid time zone.' }, 400); }
+  try {
+    localDayFor(Date.now(), timeZone); 
+  } catch {
+    return json({ error: 'Invalid time zone.' }, 400); 
+  }
 
   const database = env.PINGO_PLAYERS;
   await database.prepare(
@@ -156,8 +167,11 @@ async function scavengerRequest(request: Request, env: Env): Promise<Response> {
 async function adminRequest(request: Request, env: Env): Promise<Response> {
   if (request.method !== 'POST') return json({ error: 'POST required.' }, 405);
   let body: JsonObject;
-  try { body = await limitedJson(request); }
-  catch { return json({ error: 'Invalid request.' }, 400); }
+  try {
+    body = await limitedJson(request); 
+  } catch {
+    return json({ error: 'Invalid request.' }, 400); 
+  }
   if (typeof body.password !== 'string' ||
     !await passwordMatches(env.PINGO_ADMIN_PASSWORD!, body.password)) {
     return json({ error: 'Incorrect admin password.' }, 401);
@@ -186,7 +200,7 @@ async function adminRequest(request: Request, env: Env): Promise<Response> {
     Math.max(DRAW_BATCH_SIZE, Math.ceil((count + 1) / DRAW_BATCH_SIZE) * DRAW_BATCH_SIZE));
   const ids = await drawIds(env.PINGO_SIGNING_SECRET!, startMs, pins.map(pin => pin.id), limit);
   const sig = await signPinCount(env.PINGO_SIGNING_SECRET!, body.game, count, at);
-  return json({ game: body.game, startMs, intervalMs, pin: count, at, sig, ids });
+  return json({ at, game: body.game, ids, intervalMs, pin: count, sig, startMs });
 }
 
 async function verifyRequest(request: Request, env: Env): Promise<Response> {
@@ -218,10 +232,9 @@ async function verifyRequest(request: Request, env: Env): Promise<Response> {
   const boardIds = boardPins(board, pins).map(pin => pin.id);
   const called = new Set(ids);
   return json({
-    game, board, count, intervalMs,
+    board, checkedAt: Date.now(), count, game, intervalMs,
     matchedIds: boardIds.filter(id => called.has(id)),
     winningLines: winningLines(boardIds, called),
-    checkedAt: Date.now()
   });
 }
 
@@ -230,8 +243,9 @@ export default {
     const url = new URL(request.url);
     if (url.pathname === '/player' || url.pathname.startsWith('/api/pingo/')) {
       if (url.pathname === '/player') {
-        try { return await playerRequest(request, env); }
-        catch (error) {
+        try {
+          return await playerRequest(request, env); 
+        } catch (error) {
           console.error(JSON.stringify({ event: 'pingo_player_error', message: error instanceof Error ? error.message : 'Unknown error' }));
           return json({ error: 'Player request failed.' }, 500);
         }
@@ -247,13 +261,13 @@ export default {
         if (url.pathname === '/api/pingo/verify') return await verifyRequest(request, env);
         return json({ error: 'Unknown endpoint.' }, 404);
       } catch (error) {
-        console.error(JSON.stringify({ event: 'pingo_api_error', path: url.pathname,
-          message: error instanceof Error ? error.message : 'Unknown error' }));
+        console.error(JSON.stringify({ event: 'pingo_api_error',
+          message: error instanceof Error ? error.message : 'Unknown error', path: url.pathname }));
         return json({ error: 'Pingo request failed.' }, 500);
       }
     }
     if (request.method !== 'GET' && request.method !== 'HEAD') return new Response('Method not allowed.', { status: 405 });
     if (url.pathname === '/pins.json' || url.pathname.startsWith('/assets/')) return env.ASSETS.fetch(request);
     return env.ASSETS.fetch(new Request(new URL('/shell', request.url), request));
-  }
+  },
 };

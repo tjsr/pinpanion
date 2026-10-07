@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
 import { centeredSquare, moveSquare, photoIsValid, resizeSquare } from './scavenger.ts';
+import { describe, expect, it } from 'vitest';
 
 describe('Pingo scavenger hunt photos', () => {
   it('accepts photos captured at or after the board was opened', () => {

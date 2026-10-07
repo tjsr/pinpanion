@@ -30,7 +30,7 @@ export function photoIsValid(photo: Pick<HuntPhoto, 'capturedAt'>, startedAt: nu
 
 export function centeredSquare(width: number, height: number): CropSquare {
   const size = Math.min(width, height) * 0.65;
-  return { x: (width - size) / 2, y: (height - size) / 2, size };
+  return { size, x: (width - size) / 2, y: (height - size) / 2 };
 }
 
 export function moveSquare(square: CropSquare, dx: number, dy: number,
@@ -38,7 +38,7 @@ export function moveSquare(square: CropSquare, dx: number, dy: number,
   return {
     ...square,
     x: Math.max(0, Math.min(width - square.size, square.x + dx)),
-    y: Math.max(0, Math.min(height - square.size, square.y + dy))
+    y: Math.max(0, Math.min(height - square.size, square.y + dy)),
   };
 }
 
@@ -74,12 +74,14 @@ export async function loadBoardPhotos(boardCode: string): Promise<HuntPhoto[]> {
       request.onsuccess = () => resolve(request.result as HuntPhoto[]);
       request.onerror = () => reject(request.error ?? new Error('Saved photos could not be read.'));
     });
-  } finally { database.close(); }
+  } finally {
+    database.close(); 
+  }
 }
 
 export async function saveBoardPhoto(boardCode: string, pinId: number,
   capturedAt: number, blob: Blob): Promise<HuntPhoto> {
-  const photo: HuntPhoto = { key: `${boardCode}:${pinId}`, boardCode, pinId, capturedAt, blob };
+  const photo: HuntPhoto = { blob, boardCode, capturedAt, key: `${boardCode}:${pinId}`, pinId };
   const database = await openDatabase();
   try {
     await new Promise<void>((resolve, reject) => {
@@ -90,5 +92,7 @@ export async function saveBoardPhoto(boardCode: string, pinId: number,
       transaction.onabort = () => reject(transaction.error ?? new Error('Photo could not be saved.'));
     });
     return photo;
-  } finally { database.close(); }
+  } finally {
+    database.close(); 
+  }
 }
