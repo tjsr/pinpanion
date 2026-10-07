@@ -459,7 +459,8 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
         <TextField label="Game code" value={gameEntry}
           onChange={event => { if (!isNewGameCode(initialGame ?? '')) { setGameEntry(event.target.value.toUpperCase()); setPlayerEdited(true); } }}
-          inputProps={{ maxLength: MAX_GAME_CODE_LENGTH, readOnly: isNewGameCode(initialGame ?? '') }}
+          slotProps={{ htmlInput: { maxLength: MAX_GAME_CODE_LENGTH,
+            readOnly: isNewGameCode(initialGame ?? '') } }}
           size="small" sx={{ width: { xs: '100%', sm: 190 }, flexShrink: 0 }}
           helperText={isNewGameCode(initialGame ?? '') ? 'This board belongs to this game.' : "Enter the caller's game code."} />
         <TextField label="Player name" value={playerName}
