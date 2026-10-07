@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import Select, { type SelectChangeEvent } from '@mui/material/Select';
 
 import FormControl from '@mui/material/FormControl';
@@ -21,9 +22,10 @@ export const PinSetSelector = ({
 }: PinSetSelectorProps): JSX.Element => {
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={id}>Filter by Set</InputLabel>
+      <InputLabel id={`${id}-label`}>Filter by Set</InputLabel>
       <Select
         id={id}
+        labelId={`${id}-label`}
         label="Filter by Set"
         value={selectedSet !== undefined ? selectedSet.toString() : ''}
         onChange={(event: SelectChangeEvent) => {

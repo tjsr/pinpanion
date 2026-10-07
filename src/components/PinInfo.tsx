@@ -1,3 +1,6 @@
+import type { JSX } from 'react';
+// CSS is processed by the bundler; TypeScript does not have a declaration for it.
+// @ts-ignore
 import '../css/pincolours.css';
 
 import type { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinSet, SizesType } from '../types.ts';
@@ -45,8 +48,12 @@ export const PinInfo = ({
       <div className={pinClasses} id={htmlId || `pin_${pin.id}`} style={style}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
-          <PinSash pin={pin} sets={pinSets} groups={groups} events={events} paxs={paxs} categories={categories}/>
-          { url && <img className="pinImage" alt={pin.name} src={url} />}
+          <div className="pinSash">
+            <PinSash pin={pin} sets={pinSets} groups={groups} events={events} paxs={paxs} categories={categories}/>
+          </div>
+          <div className="pinImageContainer">
+            {url && <img className="pinImage" alt={pin.name} src={url} />}
+          </div>
         </div>
         {children}
       </div>

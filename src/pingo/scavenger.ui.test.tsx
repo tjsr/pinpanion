@@ -117,8 +117,8 @@ describe('Pingo scavenger hunt board', () => {
     await user.click(photo);
     const preview = screen.getByRole('dialog', { name: `Photo of ${pin.name}` });
     expect(within(preview).getByRole('img', { name: `Full photo of ${pin.name}` })).toBeInTheDocument();
-    expect(within(preview).getByRole('button', { name: 'OK' })).toHaveClass('MuiButton-containedPrimary');
-    expect(within(preview).getByRole('button', { name: 'Cancel' })).toHaveClass('MuiButton-outlinedSecondary');
+    expect(within(preview).getByRole('button', { name: 'OK' })).toHaveClass('MuiButton-contained', 'MuiButton-colorPrimary');
+    expect(within(preview).getByRole('button', { name: 'Cancel' })).toHaveClass('MuiButton-outlined', 'MuiButton-colorSecondary');
     await user.click(within(preview).getByRole('button', { name: 'Cancel' }));
     expect(screen.queryByText(`Camera for ${pin.name}`)).not.toBeInTheDocument();
     await user.click(photo);

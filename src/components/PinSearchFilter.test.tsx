@@ -10,7 +10,6 @@ import {
 import type { Pin, PinListFilter } from '../types.ts';
 import { PinSearchFilterDisplay, isPaxEventType, isPinFiltered } from './PinSearchFilter.js';
 
-import type { Container } from 'react-dom';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import pindata from '../../test/pinpanion-pin-data.json';
 import userEvent from '@testing-library/user-event';
@@ -19,7 +18,7 @@ describe('PinsSearchFilter', () => {
   const data = pindata as PinCollectionData;
 
   const selectPaxEventFromFilter = async (paxEventSearch: RegExp | string, paxEventId: number): Promise<{
-    container: Container,
+    container: HTMLElement,
     findByRole: (
       role: ByRoleMatcher, options?: ByRoleOptions | undefined, waitForElementOptions?: waitForOptions | undefined
     ) => Promise<HTMLElement>

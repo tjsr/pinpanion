@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import './css/App.css';
 import './css/pins.css';
 

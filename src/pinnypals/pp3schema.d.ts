@@ -430,7 +430,15 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description A pin category */
+        /**
+         * @description A pin category
+         * @example {
+         *       "id": 1,
+         *       "type": "COMPANY",
+         *       "name": "Penny Arcade",
+         *       "slug": "penny-arcade"
+         *     }
+         */
         CategoryDto: {
             /** @description The category id */
             id: number;
@@ -446,7 +454,27 @@ export interface components {
             /** @description The category's unique url slug */
             slug: string;
         };
-        /** @description An event (e.g. a PAX) */
+        /**
+         * @description An event (e.g. a PAX)
+         * @example {
+         *       "id": 1,
+         *       "name": "PAX Prime 2013",
+         *       "type": "PAX",
+         *       "subType": "PAX_WEST",
+         *       "colour": "#007dbb",
+         *       "year": 2013,
+         *       "startDate": "2013-08-30",
+         *       "endDate": "2013-09-02",
+         *       "timeZone": "America/Los_Angeles",
+         *       "startTime": "10:00:00",
+         *       "endTime": "23:59:59",
+         *       "images": [],
+         *       "slug": "pax-prime-2013",
+         *       "startTimestamp": 1377882000000,
+         *       "endTimestamp": 1378191599000,
+         *       "eventInfo": []
+         *     }
+         */
         EventDto: {
             /** @description The event id */
             id: number;
@@ -487,7 +515,23 @@ export interface components {
             /** @description Array of event infos */
             eventInfo: components["schemas"]["EventInfoDto"][];
         };
-        /** @description An event summary */
+        /**
+         * @description An event summary
+         * @example {
+         *       "id": 1,
+         *       "name": "PAX Prime 2013",
+         *       "type": "PAX",
+         *       "subType": "PAX_WEST",
+         *       "colour": "#007dbb",
+         *       "year": 2013,
+         *       "startDate": "2013-08-30",
+         *       "endDate": "2013-09-02",
+         *       "slug": "pax-prime-2013",
+         *       "startTimestamp": 1377882000000,
+         *       "endTimestamp": 1378191599000,
+         *       "eventInfo": []
+         *     }
+         */
         EventSummaryDto: {
             /** @description The event id */
             id: number;
@@ -522,7 +566,14 @@ export interface components {
             /** @description Array of event infos */
             eventInfo: components["schemas"]["EventInfoDto"][];
         };
-        /** @description Additional info for an event */
+        /**
+         * @description Additional info for an event
+         * @example {
+         *       "name": "Pin Quest",
+         *       "url": "https://example.com/",
+         *       "children": []
+         *     }
+         */
         EventInfoDto: {
             /** @description The info text */
             name: string;
@@ -573,12 +624,27 @@ export interface components {
             /** @description The link url */
             url: string;
         };
-        /** @description A pin */
+        /**
+         * @description A pin
+         * @example {
+         *       "id": 1,
+         *       "name": "Flesh Reaper",
+         *       "slug": "flesh-reaper",
+         *       "year": 2013,
+         *       "variantYears": [
+         *         2012
+         *       ],
+         *       "setId": 1,
+         *       "links": []
+         *     }
+         */
         PinDto: {
             /** @description The pin id */
             id: number;
             /** @description The pin name */
             name: string;
+            /** @description The immutable, unique slug for the pin */
+            slug: string;
             /** @description The "main" year stamp for the pin */
             year: number;
             /** @description Any notes for the pin */
@@ -606,12 +672,28 @@ export interface components {
         };
         /** @description Array of PinDto */
         PinDtoArray: components["schemas"]["PinDto"][];
-        /** @description A pin */
+        /**
+         * @description A pin
+         * @example {
+         *       "id": 1,
+         *       "name": "Flesh Reaper",
+         *       "slug": "flesh-reaper",
+         *       "year": 2013,
+         *       "variantYears": [
+         *         2012
+         *       ],
+         *       "setId": 1,
+         *       "imageUrl": "https://d3smst7texv2dk.cloudfront.net/pins/2013-pax-core-flesh-reaper.webp",
+         *       "links": []
+         *     }
+         */
         PinSummaryDto: {
             /** @description The pin id */
             id: number;
             /** @description The pin name */
             name: string;
+            /** @description The immutable, unique slug for the pin */
+            slug: string;
             /** @description The "main" year stamp for the pin */
             year: number;
             /** @description Any notes for the pin */
@@ -637,12 +719,23 @@ export interface components {
             /** @description Any links for the pin */
             links: components["schemas"]["ItemLinkDto"][];
         };
-        /** @description A pin group */
+        /**
+         * @description A pin group
+         * @example {
+         *       "id": 9,
+         *       "name": "Staff Heads",
+         *       "slug": "staff-heads",
+         *       "type": "STAFF",
+         *       "images": []
+         *     }
+         */
         PinGroupDto: {
             /** @description The pin group id */
             id: number;
             /** @description The pin group name */
             name: string;
+            /** @description The immutable, unique slug for the pin group */
+            slug: string;
             /** @description Any notes for the pin group */
             notes?: string;
             /**
@@ -655,12 +748,22 @@ export interface components {
         };
         /** @description Array of PinGroupDto */
         PinGroupDtoArray: components["schemas"]["PinGroupDto"][];
-        /** @description A pin group */
+        /**
+         * @description A pin group
+         * @example {
+         *       "id": 9,
+         *       "name": "Staff Heads",
+         *       "slug": "staff-heads",
+         *       "type": "STAFF"
+         *     }
+         */
         PinGroupSummaryDto: {
             /** @description The pin group id */
             id: number;
             /** @description The pin group name */
             name: string;
+            /** @description The immutable, unique slug for the pin group */
+            slug: string;
             /** @description Any notes for the pin group */
             notes?: string;
             /**
@@ -671,12 +774,38 @@ export interface components {
             /** @description The primary image url for the pin group */
             imageUrl?: string;
         };
-        /** @description A set */
+        /**
+         * @description A set
+         * @example {
+         *       "id": 1,
+         *       "name": "Core",
+         *       "slug": "core",
+         *       "images": [
+         *         {
+         *           "id": 1506,
+         *           "primary": true,
+         *           "versions": [
+         *             {
+         *               "id": 1506,
+         *               "width": 410,
+         *               "height": 410,
+         *               "mimeType": "image/webp",
+         *               "versionType": "FULL",
+         *               "url": "https://d3as7he2eybtni.cloudfront.net/sets/2013-core_410.webp"
+         *             }
+         *           ]
+         *         }
+         *       ],
+         *       "links": []
+         *     }
+         */
         SetDto: {
             /** @description The set id */
             id: number;
             /** @description The set name */
             name: string;
+            /** @description The immutable, unique slug for the set */
+            slug: string;
             /** @description Any notes for the set */
             notes?: string;
             /** @description Images of the set */
@@ -686,12 +815,23 @@ export interface components {
         };
         /** @description Array of SetDto */
         SetDtoArray: components["schemas"]["SetDto"][];
-        /** @description A set */
+        /**
+         * @description A set
+         * @example {
+         *       "id": 1,
+         *       "name": "Core",
+         *       "slug": "core",
+         *       "imageUrl": "https://d3as7he2eybtni.cloudfront.net/sets/2013-core_410.webp",
+         *       "links": []
+         *     }
+         */
         SetSummaryDto: {
             /** @description The set id */
             id: number;
             /** @description The set name */
             name: string;
+            /** @description The immutable, unique slug for the set */
+            slug: string;
             /** @description Any notes for the set */
             notes?: string;
             /** @description The primary image url for the set */

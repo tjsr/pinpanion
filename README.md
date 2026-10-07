@@ -8,9 +8,9 @@ More broadly though it's intended to help facilitate social interactions.  Futur
 
 ## Running the app
 
-First, `npm install`.  You'll need node 18.19.1 or node 20.  Currently this is unspecific but I'll tighten up the restrictions some time soon.
+First, `npm install`. You will need Node.js 22.18 or later and npm 11.5 or later.
 
-You'll need assets pin data and image assets to run the app - `npm run build` will pull down the latest data from pinnypals and store it cached locally.
+You'll need pin data and image assets to run the app. `npm run build` retrieves the latest data from Pinnypals and stores the generated assets locally before building the site.
 
 In the project directory, you can run:
 
@@ -18,6 +18,47 @@ In the project directory, you can run:
 
 Runs the app in the development mode.\
 Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+
+## Deployment
+
+Pinpanion is deployed as a static site with AWS Amplify. Connect Amplify to the repository and use the committed [`amplify.yml`](amplify.yml) build specification. Configure an `IMAGES_CACHE_DIR` environment variable in the Amplify app (for example, `images`) so image downloads have a writable cache directory.
+
+On each deployment, Amplify runs the following workflow:
+
+1. Installs the locked dependencies with `npm ci`.
+2. Runs `npm run download -- $IMAGES_CACHE_DIR` to refresh the pin database and image cache.
+3. Runs the test suite, copies the cached images into `public/imgs`, and runs the production build.
+4. Uploads the resulting `build/` directory as the Amplify deployment artifact. The same directory is configured as the artifact source in `amplify.yml`.
+
+The build requires outbound access to the Pinnypals API and image CDN. A failed download or test fails the deployment, preventing an incomplete asset set from being published.
+
+### Refreshing and publishing pin data locally
+
+To make a release outside Amplify, run:
+
+```sh
+npm ci
+npm run build
+```
+
+Upload the contents of `build/` to any static hosting provider. Do not upload `public/` directly: Vite produces the deployable, optimized site in `build/`.
+
+## Pin database and image refresh
+
+The refresh script, `src/utils/pindownload.ts`, is invoked by `npm run download` and as part of `npm run build`. It does the following:
+
+- Fetches the current item-data response from the Pinnypals v3 API (`https://api.pinnypals.com/api/item-data`).
+- Saves the unmodified upstream response to `public/pinnypalpins.json` for troubleshooting and converts it to Pinpanion's browser data format at `public/pins.json`.
+- Downloads every referenced pin image to the requested cache directory. It first attempts Pinpanion's image host, then falls back to the Pinnypals CDN when an image is unavailable there.
+- Reuses files already present in the image cache, then copies that cache into `public/imgs` for inclusion in the final build.
+
+At runtime the app loads the deployed `pins.json` from the same static site. It does not query Pinnypals from the browser, so visitors get the consistent, offline-capable database that was bundled into the deployed build. Run a new deployment whenever the database needs updating.
+
+Useful refresh options:
+
+- `IMAGE_DOWNLOAD_CONCURRENCY=<number>` caps parallel image downloads; without it, downloads are unrestricted.
+- `SKIP_ALL_IMAGES=true` refreshes JSON data without downloading images. This is useful only for data-focused development or tests, not a complete production deployment.
+- `PINNYPALS_VERSION` selects an upstream format; the production default is v3.
 
 ## Contact
 
@@ -38,7 +79,6 @@ Want to make a donation?  Maybe just find me at PAX and donate a fodder pin.
 ## Contributing
 
 This project is intended that if you're a pin community member you can contribute to the development if you wish.  In particular, junior developers are encouraged to get involved, using this as a good project to help learn and prove skills in a project you can actually point to for a resume, while having PRs supervised by other experienced developers.  PRs are welcome.
-
 ## Guess Who game
 
 Guess Who is a separate static Pages target in this repository. Its entry point is `guess/index.html`, the game code is in `src/guess`, and `vite.guess.config.ts` builds to `build/guess`. It uses the shared PinInfo component, pin CSS, and Material UI controls already used by the main app. Gameplay stays in browser memory; refreshing starts again.

@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "PinnyPals API",
-    "version": "1.1.3",
+    "version": "1.3.0",
     "description": "This documents the API endpoints available for use on the PinnyPals\n          website. This API is likely to change over time, possibly without any\n          prior notice. Any use of this API is at your own risk and results are\n          not guaranteed!"
   },
   "servers": [
@@ -465,6 +465,10 @@
             "type": "string",
             "description": "The pin name"
           },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the pin"
+          },
           "year": {
             "type": "integer",
             "description": "The \"main\" year stamp for the pin"
@@ -529,6 +533,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "year",
           "variantYears",
           "categoryIds",
@@ -540,6 +545,7 @@
           {
             "id": 1,
             "name": "Flesh Reaper",
+            "slug": "flesh-reaper",
             "year": 2013,
             "variantYears": [
               2012
@@ -566,6 +572,10 @@
           "name": {
             "type": "string",
             "description": "The pin name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the pin"
           },
           "year": {
             "type": "integer",
@@ -628,6 +638,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "year",
           "variantYears",
           "categoryIds",
@@ -638,6 +649,7 @@
           {
             "id": 1,
             "name": "Flesh Reaper",
+            "slug": "flesh-reaper",
             "year": 2013,
             "variantYears": [
               2012
@@ -658,6 +670,10 @@
           "name": {
             "type": "string",
             "description": "The pin group name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the pin group"
           },
           "notes": {
             "type": "string",
@@ -683,6 +699,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "type",
           "images"
         ],
@@ -691,6 +708,7 @@
           {
             "id": 9,
             "name": "Staff Heads",
+            "slug": "staff-heads",
             "type": "STAFF",
             "images": []
           }
@@ -714,6 +732,10 @@
             "type": "string",
             "description": "The pin group name"
           },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the pin group"
+          },
           "notes": {
             "type": "string",
             "description": "Any notes for the pin group"
@@ -735,6 +757,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "type"
         ],
         "description": "A pin group",
@@ -742,6 +765,7 @@
           {
             "id": 9,
             "name": "Staff Heads",
+            "slug": "staff-heads",
             "type": "STAFF"
           }
         ]
@@ -756,6 +780,10 @@
           "name": {
             "type": "string",
             "description": "The set name"
+          },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the set"
           },
           "notes": {
             "type": "string",
@@ -779,6 +807,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "images",
           "links"
         ],
@@ -787,6 +816,7 @@
           {
             "id": 1,
             "name": "Core",
+            "slug": "core",
             "images": [
               {
                 "id": 1506,
@@ -825,6 +855,10 @@
             "type": "string",
             "description": "The set name"
           },
+          "slug": {
+            "type": "string",
+            "description": "The immutable, unique slug for the set"
+          },
           "notes": {
             "type": "string",
             "description": "Any notes for the set"
@@ -844,6 +878,7 @@
         "required": [
           "id",
           "name",
+          "slug",
           "links"
         ],
         "description": "A set",
@@ -851,6 +886,7 @@
           {
             "id": 1,
             "name": "Core",
+            "slug": "core",
             "imageUrl": "https://d3as7he2eybtni.cloudfront.net/sets/2013-core_410.webp",
             "links": []
           }
