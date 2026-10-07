@@ -7,22 +7,40 @@ import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import type { Pin } from '../types.ts';
 import { PinInfo } from '../components/PinInfo.tsx';
 import QRCode from 'react-qr-code';
-import { CODE_ALPHABET, CODE_PATTERN, makeCode, normalizeCode } from '../guess/game.ts';
-import { boardCodeFromTimestamp, boardPins, DRAW_INTERVAL_SECONDS, drawIntervalFromGameCode, GAME_CODE_LENGTH, GAME_TIME_CHARS, MAX_GAME_CODE_LENGTH, PREVIOUS_TIMED_GAME_CODE_LENGTH, timestampFromGameCode, usablePinsFrom } from './game.ts';
+import { makeCode, normalizeCode } from '../guess/game.ts';
+import { BOARD_WITH_SETTINGS_LENGTH, DEFAULT_POOL_SIZE, DRAW_INTERVAL_SECONDS,
+  MAX_GAME_CODE_LENGTH, boardPins, drawIntervalFromGameCode, gameDetailsFromCode,
+  isBoardCodeForGame, isNewGameCode, timestampFromGameCode, usablePinsFrom } from './game.ts';
 import { HuntCaptureDialog, HuntPhotoCard, HuntPhotoPreview } from './ScavengerHunt.tsx';
 import { boardStartedAt, loadBoardPhotos, photoIsValid, saveBoardPhoto } from './scavenger.ts';
 import type { HuntPhoto } from './scavenger.ts';
+import { drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
+import { adminRequestAvailability, adminRequestWaitMessage,
+  recordPingoResponse, reserveAdminRequest, reservePingoPoll,
+  reserveRolloverRequest } from './adminRequestGuard.ts';
 
-type Route = { kind: 'board'; board: string; game?: string; assignedHunt?: boolean } |
+type Route = { kind: 'home' } |
+  { kind: 'join'; game: string } |
+  { kind: 'board'; board: string; game: string; assignedHunt?: boolean } |
   { kind: 'scavenger'; game: string } |
   { kind: 'verify'; game: string; board: string } |
   { kind: 'caller' | 'admin'; game: string } |
   { kind: 'invalid' };
 
 type AdminData = {
-  game: string; startMs: number; pin: number; at: number; sig: string; ids: number[];
+  game: string; startMs: number; pin: number; at: number; sig: string; ids: number[]; poolSize: number;
+  drawKeys: string[]; signingKey: string;
 };
 type CallerSnapshot = Pick<AdminData, 'game' | 'pin' | 'at'>;
+
+function dueDraw(data: AdminData, now: number, availablePins: number): { pin: number; at: number } | null {
+  const interval = drawIntervalFromGameCode(data.game);
+  const missed = Math.floor((now - data.at) / interval);
+  const remaining = (data.poolSize ?? availablePins) - data.pin;
+  if (missed < 1 || remaining < 1) return null;
+  const advance = Math.min(missed, remaining);
+  return { pin: data.pin + advance, at: data.at + advance * interval };
+}
 
 type Verification = {
   count: number; matchedIds: number[]; winningLines: number[][]; checkedAt: number;
@@ -30,13 +48,16 @@ type Verification = {
 
 type PlayerRecord = { registrationId: string; boardId: string; gameCode: string; playerName: string; updatedAt: number };
 
-const ADMIN_SESSION_KEY = 'pingo:admin:password';
+const ADMIN_SESSION_KEY = 'pingo:admin:password:';
+const adminPasswordMemory = new Map<string, string>();
+const LEGACY_ADMIN_SESSION_KEY = 'pingo:admin:password';
 const STARTED_GAMES_KEY = 'pingo:admin:startedGames';
 const SCAVENGER_DEVICE_KEY = 'pingo:scavenger:deviceId';
 
 function validGameCode(code: unknown): code is string {
-  return typeof code === 'string' && [GAME_CODE_LENGTH, GAME_TIME_CHARS, PREVIOUS_TIMED_GAME_CODE_LENGTH].includes(code.length) &&
-    [...code].every(letter => CODE_ALPHABET.includes(letter));
+  if (typeof code !== 'string') return false;
+  try { gameDetailsFromCode(code); return true; }
+  catch { return false; }
 }
 
 function startedGamesFromStorage(): string[] {
@@ -46,8 +67,10 @@ function startedGamesFromStorage(): string[] {
   } catch { return []; }
 }
 
-function rememberedAdminPassword(): string {
-  try { return window.sessionStorage.getItem(ADMIN_SESSION_KEY) ?? ''; }
+function rememberedAdminPassword(game: string): string {
+  if (adminPasswordMemory.has(game)) return adminPasswordMemory.get(game)!;
+  try { return game ? window.sessionStorage.getItem(isNewGameCode(game) ?
+    `${ADMIN_SESSION_KEY}${game}` : LEGACY_ADMIN_SESSION_KEY) ?? '' : ''; }
   catch { return ''; }
 }
 
@@ -78,13 +101,15 @@ export function routeFromLocation(): Route {
   const joinedGame = requestedGame === null ? undefined : normalizeCode(requestedGame);
   if (joinedGame && gameStartFromCode(joinedGame) === null) return { kind: 'invalid' };
   if (parts.length === 0) {
-    const board = joinedGame ? boardCodeFromTimestamp(Date.now()) : makeCode();
-    window.history.replaceState(null, '', `/${board}${joinedGame ? `?game=${joinedGame}` : ''}`);
-    return { kind: 'board', board, game: joinedGame };
+    return joinedGame ? { kind: 'join', game: joinedGame } : { kind: 'home' };
   }
-  if (parts.length === 1 && CODE_PATTERN.test(parts[0])) return {
-    kind: 'board', board: parts[0], game: joinedGame, ...(assignedHunt ? { assignedHunt: true } : {})
-  };
+  if (parts.length === 1 && joinedGame && isBoardCodeForGame(parts[0], joinedGame)) {
+    return { kind: 'board', board: parts[0], game: joinedGame,
+      ...(assignedHunt ? { assignedHunt: true } : {}) };
+  }
+  if (parts.length === 2 && parts[0] === 'join' && gameStartFromCode(parts[1]) !== null) {
+    return { kind: 'join', game: parts[1] };
+  }
   if (parts.length === 2 && parts[0] === 'scavenger' && gameStartFromCode(parts[1]) !== null) {
     return { kind: 'scavenger', game: parts[1] };
   }
@@ -94,7 +119,7 @@ export function routeFromLocation(): Route {
     return { kind: parts[1] === 'go' ? 'caller' : 'admin', game: parts[0] };
   }
   if (parts.length === 3 && parts[1] === 'verify' &&
-    validGameCode(parts[0]) && CODE_PATTERN.test(parts[2])) {
+    validGameCode(parts[0]) && isBoardCodeForGame(parts[2], parts[0])) {
     return { kind: 'verify', game: parts[0], board: parts[2] };
   }
   return { kind: 'invalid' };
@@ -107,8 +132,8 @@ function useRoute() {
     window.addEventListener('popstate', onPop);
     return () => window.removeEventListener('popstate', onPop);
   }, []);
-  const navigate = (path: string) => {
-    window.history.pushState(null, '', path);
+  const navigate = (path: string, replace = false) => {
+    window.history[replace ? 'replaceState' : 'pushState'](null, '', path);
     setRoute(routeFromLocation());
   };
   return { route, navigate };
@@ -164,14 +189,114 @@ function BoardGrid({ board, feed, checked = new Set<number>(), winning = [], onT
   </Box></Box>;
 }
 
+async function apiJson(response: Response): Promise<Record<string, unknown>> {
+  recordPingoResponse(response.status);
+  if (!response.headers.get('content-type')?.includes('application/json')) {
+    recordPingoResponse(503);
+    throw new Error(`Pingo service is temporarily unavailable (HTTP ${response.status}). Please try again.`);
+  }
+  try { return await response.json() as Record<string, unknown>; }
+  catch {
+    recordPingoResponse(503);
+    throw new Error(`Pingo service returned an invalid response (HTTP ${response.status}). Please try again.`);
+  }
+}
+
+const gameProofCache = new Map<string, { password: string; proof: Promise<string> }>();
+
+async function adminCredential(game: string, password: string): Promise<string> {
+  if (!isNewGameCode(game)) return password;
+  const cached = gameProofCache.get(game);
+  if (cached?.password === password) return cached.proof;
+  const proof = (async () => {
+    const response = await fetch(`/api/pingo/salt?${new URLSearchParams({ game })}`, { cache: 'no-store' });
+    const result = await apiJson(response);
+    if (!response.ok) throw new Error(String(result.error ?? `Request failed: ${response.status}`));
+    if (typeof result.salt !== 'string' || !/^[0-9a-f]{32}$/i.test(result.salt)) {
+      throw new Error('Game password salt is unavailable.');
+    }
+    return gamePasswordHash(password, result.salt);
+  })();
+  gameProofCache.set(game, { password, proof });
+  try { return await proof; }
+  catch (error) {
+    if (gameProofCache.get(game)?.proof === proof) gameProofCache.delete(game);
+    throw error;
+  }
+}
+
 async function postAdmin(path: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
   const response = await fetch(`/api/pingo/${path}`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body), cache: 'no-store'
   });
-  const result = await response.json() as Record<string, unknown>;
+  const result = await apiJson(response);
   if (!response.ok) throw new Error(String(result.error ?? `Request failed: ${response.status}`));
   return result;
+}
+
+type ListedGame = { gameCode: string; startMs: number; intervalMs: number; poolSize: number };
+
+export function HomePage({ navigate }: { navigate: (path: string) => void }) {
+  const [games, setGames] = useState<ListedGame[]>([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  useEffect(() => {
+    let active = true;
+    fetch('/api/pingo/games', { cache: 'no-store' })
+      .then(async response => {
+        const result = await response.json() as { games?: ListedGame[]; error?: string };
+        if (!response.ok) throw new Error(result.error ?? 'Games could not be loaded.');
+        return result.games ?? [];
+      })
+      .then(result => { if (active) { setGames(result); setLoading(false); } })
+      .catch(cause => { if (active) { setError(cause instanceof Error ? cause.message : 'Games could not be loaded.'); setLoading(false); } });
+    return () => { active = false; };
+  }, []);
+  return <Stack spacing={2}>
+    <Typography variant="h3" component="h1">Join a Pingo game</Typography>
+    {loading && <Typography>Loading games…</Typography>}
+    {error && <Typography role="alert" color="error">{error}</Typography>}
+    {!loading && !error && !games.length && <Typography>No games are available yet.</Typography>}
+    {games.map(game => <Paper key={game.gameCode} variant="outlined" sx={{ p: 2 }}>
+      <Stack spacing={1}>
+        <Typography variant="h5">Game {game.gameCode}</Typography>
+        <Typography>{game.poolSize} possible pins · one pin every {game.intervalMs / 1_000}s ·
+          started {new Date(game.startMs).toLocaleString()}</Typography>
+        <Stack direction="row" spacing={1}>
+          <Button variant="contained" onClick={() => navigate(`/join/${game.gameCode}`)}>Join game</Button>
+          <Button variant="outlined" onClick={() => navigate(`/scavenger/${game.gameCode}`)}>Scavenger hunt</Button>
+        </Stack>
+      </Stack>
+    </Paper>)}
+  </Stack>;
+}
+
+export function JoinPage({ game, navigate }: { game: string; navigate: (path: string) => void }) {
+  const attempted = useRef(false);
+  const [error, setError] = useState('');
+  const createBoard = async () => {
+    setError('');
+    try {
+      const result = await postAdmin('board', { game });
+      if (typeof result.board !== 'string' || !isBoardCodeForGame(result.board, game)) {
+        throw new Error('Board creation returned an invalid code.');
+      }
+      navigate(`/${result.board}?game=${game}`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Board could not be created.');
+    }
+  };
+  useEffect(() => {
+    if (attempted.current) return;
+    attempted.current = true;
+    void createBoard();
+  }, [game]);
+  return <Stack spacing={2}>
+    <Typography variant="h3" component="h1">Joining game {game}</Typography>
+    <Typography>{error || 'Creating your board…'}</Typography>
+    {error && <Button variant="contained" onClick={() => void createBoard()}>Try again</Button>}
+  </Stack>;
 }
 
 async function copy(value: string): Promise<void> {
@@ -211,6 +336,8 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
   const registrationId = initialPlayer.registrationId;
   const [playerEdited, setPlayerEdited] = useState(false);
   const [message, setMessage] = useState('');
+  const [registrationError, setRegistrationError] = useState('');
+  const [registered, setRegistered] = useState(() => !isNewGameCode(initialGame ?? ''));
   const [startedAt] = useState(() => boardStartedAt(code));
   const [huntMode, setHuntMode] = useState(() => {
     if (assignedHunt) return true;
@@ -226,6 +353,21 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
   const board = useMemo(() => boardPins(code, pins), [code, pins]);
   const gameCode = normalizeCode(gameEntry);
   const startMs = gameStartFromCode(gameCode);
+  useEffect(() => {
+    if (!isNewGameCode(initialGame ?? '')) return;
+    let active = true;
+    const params = new URLSearchParams({ game: initialGame!, board: code });
+    fetch(`/api/pingo/board?${params}`, { cache: 'no-store' })
+      .then(async response => {
+        if (!response.ok) {
+          const result = await response.json() as { error?: string };
+          throw new Error(result.error ?? 'Board is not registered for this game.');
+        }
+        if (active) setRegistered(true);
+      })
+      .catch(cause => { if (active) setRegistrationError(cause instanceof Error ? cause.message : 'Board could not be checked.'); });
+    return () => { active = false; };
+  }, [code, initialGame]);
   useEffect(() => {
     try {
       window.localStorage.setItem(`pingo:board:${code}:game`, gameCode);
@@ -292,7 +434,9 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
     setMessage(`Photo saved for ${selectedPin.name}.`);
   };
   const newBoard = () => navigate(assignedHunt && startMs !== null ? `/scavenger/${gameCode}` :
-    `/${makeCode()}${startMs !== null ? `?game=${gameCode}` : ''}`);
+    isNewGameCode(gameCode) ? `/join/${gameCode}` : `/${makeCode()}?game=${gameCode}`);
+  if (registrationError) return <Typography role="alert" color="error">{registrationError}</Typography>;
+  if (!registered) return <Typography>Checking board registration…</Typography>;
   return <Stack spacing={2}>
     <Box>
       <Box className="pingo-board-heading">
@@ -314,9 +458,10 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
     {!huntMode && <Paper variant="outlined" sx={{ p: 2 }}>
       <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
         <TextField label="Game code" value={gameEntry}
-          onChange={event => { setGameEntry(event.target.value.toUpperCase()); setPlayerEdited(true); }}
+          onChange={event => { if (!isNewGameCode(initialGame ?? '')) { setGameEntry(event.target.value.toUpperCase()); setPlayerEdited(true); } }}
+          InputProps={{ readOnly: isNewGameCode(initialGame ?? '') }}
           inputProps={{ maxLength: MAX_GAME_CODE_LENGTH }} size="small" sx={{ width: { xs: '100%', sm: 190 }, flexShrink: 0 }}
-          helperText="Enter the caller's game code." />
+          helperText={isNewGameCode(initialGame ?? '') ? 'This board belongs to this game.' : "Enter the caller's game code."} />
         <TextField label="Player name" value={playerName}
           onChange={event => { setPlayerName(event.target.value); setPlayerEdited(true); }}
           inputProps={{ maxLength: 80 }} size="small" sx={{ width: { xs: '100%', sm: 320 } }} />
@@ -418,7 +563,7 @@ export function ScavengerJoinPage({ game, navigate }:
       });
       const result = await response.json() as ScavengerAssignment & { error?: string };
       if (!response.ok) throw new Error(result.error ?? 'Could not create your board.');
-      if (!CODE_PATTERN.test(result.boardId) || result.gameCode !== game ||
+      if (!isBoardCodeForGame(result.boardId, game) || result.gameCode !== game ||
         !Number.isSafeInteger(result.createdAt)) throw new Error('Invalid board assignment.');
       window.localStorage.setItem(`pingo:scavenger:nickname:${game}`, result.nickname);
       setAssignment(result);
@@ -453,28 +598,42 @@ function VerifyPage({ game, boardCode, pins, feed }:
   { game: string; boardCode: string; pins: Pin[]; feed: PinCollectionData }) {
   const [result, setResult] = useState<Verification | null>(null);
   const [error, setError] = useState('');
+  const [retryNonce, setRetryNonce] = useState(0);
   const board = useMemo(() => boardPins(boardCode, pins), [boardCode, pins]);
   const startMs = gameStartFromCode(game);
   const override = window.location.search;
   useEffect(() => {
     let live = true;
+    let inFlight = false;
+    let paused = false;
     const refresh = async () => {
+      if (paused || inFlight || (!override && document.hidden)) return;
+      const reservation = reservePingoPoll(`verify:${game}:${boardCode}`, drawIntervalFromGameCode(game));
+      if (!reservation.allowed) {
+        if (reservation.reason !== 'spacing') {
+          paused = true;
+          if (live) setError(adminRequestWaitMessage(reservation));
+        }
+        return;
+      }
+      inFlight = true;
       const params = new URLSearchParams(override);
       params.set('game', game);
       params.set('board', boardCode);
       try {
         const response = await fetch(`/api/pingo/verify?${params}`, { cache: 'no-store' });
-        const data = await response.json() as Verification & { error?: string };
+        const data = await apiJson(response) as Verification & { error?: string };
         if (!response.ok) throw new Error(data.error ?? 'Verification failed.');
         if (live) { setResult(data); setError(''); }
       } catch (cause) {
+        paused = true;
         if (live) setError(cause instanceof Error ? cause.message : 'Verification failed.');
-      }
+      } finally { inFlight = false; }
     };
     void refresh();
-    const interval = override ? undefined : window.setInterval(refresh, 5_000);
+    const interval = override ? undefined : window.setInterval(refresh, drawIntervalFromGameCode(game));
     return () => { live = false; if (interval) window.clearInterval(interval); };
-  }, [game, boardCode, override]);
+  }, [game, boardCode, override, retryNonce]);
   return <Stack spacing={2}>
     <Typography variant="h4" component="h1">Verify Pingo board {boardCode}</Typography>
     <Typography>Game {game} · {result ? `${result.count} pins called` : 'Checking calls…'}</Typography>
@@ -482,27 +641,38 @@ function VerifyPage({ game, boardCode, pins, feed }:
     {result?.winningLines.length ? <Paper className="pingo-winner" role="status">
       <Typography variant="h5">Pingo! {result.winningLines.length} complete {result.winningLines.length === 1 ? 'line' : 'lines'}.</Typography>
     </Paper> : <Typography role="status">{error || (result ? 'No complete row or column yet.' : '')}</Typography>}
+    {error && <Button variant="outlined" onClick={() => setRetryNonce(previous => previous + 1)}
+      sx={{ alignSelf: 'flex-start' }}>Retry verification</Button>}
     <BoardGrid board={board} feed={feed} checked={new Set(result?.matchedIds ?? [])} winning={result?.winningLines ?? []} />
     <Typography variant="body2">{override ? 'This link is a snapshot of the signed pin count.' :
       `This board updates as each ${drawIntervalFromGameCode(game) / 1_000}-second interval passes.`}</Typography>
   </Stack>;
 }
 
-export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, view = 'caller' }:
+export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, navigate, view = 'caller' }:
   { game: string; pins: Pin[]; feed: PinCollectionData; onGameStarted: (game: string) => void;
-    onCallerSnapshot?: (snapshot: CallerSnapshot | null) => void; view?: 'caller' | 'admin' }) {
-  const [rememberedPassword] = useState(rememberedAdminPassword);
+    onCallerSnapshot?: (snapshot: CallerSnapshot | null) => void;
+    navigate: (path: string, replace?: boolean) => void; view?: 'caller' | 'admin' }) {
+  const [rememberedPassword] = useState(() => rememberedAdminPassword(game));
   const [password, setPassword] = useState(rememberedPassword);
+  const [gamePassword, setGamePassword] = useState('');
   const [activePassword, setActivePassword] = useState('');
   const autoUnlockAttempted = useRef(false);
+  const unlockRetryTimer = useRef<number | undefined>();
+  const rolloverAttempted = useRef(false);
+  const advanceInFlight = useRef(false);
+  const playersInFlight = useRef(false);
+  const playersPollingPaused = useRef(false);
   const [data, setData] = useState<AdminData | null>(null);
   const [error, setError] = useState('');
   const [clock, setClock] = useState(Date.now());
   const [busy, setBusy] = useState(false);
+  const [autoAdvancePaused, setAutoAdvancePaused] = useState(false);
   const [readIds, setReadIds] = useState<Set<number>>(new Set());
   const [boardEntry, setBoardEntry] = useState('');
   const [gameEntry, setGameEntry] = useState(game);
   const [intervalSeconds, setIntervalSeconds] = useState<number>(30);
+  const [poolSize, setPoolSize] = useState(Math.min(DEFAULT_POOL_SIZE, Math.floor(pins.length / 25) * 25));
   const [players, setPlayers] = useState<PlayerRecord[]>([]);
   const [playersError, setPlayersError] = useState('');
   const pinById = useMemo(() => new Map(pins.map(pin => [pin.id, pin])), [pins]);
@@ -513,54 +683,113 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
   }, [view, data?.game, data?.pin, data?.at, onCallerSnapshot]);
 
   const refreshPlayers = async (secret: string) => {
+    if (playersInFlight.current) return;
+    const targetGame = data?.game ?? game;
+    const reservation = reservePingoPoll(`players:${targetGame}`, 10_000);
+    if (!reservation.allowed) {
+      if (reservation.reason !== 'spacing') {
+        playersPollingPaused.current = true;
+        setPlayersError(adminRequestWaitMessage(reservation));
+      }
+      return;
+    }
+    playersInFlight.current = true;
     try {
-      const response = await fetch('/player', {
-        headers: { Authorization: `Bearer ${secret}` }, cache: 'no-store'
+      const credential = await adminCredential(targetGame, secret);
+      const response = await fetch(isNewGameCode(targetGame) ?
+        `/player?${new URLSearchParams({ game: targetGame })}` : '/player', {
+        headers: { Authorization: `Bearer ${credential}` }, cache: 'no-store'
       });
-      const result = await response.json() as { players?: PlayerRecord[]; error?: string };
+      const result = await apiJson(response) as { players?: PlayerRecord[]; error?: string };
       if (!response.ok) throw new Error(result.error ?? 'Player list failed.');
       setPlayers(result.players ?? []);
       setPlayersError('');
     } catch (cause) {
+      playersPollingPaused.current = true;
       setPlayersError(cause instanceof Error ? cause.message : 'Player list failed.');
-    }
+    } finally { playersInFlight.current = false; }
   };
 
-  const update = async (secret: string, targetGame: string, pin?: number, at?: number) => {
+  const update = async (secret: string, targetGame: string, pin?: number, at?: number, automatic = false) => {
+    const reservation = reserveAdminRequest(targetGame);
+    if (!reservation.allowed) {
+      if (automatic && reservation.reason === 'spacing') return false;
+      setError(adminRequestWaitMessage(reservation));
+      setAutoAdvancePaused(true);
+      return false;
+    }
     setBusy(true);
     try {
-      const next = await postAdmin('admin', { password: secret, game: targetGame, pin, at }) as AdminData;
-      setData(next);
+      const credential = await adminCredential(targetGame, secret);
+      const next = await postAdmin('admin', { game: targetGame, pin, at,
+        ...(isNewGameCode(targetGame) ? { passwordProof: credential } : { password: credential }) }) as AdminData;
+      if (!/^[0-9a-f]{64}$/i.test(next.signingKey) || !Array.isArray(next.drawKeys)) {
+        throw new Error('Caller draw data is unavailable. Please reload the page.');
+      }
+      const poolIds = pins.slice(0, next.poolSize ?? pins.length).map(pin => pin.id);
+      const allIds = await drawIdsFromBatchKeys(next.drawKeys, poolIds, poolIds.length);
+      if (next.ids.some((id, index) => allIds[index] !== id)) {
+        throw new Error('Caller draw data does not match the game. Please reload the page.');
+      }
+      setData({ ...next, ids: allIds });
       setError('');
+      setAutoAdvancePaused(false);
       const params = new URLSearchParams({ pin: String(next.pin), at: String(next.at) });
       window.history.replaceState(null, '', `/${targetGame}/${view === 'admin' ? 'admin' : 'go'}?${params}`);
       return true;
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Caller request failed.');
+      setAutoAdvancePaused(true);
       return false;
     } finally { setBusy(false); }
   };
 
-  const unlock = async (secret = password) => {
+  const unlock = async (secret = password, autoResume = false) => {
     if (!secret) return;
+    if (!autoResume && unlockRetryTimer.current !== undefined) {
+      window.clearTimeout(unlockRetryTimer.current);
+      unlockRetryTimer.current = undefined;
+    }
     setBusy(true);
     try {
       let targetGame = game || (view === 'admin' ? normalizeCode(gameEntry) : '');
+      let callerPassword = secret;
       if (!targetGame) {
         if (view === 'admin') throw new Error('Enter a game code.');
-        const created = await postAdmin('create', { password: secret, intervalSeconds });
+        if (!gamePassword) throw new Error('Choose a game admin password.');
+        if (gamePassword.length < 4 || gamePassword.length > 128 || /[\x00-\x1f\x7f]/.test(gamePassword)) {
+          throw new Error('Game admin password must be 4–128 characters without control characters.');
+        }
+        const { salt, hash } = await hashGamePassword(gamePassword);
+        const created = await postAdmin('create', {
+          password: secret, passwordSalt: salt, passwordHash: hash, intervalSeconds, poolSize
+        });
         if (!validGameCode(created.game)) throw new Error('Game creation returned an invalid code.');
         targetGame = created.game;
+        callerPassword = gamePassword;
+        gameProofCache.set(targetGame, { password: gamePassword, proof: Promise.resolve(hash) });
         onGameStarted(targetGame);
         window.history.replaceState(null, '', `/${targetGame}/go`);
       }
       if (!validGameCode(targetGame)) throw new Error('Enter a valid game code.');
+      if (autoResume) {
+        const availability = adminRequestAvailability(targetGame);
+        if (!availability.allowed && availability.reason === 'spacing') {
+          unlockRetryTimer.current = window.setTimeout(() => {
+            unlockRetryTimer.current = undefined;
+            void unlock(secret, true);
+          }, availability.waitMs + 50);
+          return;
+        }
+      }
       const params = new URLSearchParams(window.location.search);
       const requested = params.has('pin') ? Number(params.get('pin')) : undefined;
       const at = params.has('at') ? Number(params.get('at')) : undefined;
-      if (await update(secret, targetGame, requested, at)) {
-        setActivePassword(secret);
-        try { window.sessionStorage.setItem(ADMIN_SESSION_KEY, secret); }
+      if (await update(callerPassword, targetGame, requested, at)) {
+        setActivePassword(callerPassword);
+        adminPasswordMemory.set(targetGame, callerPassword);
+        try { window.sessionStorage.setItem(isNewGameCode(targetGame) ?
+          `${ADMIN_SESSION_KEY}${targetGame}` : LEGACY_ADMIN_SESSION_KEY, callerPassword); }
         catch { /* Caller remains usable when browser storage is unavailable. */ }
       }
     } catch (cause) {
@@ -571,9 +800,13 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
   useEffect(() => {
     if (game && rememberedPassword && !autoUnlockAttempted.current) {
       autoUnlockAttempted.current = true;
-      void unlock(rememberedPassword);
+      void unlock(rememberedPassword, true);
     }
   }, [game, rememberedPassword]);
+
+  useEffect(() => () => {
+    if (unlockRetryTimer.current !== undefined) window.clearTimeout(unlockRetryTimer.current);
+  }, []);
 
   useEffect(() => {
     const interval = window.setInterval(() => setClock(Date.now()), 1_000);
@@ -582,42 +815,124 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
 
   useEffect(() => {
     if (!activePassword || view !== 'admin') return;
-    void refreshPlayers(activePassword);
-    const interval = window.setInterval(() => void refreshPlayers(activePassword), 10_000);
+    playersPollingPaused.current = false;
+    if (!document.hidden) void refreshPlayers(activePassword);
+    const interval = window.setInterval(() => {
+      if (!playersPollingPaused.current && !document.hidden) void refreshPlayers(activePassword);
+    }, 10_000);
     return () => window.clearInterval(interval);
   }, [activePassword, view]);
 
   useEffect(() => {
-    if (!data || busy || !activePassword || data.pin >= pins.length ||
-      clock < data.at + drawIntervalFromGameCode(data.game)) return;
-    void update(activePassword, data.game, data.pin + 1,
-      data.at + drawIntervalFromGameCode(data.game));
-  }, [clock, data, busy, activePassword, pins.length]);
+    if (!data || busy || autoAdvancePaused || !activePassword) return;
+    const target = dueDraw(data, clock, pins.length);
+    if (target) void advance(data, target.pin, target.at);
+  }, [clock, data, busy, autoAdvancePaused, activePassword, pins.length]);
+
+  const advance = async (current: AdminData, pin: number, at: number) => {
+    if (advanceInFlight.current) return;
+    advanceInFlight.current = true;
+    setBusy(true);
+    try {
+      const sig = await signPinCount(current.signingKey, current.game, pin, at);
+      setData({ ...current, pin, at, sig });
+      setError('');
+      setAutoAdvancePaused(false);
+      const params = new URLSearchParams({ pin: String(pin), at: String(at) });
+      window.history.replaceState(null, '', `/${current.game}/${view === 'admin' ? 'admin' : 'go'}?${params}`);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not advance the pin.');
+      setAutoAdvancePaused(true);
+    } finally {
+      advanceInFlight.current = false;
+      setBusy(false);
+    }
+  };
+
+  const rollover = async (finished: AdminData, secret: string) => {
+    if (rolloverAttempted.current) return;
+    rolloverAttempted.current = true;
+    const reservation = reserveRolloverRequest(finished.game);
+    if (!reservation.allowed) {
+      setError(adminRequestWaitMessage(reservation));
+      return;
+    }
+    setBusy(true);
+    try {
+      const credential = await adminCredential(finished.game, secret);
+      const result = await postAdmin('rollover', { game: finished.game,
+        passwordProof: credential, pin: finished.pin, at: finished.at, sig: finished.sig });
+      if (!validGameCode(result.game) || result.game === finished.game) {
+        throw new Error('The new game code is invalid.');
+      }
+      const newGame = result.game;
+      adminPasswordMemory.set(newGame, secret);
+      gameProofCache.set(newGame, { password: secret, proof: Promise.resolve(credential) });
+      try { window.sessionStorage.setItem(`${ADMIN_SESSION_KEY}${newGame}`, secret); }
+      catch { /* Keep the password for this tab in memory. */ }
+      onGameStarted(newGame);
+      navigate(`/${newGame}/go`, true);
+    } catch (cause) {
+      setError(cause instanceof Error ? cause.message : 'Could not start the next game.');
+    } finally { setBusy(false); }
+  };
+
+  useEffect(() => {
+    if (!data || !activePassword || busy || view !== 'caller' ||
+      data.pin < (data.poolSize ?? pins.length) ||
+      clock < data.at + 5 * drawIntervalFromGameCode(data.game)) return;
+    void rollover(data, activePassword);
+  }, [clock, data, activePassword, busy, view, pins.length]);
 
   const next = () => {
-    if (data && activePassword && !busy && data.pin < pins.length) {
-      void update(activePassword, data.game, data.pin + 1, Date.now());
+    if (data && activePassword && !busy && data.pin < (data.poolSize ?? pins.length)) {
+      void advance(data, data.pin + 1, Date.now());
     }
   };
   const current = data?.ids[data.pin - 1];
+  const poolLimit = data?.poolSize ?? pins.length;
+  const concluded = !!data && data.pin >= poolLimit;
+  const newGameSeconds = data ? Math.max(0,
+    Math.ceil((data.at + 5 * drawIntervalFromGameCode(data.game) - clock) / 1_000)) : 0;
+  const newGameCountdown = `${String(Math.floor(newGameSeconds / 60)).padStart(2, '0')}:${String(newGameSeconds % 60).padStart(2, '0')}`;
   const previous = data?.ids.slice(Math.max(0, data.pin - 6), Math.max(0, data.pin - 1)) ?? [];
   const seconds = data ? Math.max(0, Math.ceil((data.at + drawIntervalFromGameCode(data.game) - clock) / 1_000)) : intervalSeconds;
-  const verifyLink = data && CODE_PATTERN.test(normalizeCode(boardEntry)) ?
+  const verifyLink = data && isBoardCodeForGame(normalizeCode(boardEntry), data.game) ?
     `${window.location.origin}/${data.game}/verify/${normalizeCode(boardEntry)}?${new URLSearchParams({ pin: String(data.pin), at: String(data.at), sig: data.sig })}` : '';
   const joinLink = data ? `${window.location.origin}/?game=${data.game}` : '';
   const shownGame = data?.game ?? game;
+  const adminRequestGate = adminRequestAvailability(shownGame, clock);
 
   return <Stack spacing={data && view === 'caller' ? 0 : 2}
     className={data && view === 'caller' ? 'pingo-caller-display' : undefined}>
-    {data && view === 'caller' ? <GameStartTime startMs={data.startMs} game={data.game} heading /> :
+    {data && view === 'caller' ? concluded ?
+      <Typography variant="h3" component="h1">Game {data.game} concluded at {new Intl.DateTimeFormat(undefined,
+        { hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date(data.at))}.
+        {' '}New game starting in {newGameCountdown}</Typography> :
+      <GameStartTime startMs={data.startMs} game={data.game} heading /> :
       <Typography variant="h3" component="h1">Pingo {view === 'admin' ? 'admin' : 'caller'}{shownGame ? ` · Game ${shownGame}` : ''}</Typography>}
+    {data && view === 'caller' && error && <Paper variant="outlined" sx={{ p: 1 }}>
+      <Stack direction="row" spacing={1} alignItems="center">
+        <Typography role="alert" color="error">{error} {concluded ? 'Automatic game start is paused.' : 'Automatic draws are paused.'}</Typography>
+        {concluded && !adminRequestGate.allowed &&
+          <Typography variant="body2">{adminRequestWaitMessage(adminRequestGate)}</Typography>}
+        <Button variant="outlined" onClick={() => {
+          if (concluded) { rolloverAttempted.current = false; void rollover(data, activePassword); return; }
+          const target = dueDraw(data, Date.now(), pins.length);
+          if (target) void advance(data, target.pin, target.at);
+        }} disabled={busy || (concluded && !adminRequestGate.allowed)}>
+          {concluded ? 'Retry new game' : 'Retry draw'}
+        </Button>
+      </Stack>
+    </Paper>}
     {view === 'admin' && data && <Button variant="outlined" component="a"
       href={`/${data.game}/go?${new URLSearchParams({ pin: String(data.pin), at: String(data.at) })}`}
       sx={{ alignSelf: 'flex-start' }}>Back to Caller page</Button>}
-    {!shownGame && <Typography>{view === 'admin' ? 'Enter a game code and admin password.' : 'Enter the admin password to start a new timed game.'}</Typography>}
+    {!shownGame && <Typography>{view === 'admin' ? 'Enter a game code and its admin password.' : 'Enter the site admin password and choose a password for this game.'}</Typography>}
     {!data ? <Paper variant="outlined" sx={{ p: 2, maxWidth: 520 }}>
       <Stack spacing={2}>
-        <TextField label="Admin password" type="password" value={password}
+        <TextField label={view === 'caller' && !game ? 'Site admin password' :
+          isNewGameCode(game) ? 'Game admin password' : 'Admin password'} type="password" value={password}
           onChange={event => setPassword(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') void unlock(); }} />
         {view === 'admin' && !game && <TextField label="Game code" value={gameEntry}
           inputProps={{ maxLength: MAX_GAME_CODE_LENGTH }} onChange={event => setGameEntry(event.target.value.toUpperCase())} />}
@@ -627,12 +942,26 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
           helperText="Note: This can not be changed once a game is created.">
           {DRAW_INTERVAL_SECONDS.map(seconds => <option key={seconds} value={seconds}>{seconds}s</option>)}
         </TextField>}
-        <Button variant="contained" onClick={() => void unlock()} disabled={busy || !password}>{game || view === 'admin' ? (view === 'admin' ? 'Open admin' : 'Open caller') : 'Create game'}</Button>
+        {view === 'caller' && !game && <TextField select label="Pins in candidate pool" value={poolSize}
+          onChange={event => setPoolSize(Number(event.target.value))}
+          SelectProps={{ native: true }} InputLabelProps={{ shrink: true }}
+          helperText="The board and caller use the first N pins in the catalog. This cannot change after creation.">
+          {Array.from({ length: Math.floor(pins.length / 25) }, (_, index) => (index + 1) * 25)
+            .map(size => <option key={size} value={size}>{size} pins</option>)}
+        </TextField>}
+        {view === 'caller' && !game && <TextField label="Game admin password" type="password"
+          value={gamePassword} onChange={event => setGamePassword(event.target.value)} />}
+        <Button variant="contained" onClick={() => void unlock()}
+          disabled={busy || !password || !adminRequestGate.allowed ||
+            (view === 'caller' && !game && gamePassword.length < 4)}>
+          {game || view === 'admin' ? (view === 'admin' ? 'Open admin' : 'Open caller') : 'Create game'}
+        </Button>
         <Typography role="alert" color="error">{error}</Typography>
+        {!adminRequestGate.allowed && <Typography variant="body2">{adminRequestWaitMessage(adminRequestGate)}</Typography>}
       </Stack>
     </Paper> : <>
       {view === 'admin' && <><GameStartTime startMs={data.startMs} game={data.game} />
-        <Typography>Pin {data.pin} of {pins.length}</Typography></>}
+        <Typography>Pin {data.pin} of {poolLimit}</Typography></>}
       {view === 'caller' ? <><Box className="pingo-caller-layout">
       <Paper className="pingo-join-panel" variant="outlined" sx={{ p: 2 }}>
         <Typography variant="h6">Scan to join this game</Typography>
@@ -652,17 +981,18 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
         }) : <Typography>First pin is on screen.</Typography>}</Box>
       </Paper>
       <Paper className="pingo-current" variant="outlined">
-        <Typography variant="h6">Current pin ({data.pin} of {pins.length})</Typography>
+        <Typography variant="h6">Current pin ({data.pin} of {poolLimit})</Typography>
         {current !== undefined && pinById.has(current) && <PinCard pin={pinById.get(current)!} feed={feed} large />}
-        <Typography className="pingo-current-timer" variant="h5" aria-live="polite">Next pin in {seconds}s</Typography>
-        <Button className="pingo-next-button" variant="contained" size="large" onClick={next} disabled={busy || data.pin >= pins.length}>Next pin now</Button>
+        <Typography className="pingo-current-timer" variant="h5" aria-live="polite">{concluded ? 'All pins called' : `Next pin in ${seconds}s`}</Typography>
+        <Button className="pingo-next-button" variant="contained" size="large" onClick={next}
+          disabled={busy || data.pin >= poolLimit}>Next pin now</Button>
       </Paper>
       </Box>
       </> : <Stack spacing={2}>
       <Paper className="pingo-check-panel" variant="outlined" sx={{ p: 2 }}>
         <Stack spacing={1}>
           <Typography variant="h6">Check a board</Typography>
-          <TextField label="Board code" value={boardEntry} inputProps={{ maxLength: 4 }}
+          <TextField label="Board code" value={boardEntry} inputProps={{ maxLength: BOARD_WITH_SETTINGS_LENGTH }}
             onChange={event => setBoardEntry(event.target.value.toUpperCase())} size="small" />
           <Button variant="outlined" component="a" href={verifyLink || undefined}
             target="_blank" rel="noopener noreferrer" disabled={!verifyLink}>Check board</Button>
@@ -672,7 +1002,10 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
       <Paper className="pingo-players-panel" variant="outlined" sx={{ p: 2 }}>
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <Typography variant="h6">Players ({players.length})</Typography>
-          <Button size="small" onClick={() => void refreshPlayers(activePassword)}>Refresh</Button>
+          <Button size="small" onClick={() => {
+            playersPollingPaused.current = false;
+            void refreshPlayers(activePassword);
+          }}>Refresh</Button>
         </Stack>
         {playersError && <Typography role="alert" color="error">{playersError}</Typography>}
         <Box className="pingo-player-list">
@@ -692,7 +1025,8 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, v
       <Paper className="pingo-call-panel" variant="outlined" sx={{ p: 2 }}>
         <Typography variant="h6">Call list</Typography>
         <Typography variant="body2">Click a displayed pin to mark it as read. The list extends by 100 pins as the game continues.</Typography>
-        <Box className="pingo-call-list">{data.ids.map((id, index) => {
+        <Box className="pingo-call-list">{data.ids.slice(0, Math.min(poolLimit,
+          Math.max(100, Math.ceil((data.pin + 1) / 100) * 100))).map((id, index) => {
           const pin = pinById.get(id);
           return <Button key={`${id}-${index}`} size="small" color={readIds.has(id) ? 'success' : 'inherit'}
             variant={index + 1 === data.pin ? 'contained' : 'outlined'}
@@ -745,7 +1079,9 @@ export function PingoApp() {
     <AppBar position="static" sx={{ bgcolor: 'var(--pax-colour-aus)', color: 'var(--pax-text-dark)' }}>
       <Toolbar sx={{ gap: 1, flexWrap: 'wrap' }}>
         <Typography component="a" href="/" variant="h6" sx={{ color: 'inherit', textDecoration: 'none' }}>Pingo</Typography>
-        {!(huntMode && route.kind === 'board') && <Button color="inherit" onClick={() => navigate(`/${makeCode()}${route.kind === 'board' && route.game ? `?game=${route.game}` : ''}`)}>New board</Button>}
+        {route.kind === 'board' && !huntMode && <Button color="inherit"
+          onClick={() => navigate(isNewGameCode(route.game) ? `/join/${route.game}` :
+            `/${makeCode()}?game=${route.game}`)}>New board</Button>}
         {huntMode && route.kind === 'board' ? <Typography variant="h6">Scavenger Hunt</Typography> : <>
           <Button color="inherit" onClick={() => navigate('/go')}>Run a game</Button>
           {startedGames.length > 0 && <TextField select label="Switch to game" value=""
@@ -763,14 +1099,16 @@ export function PingoApp() {
       className={callerDisplay ? 'pingo-caller-main' : undefined}
       sx={{ py: callerDisplay ? 1 : 3, minHeight: callerDisplay ? 0 : 'calc(100vh - 120px)' }}>
       {error ? <Typography role="alert" color="error">{error}</Typography> : !feed ? <Typography>Loading pins…</Typography> :
-        route.kind === 'board' ? <BoardPage key={`${route.board}-${route.game ?? ''}`} code={route.board} initialGame={route.game} pins={pins} feed={feed}
+        route.kind === 'home' ? <HomePage navigate={navigate} /> :
+        route.kind === 'join' ? <JoinPage key={route.game} game={route.game} navigate={navigate} /> :
+        route.kind === 'board' ? <BoardPage key={`${route.board}-${route.game}`} code={route.board} initialGame={route.game} pins={pins} feed={feed}
           assignedHunt={route.assignedHunt} navigate={navigate} onHuntModeChange={setHuntMode} /> :
         route.kind === 'scavenger' ? <ScavengerJoinPage key={route.game} game={route.game} navigate={navigate} /> :
         route.kind === 'verify' ? <VerifyPage key={`${route.game}-${route.board}`} game={route.game} boardCode={route.board} pins={pins} feed={feed} /> :
         route.kind === 'caller' || route.kind === 'admin' ?
           <AdminPage key={`${route.kind}-${route.game}`} view={route.kind} game={route.game}
             pins={pins} feed={feed} onGameStarted={rememberStartedGame}
-            onCallerSnapshot={setCallerSnapshot} /> :
+            onCallerSnapshot={setCallerSnapshot} navigate={navigate} /> :
         <Typography role="alert">That Pingo URL is invalid.</Typography>}
     </Container>
     <Box component="footer" className={callerDisplay ? 'pingo-caller-footer' : undefined}

@@ -171,13 +171,9 @@ describe('Pingo verification API', () => {
       body: JSON.stringify({ password: 'wrong password' }), method: 'POST',
     }), env);
     expect(denied.status).toBe(401);
-    const created = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
-      body: JSON.stringify({ password: 'test password' }), method: 'POST',
-    }), env);
-    expect(created.status).toBe(200);
-    const { game } = await created.json() as { game: string };
+    const game = createTimedGameCode(Date.now() - 1_000, 30);
     expect(game).toHaveLength(6);
-    expect(verifiedGameStart(game)).toBeGreaterThan(Date.now() - 1_000);
+    expect(verifiedGameStart(game)).toBeGreaterThan(Date.now() - 3_000);
     const admin = await worker.fetch(new Request('https://pingo.test/api/pingo/admin', {
       body: JSON.stringify({ at: Date.now(), game, password: 'test password', pin: 10 }),
       headers: { 'Content-Type': 'application/json' }, method: 'POST',
@@ -191,7 +187,7 @@ describe('Pingo verification API', () => {
     expect((await checked.json() as { count: number }).count).toBe(10);
   });
 
-  it.each([10, 15, 20, 30] as const)('creates a %is game and counts at its interval', async intervalSeconds => {
+  it.each([10, 15, 20, 30] as const)('counts a legacy %is game at its interval', async intervalSeconds => {
     const startMs = 1_704_067_200_000;
     const game = createTimedGameCode(startMs, intervalSeconds);
     const env = { ASSETS: { fetch: async () => Response.json({ pins }) },
@@ -199,11 +195,6 @@ describe('Pingo verification API', () => {
     const now = vi.spyOn(Date, 'now');
     try {
       now.mockReturnValue(startMs);
-      const create = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
-        body: JSON.stringify({ intervalSeconds, password: 'test password' }), method: 'POST',
-      }), env);
-      expect(create.status).toBe(200);
-      expect((await create.json() as { game: string }).game).toBe(game);
       now.mockReturnValue(startMs + intervalSeconds * 1_000 - 1);
       const before = await worker.fetch(new Request(`https://pingo.test/api/pingo/verify?game=${game}&board=XY6D`), env);
       expect((await before.json() as { count: number }).count).toBe(1);

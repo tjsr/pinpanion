@@ -3,9 +3,9 @@ import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import type { Pin } from '../types.ts';
-import { boardPins } from './game.ts';
+import { boardCodeForGame, boardPins } from './game.ts';
 import { loadBoardPhotos } from './scavenger.ts';
-import { createGameCode } from './secure.ts';
+import { createGameCode, createRegisteredGameCode } from './secure.ts';
 import { BoardPage, routeFromLocation, ScavengerJoinPage } from './PingoApp.tsx';
 
 vi.mock('../components/PinInfo.tsx', () => ({
@@ -35,25 +35,26 @@ afterEach(() => vi.unstubAllGlobals());
 describe('direct scavenger join', () => {
   it('routes a game code to nickname entry and opens a newly assigned hunt board', async () => {
     const user = userEvent.setup();
-    const game = createGameCode(Date.now() - 60_000);
+    const game = createRegisteredGameCode(Date.now() - 60_000, 30, 25);
+    const board = boardCodeForGame('ACDE', game);
     window.history.replaceState(null, '', `/scavenger/${game}`);
     expect(routeFromLocation()).toEqual({ kind: 'scavenger', game });
     const navigate = vi.fn();
     const fetchMock = vi.fn(async (_url: string, _options: RequestInit) => Response.json({
-      gameCode: game, boardId: 'ACDE', nickname: 'Alice', createdAt: 123_000, existing: false
+      gameCode: game, boardId: board, nickname: 'Alice', createdAt: 123_000, existing: false
     }));
     vi.stubGlobal('fetch', fetchMock);
     render(<ScavengerJoinPage game={game} navigate={navigate} />);
     expect(screen.getByRole('button', { name: 'Get scavenger board' })).toBeDisabled();
     await user.type(screen.getByRole('textbox', { name: 'Nickname' }), 'Alice');
     await user.click(screen.getByRole('button', { name: 'Get scavenger board' }));
-    await waitFor(() => expect(navigate).toHaveBeenCalledWith(`/ACDE?game=${game}&hunt=1`));
-    expect(window.localStorage.getItem('pingo:board:ACDE:createdAt')).toBe('123000');
-    expect(window.localStorage.getItem('pingo:board:ACDE:huntMode')).toBe('true');
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(`/${board}?game=${game}&hunt=1`));
+    expect(window.localStorage.getItem(`pingo:board:${board}:createdAt`)).toBe('123000');
+    expect(window.localStorage.getItem(`pingo:board:${board}:huntMode`)).toBe('true');
     expect(window.localStorage.getItem('pingo:scavenger:deviceId')).toMatch(/^[0-9a-f]{32}$/);
     expect(JSON.parse(String(fetchMock.mock.calls[0][1].body)).nickname).toBe('Alice');
-    window.history.replaceState(null, '', `/ACDE?game=${game}&hunt=1`);
-    expect(routeFromLocation()).toMatchObject({ kind: 'board', board: 'ACDE', assignedHunt: true });
+    window.history.replaceState(null, '', `/${board}?game=${game}&hunt=1`);
+    expect(routeFromLocation()).toMatchObject({ kind: 'board', board, assignedHunt: true });
   });
 
   it('shows the daily limit and opens the existing board', async () => {

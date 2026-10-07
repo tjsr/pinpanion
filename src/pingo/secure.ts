@@ -2,7 +2,7 @@ import {
   DRAW_BATCH_OFFSET_MS, DRAW_BATCH_SIZE,
   GAME_CODE_LENGTH, GAME_TAG_CHARS, GAME_TIME_CHARS,
   PREVIOUS_TIMED_GAME_CODE_LENGTH, encodeBase28,
-  gameDetailsFromCode, timedGamePayload, timestampPayload
+  gameCodeWithSettings, gameDetailsFromCode, isNewGameCode, timedGamePayload, timestampPayload
 } from './game.ts';
 import { CODE_ALPHABET } from '../guess/game.ts';
 import type { DrawIntervalSeconds } from './game.ts';
@@ -52,7 +52,56 @@ export function createTimedGameCode(epochMs: number, intervalSeconds: DrawInterv
   return timedGamePayload(Math.floor(epochMs / 1_000), intervalSeconds);
 }
 
-export function verifiedGameDetails(code: string): { startMs: number; intervalMs: number } | null {
+export function createRegisteredGameCode(epochMs: number,
+  intervalSeconds: DrawIntervalSeconds, poolSize: number): string {
+  if (!Number.isSafeInteger(epochMs) || epochMs < 0) throw new Error('Invalid game start time.');
+  return gameCodeWithSettings(Math.floor(epochMs / 1_000), intervalSeconds, poolSize);
+}
+
+const GAME_PASSWORD_ITERATIONS = 100_000;
+
+function hex(bytes: Uint8Array): string {
+  return [...bytes].map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
+function unhex(value: string): Uint8Array {
+  if (!/^(?:[0-9a-f]{2})+$/i.test(value)) throw new Error('Invalid password hash.');
+  return new Uint8Array(value.match(/../g)!.map(byte => parseInt(byte, 16)));
+}
+
+async function deriveGamePassword(password: string, salt: Uint8Array): Promise<Uint8Array> {
+  const key = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({
+    name: 'PBKDF2', hash: 'SHA-256', salt: new Uint8Array(salt).buffer,
+    iterations: GAME_PASSWORD_ITERATIONS
+  }, key, 256));
+}
+
+export async function hashGamePassword(password: string): Promise<{ salt: string; hash: string }> {
+  const salt = crypto.getRandomValues(new Uint8Array(16));
+  return { salt: hex(salt), hash: hex(await deriveGamePassword(password, salt)) };
+}
+
+export async function gamePasswordHash(password: string, salt: string): Promise<string> {
+  return hex(await deriveGamePassword(password, unhex(salt)));
+}
+
+export async function gamePasswordVerifier(secret: string, proof: string): Promise<string> {
+  if (!/^[0-9a-f]{64}$/i.test(proof)) throw new Error('Invalid game password proof.');
+  return `v2:${hex(await hmac(secret, proof.toLowerCase()))}`;
+}
+
+export async function gamePasswordProofMatches(proof: string, verifier: string,
+  secret: string): Promise<boolean> {
+  return /^[0-9a-f]{64}$/i.test(proof) && /^v2:[0-9a-f]{64}$/i.test(verifier) &&
+    sameBytes(unhex((await gamePasswordVerifier(secret, proof)).slice(3)), unhex(verifier.slice(3)));
+}
+
+export function verifiedGameDetails(code: string): { startMs: number; intervalMs: number; poolSize?: number } | null {
+  if (isNewGameCode(code)) {
+    try { return gameDetailsFromCode(code); }
+    catch { return null; }
+  }
   if (![GAME_CODE_LENGTH, GAME_TIME_CHARS, PREVIOUS_TIMED_GAME_CODE_LENGTH].includes(code.length) ||
     [...code].some(letter => !CODE_ALPHABET.includes(letter))) return null;
   try {
@@ -80,8 +129,37 @@ export async function pinCountSignatureIsValid(
   return sameCode(signature, await signPinCount(secret, game, count, at));
 }
 
-async function shuffledIds(secret: string, batchStartMs: number, ids: number[]): Promise<number[]> {
-  const keyBytes = await hmac(secret, `draw:${batchStartMs}`);
+export async function callerSigningKey(secret: string, game: string): Promise<string> {
+  return hex(await hmac(secret, `pingo:caller-signature:v1:${game}`));
+}
+
+export async function callerPinSignatureIsValid(
+  secret: string, game: string, count: number, at: number, signature: string
+): Promise<boolean> {
+  const scopedKey = await callerSigningKey(secret, game);
+  const [current, legacy] = await Promise.all([
+    pinCountSignatureIsValid(scopedKey, game, count, at, signature),
+    pinCountSignatureIsValid(secret, game, count, at, signature)
+  ]);
+  return current || legacy;
+}
+
+export async function drawBatchKeys(secret: string, startMs: number, requestedCount: number): Promise<string[]> {
+  if (!Number.isSafeInteger(startMs) || startMs < 0 ||
+    !Number.isSafeInteger(requestedCount) || requestedCount < 0) throw new Error('Invalid draw request.');
+  const key = await crypto.subtle.importKey('raw', encoder.encode(secret),
+    { hash: 'SHA-256', name: 'HMAC' }, false, ['sign']);
+  const keys: string[] = [];
+  for (let batch = 0; batch < Math.ceil(requestedCount / DRAW_BATCH_SIZE); batch += 1) {
+    const value = encoder.encode(`draw:${startMs + batch * DRAW_BATCH_OFFSET_MS}`);
+    keys.push(hex(new Uint8Array(await crypto.subtle.sign('HMAC', key, value))));
+  }
+  return keys;
+}
+
+async function shuffledIdsFromKey(keyHex: string, ids: number[]): Promise<number[]> {
+  if (!/^[0-9a-f]{64}$/i.test(keyHex)) throw new Error('Invalid draw batch key.');
+  const keyBytes = unhex(keyHex);
   const keyMaterial = new ArrayBuffer(keyBytes.length);
   new Uint8Array(keyMaterial).set(keyBytes);
   const key = await crypto.subtle.importKey('raw', keyMaterial, 'AES-CTR', false, ['encrypt']);
@@ -101,15 +179,16 @@ async function shuffledIds(secret: string, batchStartMs: number, ids: number[]):
   return shuffled;
 }
 
-export async function drawIds(
-  secret: string, startMs: number, ids: number[], requestedCount: number
+export async function drawIdsFromBatchKeys(
+  keys: string[], ids: number[], requestedCount: number
 ): Promise<number[]> {
   if (!Number.isSafeInteger(requestedCount) || requestedCount < 0) throw new Error('Invalid draw count.');
   const wanted = Math.min(requestedCount, ids.length);
+  if (keys.length < Math.ceil(wanted / DRAW_BATCH_SIZE)) throw new Error('Draw batch keys are unavailable.');
   const selected: number[] = [];
   const seen = new Set<number>();
   for (let batch = 0; selected.length < wanted; batch += 1) {
-    const shuffled = await shuffledIds(secret, startMs + batch * DRAW_BATCH_OFFSET_MS, ids);
+    const shuffled = await shuffledIdsFromKey(keys[batch], ids);
     for (const id of shuffled) {
       if (seen.has(id)) continue;
       seen.add(id);
@@ -119,4 +198,11 @@ export async function drawIds(
     if (seen.size === ids.length) break;
   }
   return selected.slice(0, wanted);
+}
+
+export async function drawIds(
+  secret: string, startMs: number, ids: number[], requestedCount: number
+): Promise<number[]> {
+  const keys = await drawBatchKeys(secret, startMs, Math.min(requestedCount, ids.length));
+  return drawIdsFromBatchKeys(keys, ids, requestedCount);
 }

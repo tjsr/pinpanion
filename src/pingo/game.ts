@@ -8,9 +8,13 @@ export const DRAW_BATCH_OFFSET_MS = 3_000_000;
 export const GAME_TAG_CHARS = 11;
 export const GAME_TIME_CHARS = 7;
 export const GAME_CODE_LENGTH = 6;
+export const GAME_SETTINGS_CHARS = 3;
+export const GAME_WITH_SETTINGS_LENGTH = GAME_CODE_LENGTH + 1 + GAME_SETTINGS_CHARS;
+export const BOARD_WITH_SETTINGS_LENGTH = 4 + 1 + GAME_SETTINGS_CHARS;
 export const PREVIOUS_TIMED_GAME_CODE_LENGTH = 8;
-export const MAX_GAME_CODE_LENGTH = PREVIOUS_TIMED_GAME_CODE_LENGTH;
+export const MAX_GAME_CODE_LENGTH = GAME_WITH_SETTINGS_LENGTH;
 export const DRAW_INTERVAL_SECONDS = [10, 15, 20, 30] as const;
+export const DEFAULT_POOL_SIZE = 150;
 export type DrawIntervalSeconds = typeof DRAW_INTERVAL_SECONDS[number];
 const BASE = BigInt(CODE_ALPHABET.length);
 const TIME_BITS = 32;
@@ -29,15 +33,57 @@ export function usablePinsFrom(feed: { pins?: unknown }): Pin[] {
 }
 
 export function boardPins(code: string, pins: Pin[]): Pin[] {
-  if (!CODE_PATTERN.test(code)) throw new Error('Invalid board code.');
-  if (pins.length < BOARD_SIZE) throw new Error('At least 25 usable pins are required.');
-  const indexes = Array.from({ length: pins.length }, (_, index) => index);
+  const poolSize = boardPoolSize(code) ?? pins.length;
+  if (pins.length < poolSize || poolSize < BOARD_SIZE) throw new Error('The pin pool is unavailable.');
+  const indexes = Array.from({ length: poolSize }, (_, index) => index);
   const random = createRandom(hashString(`${code}:PINGO:BOARD`));
   for (let index = indexes.length - 1; index > 0; index -= 1) {
     const other = Math.floor(random() * (index + 1));
     [indexes[index], indexes[other]] = [indexes[other], indexes[index]];
   }
   return indexes.slice(0, BOARD_SIZE).map(index => pins[index]);
+}
+
+export function settingsCode(intervalSeconds: DrawIntervalSeconds, poolSize: number): string {
+  const speed = DRAW_INTERVAL_SECONDS.indexOf(intervalSeconds);
+  if (speed < 0 || !Number.isSafeInteger(poolSize) || poolSize < BOARD_SIZE ||
+    poolSize % BOARD_SIZE !== 0 || poolSize / BOARD_SIZE > Number((BASE ** 3n - 1n) >> 2n)) {
+    throw new Error('Invalid game settings.');
+  }
+  return encodeBase28(BigInt((poolSize / BOARD_SIZE) * 4 + speed), GAME_SETTINGS_CHARS);
+}
+
+export function settingsFromCode(suffix: string): { intervalMs: number; poolSize: number } {
+  if (suffix.length !== GAME_SETTINGS_CHARS) throw new Error('Invalid game settings.');
+  const packed = decodeBase28(suffix);
+  const units = Number(packed >> 2n);
+  if (units < 1) throw new Error('Invalid pin pool size.');
+  return { intervalMs: DRAW_INTERVAL_SECONDS[Number(packed & 3n)] * 1_000,
+    poolSize: units * BOARD_SIZE };
+}
+
+export function isNewGameCode(code: string): boolean {
+  return code.length === GAME_WITH_SETTINGS_LENGTH && code[GAME_CODE_LENGTH] === '-';
+}
+
+export function isBoardCodeForGame(board: string, game: string): boolean {
+  if (isNewGameCode(game)) return board.length === BOARD_WITH_SETTINGS_LENGTH &&
+    CODE_PATTERN.test(board.slice(0, 4)) && board[4] === '-' &&
+    board.slice(5) === game.slice(GAME_CODE_LENGTH + 1);
+  return CODE_PATTERN.test(board);
+}
+
+export function boardCodeForGame(baseCode: string, game: string): string {
+  if (!CODE_PATTERN.test(baseCode) || !isNewGameCode(game)) throw new Error('Invalid game or board code.');
+  settingsFromCode(game.slice(GAME_CODE_LENGTH + 1));
+  return `${baseCode}-${game.slice(GAME_CODE_LENGTH + 1)}`;
+}
+
+export function boardPoolSize(code: string): number | null {
+  if (CODE_PATTERN.test(code)) return null;
+  if (code.length !== BOARD_WITH_SETTINGS_LENGTH || !CODE_PATTERN.test(code.slice(0, 4)) ||
+    code[4] !== '-') throw new Error('Invalid board code.');
+  return settingsFromCode(code.slice(5)).poolSize;
 }
 
 export function boardCodeFromTimestamp(epochMs: number): string {
@@ -107,16 +153,25 @@ export function timedGamePayload(epochSeconds: number, intervalSeconds: DrawInte
   return encodeBase28((reverseBits(lowSeconds, ROLLING_TIME_BITS) << 2n) | BigInt(speed), GAME_CODE_LENGTH);
 }
 
-export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs: number; intervalMs: number } {
+export function gameCodeWithSettings(epochSeconds: number,
+  intervalSeconds: DrawIntervalSeconds, poolSize = DEFAULT_POOL_SIZE): string {
+  if (!Number.isSafeInteger(epochSeconds) || epochSeconds < 0) throw new Error('Invalid game start time.');
+  const lowSeconds = BigInt(epochSeconds) & ROLLING_MASK;
+  return `${encodeBase28(reverseBits(lowSeconds, ROLLING_TIME_BITS), GAME_CODE_LENGTH)}-${settingsCode(intervalSeconds, poolSize)}`;
+}
+
+export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs: number; intervalMs: number; poolSize?: number } {
   if (code.length === GAME_TIME_CHARS) {
     return { intervalMs: DRAW_INTERVAL_MS, startMs: timestampFromPayload(code) * 1_000 };
   }
-  if (code.length !== GAME_CODE_LENGTH && code.length !== PREVIOUS_TIMED_GAME_CODE_LENGTH) {
+  const newFormat = isNewGameCode(code);
+  if (!newFormat && code.length !== GAME_CODE_LENGTH && code.length !== PREVIOUS_TIMED_GAME_CODE_LENGTH) {
     throw new Error('Invalid game code length.');
   }
-  const payload = decodeBase28(code);
-  const reversed = payload >> 2n;
-  const intervalMs = DRAW_INTERVAL_SECONDS[Number(payload & 3n)] * 1_000;
+  const payload = decodeBase28(newFormat ? code.slice(0, GAME_CODE_LENGTH) : code);
+  const reversed = newFormat ? payload : payload >> 2n;
+  const settings = newFormat ? settingsFromCode(code.slice(GAME_CODE_LENGTH + 1)) : null;
+  const intervalMs = settings?.intervalMs ?? DRAW_INTERVAL_SECONDS[Number(payload & 3n)] * 1_000;
   if (code.length === PREVIOUS_TIMED_GAME_CODE_LENGTH) {
     if (reversed > MAX_TIME) throw new Error('Invalid game timestamp.');
     return { intervalMs, startMs: Number(reverseBits32(reversed)) * 1_000 };
@@ -131,6 +186,7 @@ export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs
   return {
     intervalMs,
     startMs: Number(startSeconds) * 1_000,
+    ...(settings ? { poolSize: settings.poolSize } : {}),
   };
 }
 
