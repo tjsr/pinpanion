@@ -19,6 +19,8 @@ type PinInfoPropTypes = {
   pinSets: PinSet[];
   groups: PinGroup[];
   children?: React.ReactNode;
+  htmlId?: string;
+  imagePrefix?: string;
   style?: any;
 };
 
@@ -31,17 +33,19 @@ export const PinInfo = ({
   pinSets,
   groups,
   children,
+  htmlId,
+  imagePrefix = config.imagePrefix,
   style,
 }: PinInfoPropTypes): JSX.Element => {
   if (events === undefined || events.length === 0) {
     throw new Error(`PAXEvents list is required (${events === undefined ? 'undefined' : 'empty list'})`);
   }
-  const url = pin.image_name ? `${config.imagePrefix}/${pin.image_name.split('?')[0]}` : undefined;
+  const url = pin.image_name ? `${imagePrefix}/${pin.image_name.split('?')[0]}` : undefined;
 
   const pinClasses = getPinClassForSize(displaySize);
   return (
     <>
-      <div className={pinClasses} id={`pin_${pin.id}`} style={style}>
+      <div className={pinClasses} id={htmlId || `pin_${pin.id}`} style={style}>
         <div className="pinInfo">
           <h3>{pin.name}</h3>
           <div className="pinSash">

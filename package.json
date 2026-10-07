@@ -27,7 +27,7 @@
     "start:proxy": "node --loader ts-node/esm src/proxy.ts",
     "start": "cross-env BROWSER='chrome',BROWSER_ARGS='--remote-debugging-port=9222',PORT=5173,GENERATE_SOURCEMAP=false vite dev",
     "chrome-remote-debug": "chrome --remote-debugging-port=9222'",
-    "build": "tsc && npm run ppschema && npm run download -- public/imgs && npm run build:vite",
+    "build": "tsc -b && npm run ppschema && npm run download -- public/imgs && npm run build:vite",
     "build:vite": "vite build",
     "build:preview": "npm run ensure:preview-assets && vite build && vite preview",
     "build:amplify": "npm run ppschema && npm run download:amplify && npm run build:vite",
@@ -46,7 +46,16 @@
     "ios": "node node_modules/react-native/local-cli/cli.js run-ios",
     "android": "node node_modules/react-native/local-cli/cli.js run-android",
     "clean": "rimraf images coverage build amplify public/images public/imgs public/pins.json",
-    "clean:all": "npm run clean && rimraf node_modules"
+    "clean:all": "npm run clean && rimraf node_modules",
+    "preview": "npm run build && vite preview",
+    "deploy": "npm run build && wrangler deploy",
+    "build:guess": "vite build --config vite.guess.config.ts && node scripts/prepare-guess-data.mjs",
+    "deploy:guess:dev": "npm run build:guess && wrangler pages deploy build/guess --project-name pinpanion-guess-dev --branch main",
+    "deploy:guess": "npm run build:guess && wrangler pages deploy build/guess --project-name pinpanion-guess --branch main",
+    "cf-typegen": "wrangler types",
+    "build:pingo": "vite build --config vite.pingo.config.ts && node scripts/prepare-pingo-data.mjs && esbuild src/pingo/worker.ts --bundle --format=esm --platform=browser --target=es2022 --outfile=build/pingo/_worker.js",
+    "deploy:pingo:dev": "npm run build:pingo && node scripts/deploy-pingo.mjs dev",
+    "deploy:pingo": "npm run build:pingo && node scripts/deploy-pingo.mjs prod"
   },
   "eslintConfig": {
     "extends": [
@@ -67,10 +76,11 @@
     ]
   },
   "devDependencies": {
+    "@cloudflare/vite-plugin": "^1.12.3",
     "@babel/core": "^8.0.6",
-    "@testing-library/jest-dom": "^7.0.1",
-    "@testing-library/react": "^16.3.3",
-    "@testing-library/user-event": "^14.6.7",
+    "@testing-library/jest-dom": "^6.8.0",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
     "@tjsr/eslint-config": "github:tjsr/eslint-config#main",
     "@types/express": "^5.0.6",
     "@types/is-valid-path": "^0.1.2",
@@ -79,7 +89,7 @@
     "@types/react-dom": "^19.3.0",
     "@typescript-eslint/eslint-plugin": "^8.71.0",
     "@typescript-eslint/parser": "^8.71.0",
-    "@vitejs/plugin-react": "^6.1.1",
+    "@vitejs/plugin-react": "^5.0.1",
     "commander": "^15.0.0",
     "eslint-config-google": "^0.14.0",
     "eslint-config-prettier": "^10.1.8",
@@ -91,10 +101,12 @@
     "prettier-plugin-sort-members": "^0.2.5",
     "rimraf": "^6.1.3",
     "ts-node": "^10.9.2",
-    "typescript": "^5.9.3",
-    "vite": "^8.3.2",
-    "vitest": "^5.0.3",
-    "web-vitals": "^6.2.2"
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.2.4",
+    "web-vitals": "^4.2.3",
+    "wrangler": "^4.34.0"
   },
   "overrides": {
     "tough-cookie": ">=4.1.3",

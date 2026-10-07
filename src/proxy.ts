@@ -16,10 +16,10 @@ const pinUrl: string =
 
 let ALL_PINS: PinnypalsPinsRequest | undefined = undefined;
 
-app.get('/', (req, res) => {
+app.get('/', (_req, res) => {
   res.send('Welcome to CORS server 😁');
 });
-app.get('/pins', (req, res): void => {
+app.get('/pins', (_req, res): void => {
   res.set('Access-Control-Allow-Origin', 'http://localhost:3000');
   if (ALL_PINS === undefined) {
     fetch(pinUrl)
@@ -37,7 +37,7 @@ app.get('/pins', (req, res): void => {
     res.send(ALL_PINS);
   }
 });
-app.get('/cors', (req, res) => {
+app.get('/cors', (_req, res) => {
   res.send('This has CORS enabled 🎈');
 });
 app.listen(8080, () => {

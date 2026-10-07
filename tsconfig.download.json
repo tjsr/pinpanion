@@ -1,5 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "include": ["./src/**/*.ts"],
+  "types": ["vitest/globals", "@testing-library/jest-dom/vitest", "@testing-library/react", "./worker-configuration.d.ts"],
   "exclude": ["node_modules", "test", "dist", "./vitest.config.ts", "**/*.test.ts"]
 }

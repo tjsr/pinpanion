@@ -28,7 +28,7 @@ export type AppSettingsPanelProps = {
 };
 
 const ObjectSizeSetting = ({ size, setObjectSize }: ObjectSizeSettingProps): JSX.Element => {
-  const handleSizeChange = (event: React.MouseEvent<HTMLElement>, newSize: SizesType | null) => {
+  const handleSizeChange = (_event: React.MouseEvent<HTMLElement>, newSize: SizesType | null) => {
     if (newSize !== null) {
       setObjectSize(newSize);
     }

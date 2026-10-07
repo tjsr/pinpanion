@@ -1,13 +1,14 @@
-import { program } from "commander";
+import { existsSync } from 'fs';
+import { program } from 'commander';
 import { writeFile } from 'fs/promises';
 
 // https://api.pinnypals.com/api/version gives latest version
 
 interface SchemaToolCommandOptions {
-  latest: boolean;
-  version: string;
   host: string;
+  latest: boolean;
   path: string;
+  version: string;
 }
 
 async function downloadFile(url: string, outputPath: string) {
@@ -27,6 +28,7 @@ program
   .option('-p, --path <path>', 'Schema file output path', './src/pinnypals')
   .action(async (options: SchemaToolCommandOptions, _command) => {
     let version: string | undefined;
+
     if (options.version) {
       if (options.latest) {
         console.error('Cannot specify both --latest and --version');
@@ -52,6 +54,11 @@ program
     const outputPath = options.version
       ? `${options.path}/${schemaFileName}`
       : `${options.path}/pinnypals-openapi-latest-public.json`;
+    if (existsSync(outputPath) && !options.latest) {
+      console.log(`File ${outputPath} already exists, skipping download. Use --latest to force update.`);
+      process.exit(0);
+    }
+
     downloadFile(url, outputPath)
       .then(() => console.log(`Downloaded ${url} to ${outputPath}`))
       .catch((err) => {

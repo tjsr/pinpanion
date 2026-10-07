@@ -1,3 +1,4 @@
+import { cloudflare } from '@cloudflare/vite-plugin';
 import { defineConfig } from 'vite';
 import { findFileUpwards } from './test/testutils.ts';
 import react from '@vitejs/plugin-react';
@@ -5,10 +6,11 @@ import react from '@vitejs/plugin-react';
 const setupPath = findFileUpwards('test/vitest.setup.ts');
 
 export default defineConfig({
+  base: '/',
   build: {
     outDir: 'build',
   },
-  plugins: [react()],
+  plugins: [react(), cloudflare()],
   resolve: {
     tsconfigPaths: true,
   },

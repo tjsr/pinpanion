@@ -1,0 +1,12 @@
+{
+  "name": "pingo",
+  "compatibility_date": "2026-10-05",
+  "pages_build_output_dir": "../../build/pingo",
+  "d1_databases": [
+    {
+      "binding": "PINGO_PLAYERS",
+      "database_name": "pingo-players",
+      "database_id": "1cba457c-e9fb-43e1-84b5-8aa888b9f0d3"
+    }
+  ]
+}
