@@ -938,7 +938,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
           inputProps={{ maxLength: MAX_GAME_CODE_LENGTH }} onChange={event => setGameEntry(event.target.value.toUpperCase())} />}
         {view === 'caller' && !game && <TextField select label="Time between pin draws" value={intervalSeconds}
           onChange={event => setIntervalSeconds(Number(event.target.value))}
-          SelectProps={{ native: true }} InputLabelProps={{ shrink: true }}
+          slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
           helperText="Note: This can not be changed once a game is created.">
           {DRAW_INTERVAL_SECONDS.map(seconds => <option key={seconds} value={seconds}>{seconds}s</option>)}
         </TextField>}
@@ -1086,7 +1086,7 @@ export function PingoApp() {
           <Button color="inherit" onClick={() => navigate('/go')}>Run a game</Button>
           {startedGames.length > 0 && <TextField select label="Switch to game" value=""
             onChange={event => { if (validGameCode(event.target.value)) navigate(`/${event.target.value}/go`); }}
-            SelectProps={{ native: true }} InputLabelProps={{ shrink: true }} size="small"
+            slotProps={{ select: { native: true }, inputLabel: { shrink: true } }} size="small"
             sx={{ minWidth: 185, bgcolor: 'white', borderRadius: 1 }}>
             <option value="">Select game</option>
             {startedGames.map(game => <option key={game} value={game}>Game {game}</option>)}

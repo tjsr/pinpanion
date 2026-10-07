@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type { AppSettingsPanelProps } from '../components/AppSettingsPanel.tsx';
 import { DrawerFragment } from '../components/DrawerFragment.tsx';
 import type { ReactElement } from 'react';

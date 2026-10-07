@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type { PinSelectionList, UserId } from '../types.ts';
 
 import FormControl from '@mui/material/FormControl';
@@ -33,10 +34,11 @@ export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): 
 
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={props.id}>Switch lanyard</InputLabel>
+      <InputLabel id={`${props.id}-label`}>Switch lanyard</InputLabel>
       <Select
         data-testid="lanyardSelectTestElement"
         id={props.id}
+        labelId={`${props.id}-label`}
         value={hasSelected ? props.activeLanyard.id : ''}
         label="Switch lanyard"
         onChange={(event: SelectChangeEvent) => {

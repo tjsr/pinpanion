@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import '../css/pins.css';
 
 import type { PAXEvent, PAXEventId, PaxType } from '../types.ts';
@@ -38,9 +39,10 @@ export const PAXEventSelector = ({
 
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
-      <InputLabel id={id}>Filter by PAX</InputLabel>
+      <InputLabel id={`${id}-label`}>Filter by PAX</InputLabel>
       <Select
         id={id}
+        labelId={`${id}-label`}
         label="Filter by PAX"
         value={selectValue}
         onChange={(event: SelectChangeEvent) => {

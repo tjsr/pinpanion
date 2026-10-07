@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import { PinSelectionEditor, PinSelectionListEditor } from './PinSelectionFilter.tsx';
 import type { PinSelectionList, UserId } from '../types.ts';
 import {

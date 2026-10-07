@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 /* eslint-disable operator-linebreak */
 
 import type {

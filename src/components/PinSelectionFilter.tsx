@@ -1,3 +1,4 @@
+import type { JSX } from 'react';
 import type { PinSelectionList, UserId } from '../types.ts';
 
 import Alert from '@mui/material/Alert';
