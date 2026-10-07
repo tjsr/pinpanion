@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createGameCode } from './secure.ts';
 import worker, { localDayFor } from './worker.ts';
+import { createGameCode } from './secure.ts';
 
 type Assignment = { boardId: string; nickname: string; createdAt: number };
 
@@ -11,6 +11,19 @@ function memoryDatabase() {
   return {
     assignments,
     prepare: (query: string) => ({ bind: (...values: unknown[]) => ({
+      all: async () => {
+        if (query.includes('FROM scavenger_devices')) {
+          const [game, device] = values as string[];
+          const timeZone = devices.get(`${game}:${device}`);
+          return { results: timeZone ? [{ timeZone }] : [] };
+        }
+        if (query.includes('FROM scavenger_assignments')) {
+          const [game, device, day] = values as string[];
+          const assignment = assignments.get(`${game}:${device}:${day}`);
+          return { results: assignment ? [assignment] : [] };
+        }
+        throw new Error(`Unexpected query: ${query}`);
+      },
       run: async () => {
         if (query.includes('INTO scavenger_devices')) {
           const [game, device, zone] = values as string[];
@@ -23,22 +36,9 @@ function memoryDatabase() {
             [string, string, string, string, string, number];
           const key = `${game}:${device}:${day}`;
           if (assignments.has(key) || boards.has(boardId)) return { meta: { changes: 0 } };
-          assignments.set(key, { boardId, nickname, createdAt });
+          assignments.set(key, { boardId, createdAt, nickname });
           boards.add(boardId);
           return { meta: { changes: 1 } };
-        }
-        throw new Error(`Unexpected query: ${query}`);
-      },
-      all: async () => {
-        if (query.includes('FROM scavenger_devices')) {
-          const [game, device] = values as string[];
-          const timeZone = devices.get(`${game}:${device}`);
-          return { results: timeZone ? [{ timeZone }] : [] };
-        }
-        if (query.includes('FROM scavenger_assignments')) {
-          const [game, device, day] = values as string[];
-          const assignment = assignments.get(`${game}:${device}:${day}`);
-          return { results: assignment ? [assignment] : [] };
         }
         throw new Error(`Unexpected query: ${query}`);
       },
@@ -60,12 +60,12 @@ describe('scavenger assignment', () => {
     const gameCode = createGameCode(beforeMidnight - 60_000);
     const deviceId = '0123456789abcdef0123456789abcdef';
     const database = memoryDatabase();
-    const env = { PINGO_PLAYERS: database, PINGO_ADMIN_PASSWORD: 'pinny',
-      PINGO_SIGNING_SECRET: 'test signing secret',
-      ASSETS: { fetch: async () => Response.json({ pins: [] }) } };
+    const env = { ASSETS: { fetch: async () => Response.json({ pins: [] }) },
+      PINGO_ADMIN_PASSWORD: 'pinny', PINGO_PLAYERS: database,
+      PINGO_SIGNING_SECRET: 'test signing secret' };
     const assign = async (nickname: string, timeZone = 'Australia/Sydney', id = deviceId) => {
       const response = await worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
-        method: 'POST', body: JSON.stringify({ gameCode, deviceId: id, nickname, timeZone }),
+        body: JSON.stringify({ deviceId: id, gameCode, nickname, timeZone }), method: 'POST',
       }), env);
       expect(response.status).toBe(200);
       return response.json() as Promise<{ boardId: string; nickname: string; localDay: string; existing: boolean }>;
@@ -73,13 +73,13 @@ describe('scavenger assignment', () => {
     try {
       now.mockReturnValue(beforeMidnight);
       const first = await assign('Alice');
-      expect(first).toMatchObject({ nickname: 'Alice', localDay: '2026-10-05', existing: false });
+      expect(first).toMatchObject({ existing: false, localDay: '2026-10-05', nickname: 'Alice' });
       const repeat = await assign('Changed name', 'Pacific/Honolulu');
-      expect(repeat).toMatchObject({ boardId: first.boardId, nickname: 'Alice', existing: true });
+      expect(repeat).toMatchObject({ boardId: first.boardId, existing: true, nickname: 'Alice' });
       expect(database.assignments.size).toBe(1);
       now.mockReturnValue(Date.UTC(2026, 9, 5, 13, 0));
       const nextDay = await assign('Alice', 'Pacific/Honolulu');
-      expect(nextDay).toMatchObject({ localDay: '2026-10-06', existing: false });
+      expect(nextDay).toMatchObject({ existing: false, localDay: '2026-10-06' });
       expect(nextDay.boardId).not.toBe(first.boardId);
       expect(database.assignments.size).toBe(2);
       const otherDevice = await assign('Bob', 'Australia/Sydney', 'abcdef0123456789abcdef0123456789');
@@ -92,12 +92,12 @@ describe('scavenger assignment', () => {
 
   it('requires a nickname and a valid time zone', async () => {
     const gameCode = createGameCode(Date.now() - 60_000);
-    const env = { PINGO_PLAYERS: memoryDatabase(), PINGO_ADMIN_PASSWORD: 'pinny',
-      PINGO_SIGNING_SECRET: 'test signing secret',
-      ASSETS: { fetch: async () => Response.json({ pins: [] }) } };
+    const env = { ASSETS: { fetch: async () => Response.json({ pins: [] }) },
+      PINGO_ADMIN_PASSWORD: 'pinny', PINGO_PLAYERS: memoryDatabase(),
+      PINGO_SIGNING_SECRET: 'test signing secret' };
     const request = (nickname: string, timeZone: string) => worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
-      method: 'POST', body: JSON.stringify({ gameCode,
-        deviceId: '0123456789abcdef0123456789abcdef', nickname, timeZone }),
+      body: JSON.stringify({ deviceId: '0123456789abcdef0123456789abcdef', gameCode, nickname, timeZone }),
+      method: 'POST',
     }), env);
     expect((await request('', 'Australia/Sydney')).status).toBe(400);
     expect((await request('Alice', 'Not/AZone')).status).toBe(400);

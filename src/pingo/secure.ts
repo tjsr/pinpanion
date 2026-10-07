@@ -1,10 +1,10 @@
-import { CODE_ALPHABET } from '../guess/game.ts';
 import {
   DRAW_BATCH_OFFSET_MS, DRAW_BATCH_SIZE,
   GAME_CODE_LENGTH, GAME_TAG_CHARS, GAME_TIME_CHARS,
   PREVIOUS_TIMED_GAME_CODE_LENGTH, encodeBase28,
   gameDetailsFromCode, timedGamePayload, timestampPayload
 } from './game.ts';
+import { CODE_ALPHABET } from '../guess/game.ts';
 import type { DrawIntervalSeconds } from './game.ts';
 
 const encoder = new TextEncoder();
@@ -27,7 +27,7 @@ export async function passwordMatches(expected: string, supplied: string): Promi
 
 async function hmac(secret: string, value: string): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey('raw', encoder.encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    { hash: 'SHA-256', name: 'HMAC' }, false, ['sign']);
   return new Uint8Array(await crypto.subtle.sign('HMAC', key, encoder.encode(value)));
 }
 
@@ -86,7 +86,7 @@ async function shuffledIds(secret: string, batchStartMs: number, ids: number[]):
   new Uint8Array(keyMaterial).set(keyBytes);
   const key = await crypto.subtle.importKey('raw', keyMaterial, 'AES-CTR', false, ['encrypt']);
   const randomBytes = new Uint8Array(await crypto.subtle.encrypt(
-    { name: 'AES-CTR', counter: new Uint8Array(16), length: 64 },
+    { counter: new Uint8Array(16), length: 64, name: 'AES-CTR' },
     key, new Uint8Array(Math.max(0, ids.length - 1) * 4)
   ));
   const shuffled = [...ids];

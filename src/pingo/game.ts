@@ -1,5 +1,5 @@
-import type { Pin } from '../types.ts';
 import { CODE_ALPHABET, CODE_PATTERN, createRandom, hashString, validPinsFrom } from '../guess/game.ts';
+import type { Pin } from '../types.ts';
 
 export const BOARD_SIZE = 25;
 export const DRAW_BATCH_SIZE = 100;
@@ -109,7 +109,7 @@ export function timedGamePayload(epochSeconds: number, intervalSeconds: DrawInte
 
 export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs: number; intervalMs: number } {
   if (code.length === GAME_TIME_CHARS) {
-    return { startMs: timestampFromPayload(code) * 1_000, intervalMs: DRAW_INTERVAL_MS };
+    return { intervalMs: DRAW_INTERVAL_MS, startMs: timestampFromPayload(code) * 1_000 };
   }
   if (code.length !== GAME_CODE_LENGTH && code.length !== PREVIOUS_TIMED_GAME_CODE_LENGTH) {
     throw new Error('Invalid game code length.');
@@ -119,7 +119,7 @@ export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs
   const intervalMs = DRAW_INTERVAL_SECONDS[Number(payload & 3n)] * 1_000;
   if (code.length === PREVIOUS_TIMED_GAME_CODE_LENGTH) {
     if (reversed > MAX_TIME) throw new Error('Invalid game timestamp.');
-    return { startMs: Number(reverseBits32(reversed)) * 1_000, intervalMs };
+    return { intervalMs, startMs: Number(reverseBits32(reversed)) * 1_000 };
   }
   if (reversed >= ROLLING_PERIOD || !Number.isSafeInteger(nowMs) || nowMs < 0) {
     throw new Error('Invalid game timestamp.');
@@ -129,8 +129,8 @@ export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs
   if (startSeconds > nowSeconds) startSeconds -= ROLLING_PERIOD;
   if (startSeconds < 0n) throw new Error('Invalid game timestamp.');
   return {
-    startMs: Number(startSeconds) * 1_000,
     intervalMs,
+    startMs: Number(startSeconds) * 1_000,
   };
 }
 

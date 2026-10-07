@@ -1,22 +1,22 @@
-import { webcrypto } from 'node:crypto';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
-import type { Pin } from '../types.ts';
 import {
   GAME_CODE_LENGTH, boardCodeFromTimestamp, boardPins, decodeBase28, drawIntervalFromGameCode,
   encodeBase28, gameDetailsFromCode, scheduledCount, timedGamePayload, timestampFromPayload,
   timestampPayload, usablePinsFrom, winningLines
 } from './game.ts';
+import { beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   createGameCode, createTimedGameCode, drawIds, pinCountSignatureIsValid, signPinCount,
   verifiedGameStart
 } from './secure.ts';
+import type { Pin } from '../types.ts';
+import { webcrypto } from 'node:crypto';
 import worker from './worker.ts';
 
-const pins = Array.from({ length: 130 }, (_, id) => ({ id, name: `Pin ${id}`, image_name: `pin-${id}.webp` })) as Pin[];
+const pins = Array.from({ length: 130 }, (_, id) => ({ id, image_name: `pin-${id}.webp`, name: `Pin ${id}` })) as Pin[];
 const secret = 'unit-test-secret-with-sufficient-length';
 
 beforeAll(() => {
-  Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true }); 
+  Object.defineProperty(globalThis, 'crypto', { configurable: true, value: webcrypto });
 });
 
 describe('Pingo generation', () => {
@@ -69,7 +69,7 @@ describe('Pingo generation', () => {
   ] as const)('encodes epoch second %i at %is as %s', (seconds, intervalSeconds, code) => {
     expect(timedGamePayload(seconds, intervalSeconds)).toBe(code);
     expect(gameDetailsFromCode(code, seconds * 1_000)).toEqual({
-      startMs: seconds * 1_000, intervalMs: intervalSeconds * 1_000,
+      intervalMs: intervalSeconds * 1_000, startMs: seconds * 1_000,
     });
     expect(Number(decodeBase28(code) % 4n)).toBe([10, 15, 20, 30].indexOf(intervalSeconds));
   });
@@ -84,7 +84,7 @@ describe('Pingo generation', () => {
 
   it('keeps seven- and eight-character games valid and rejects impossible timestamps', () => {
     expect(drawIntervalFromGameCode(createGameCode(1_704_067_200_000))).toBe(30_000);
-    expect(gameDetailsFromCode('226XDKAP')).toEqual({ startMs: 1_704_067_200_000, intervalMs: 20_000 });
+    expect(gameDetailsFromCode('226XDKAP')).toEqual({ intervalMs: 20_000, startMs: 1_704_067_200_000 });
     expect(() => gameDetailsFromCode('ZZZZZZZZ')).toThrow();
     expect(() => gameDetailsFromCode('ZZZZZZ')).toThrow();
     expect(() => timedGamePayload(0, 12 as 10)).toThrow();
@@ -129,8 +129,8 @@ describe('Pingo verification API', () => {
     const game = createGameCode(startMs);
     const board = 'XY6D';
     const env = {
-      PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret,
       ASSETS: { fetch: async () => Response.json({ pins }) },
+      PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret,
     };
     const request = new Request(`https://pingo.test/api/pingo/verify?game=${game}&board=${board}`);
     const now = vi.spyOn(Date, 'now');
@@ -164,23 +164,23 @@ describe('Pingo verification API', () => {
 
   it('rejects unsigned future counts and accepts an admin-signed snapshot', async () => {
     const env = {
-      PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret,
       ASSETS: { fetch: async () => Response.json({ pins }) },
+      PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret,
     };
     const denied = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
-      method: 'POST', body: JSON.stringify({ password: 'wrong password' }),
+      body: JSON.stringify({ password: 'wrong password' }), method: 'POST',
     }), env);
     expect(denied.status).toBe(401);
     const created = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
-      method: 'POST', body: JSON.stringify({ password: 'test password' }),
+      body: JSON.stringify({ password: 'test password' }), method: 'POST',
     }), env);
     expect(created.status).toBe(200);
     const { game } = await created.json() as { game: string };
     expect(game).toHaveLength(6);
     expect(verifiedGameStart(game)).toBeGreaterThan(Date.now() - 1_000);
     const admin = await worker.fetch(new Request('https://pingo.test/api/pingo/admin', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: 'test password', game, pin: 10, at: Date.now() }),
+      body: JSON.stringify({ at: Date.now(), game, password: 'test password', pin: 10 }),
+      headers: { 'Content-Type': 'application/json' }, method: 'POST',
     }), env);
     expect(admin.status).toBe(200);
     const signed = await admin.json() as { pin: number; at: number; sig: string };
@@ -194,13 +194,13 @@ describe('Pingo verification API', () => {
   it.each([10, 15, 20, 30] as const)('creates a %is game and counts at its interval', async intervalSeconds => {
     const startMs = 1_704_067_200_000;
     const game = createTimedGameCode(startMs, intervalSeconds);
-    const env = { PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret,
-      ASSETS: { fetch: async () => Response.json({ pins }) } };
+    const env = { ASSETS: { fetch: async () => Response.json({ pins }) },
+      PINGO_ADMIN_PASSWORD: 'test password', PINGO_SIGNING_SECRET: secret };
     const now = vi.spyOn(Date, 'now');
     try {
       now.mockReturnValue(startMs);
       const create = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
-        method: 'POST', body: JSON.stringify({ password: 'test password', intervalSeconds }),
+        body: JSON.stringify({ intervalSeconds, password: 'test password' }), method: 'POST',
       }), env);
       expect(create.status).toBe(200);
       expect((await create.json() as { game: string }).game).toBe(game);
@@ -221,29 +221,29 @@ describe('Pingo player API', () => {
     const rows = new Map<string, Record<string, unknown>>();
     const database = {
       prepare: (_query: string) => ({ bind: (...values: unknown[]) => ({
+        all: async () => ({ results: [...rows.values()] }),
         run: async () => {
           const [registrationId, boardId, gameCode, playerName, updatedAt, ipAddress] = values;
-          rows.set(`${gameCode}:${registrationId}`, { registrationId, boardId, gameCode, playerName, updatedAt, ipAddress });
+          rows.set(`${gameCode}:${registrationId}`, { boardId, gameCode, ipAddress, playerName, registrationId, updatedAt });
         },
-        all: async () => ({ results: [...rows.values()] }),
       }) }),
     };
     const env = { ASSETS: { fetch: async () => Response.json({ pins }) },
-      PINGO_ADMIN_PASSWORD: 'pinny', PINGO_SIGNING_SECRET: secret, PINGO_PLAYERS: database };
+      PINGO_ADMIN_PASSWORD: 'pinny', PINGO_PLAYERS: database, PINGO_SIGNING_SECRET: secret };
     const gameCode = createGameCode(Date.now());
     const registrationId = '0123456789abcdef0123456789abcdef';
     const put = (playerName: string) => worker.fetch(new Request('https://pingo.test/player', {
-      method: 'PUT', headers: { 'CF-Connecting-IP': '192.0.2.4', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ registrationId, boardId: 'ACDE', gameCode, playerName }),
+      body: JSON.stringify({ boardId: 'ACDE', gameCode, playerName, registrationId }),
+      headers: { 'CF-Connecting-IP': '192.0.2.4', 'Content-Type': 'application/json' }, method: 'PUT',
     }), env);
     expect((await put('Alice')).status).toBe(200);
     expect((await put('Alice Smith')).status).toBe(200);
     expect(rows.size).toBe(1);
-    expect(rows.get(`${gameCode}:${registrationId}`)).toMatchObject({ playerName: 'Alice Smith', ipAddress: '192.0.2.4' });
+    expect(rows.get(`${gameCode}:${registrationId}`)).toMatchObject({ ipAddress: '192.0.2.4', playerName: 'Alice Smith' });
     expect(typeof rows.get(`${gameCode}:${registrationId}`)?.updatedAt).toBe('number');
     await worker.fetch(new Request('https://pingo.test/player', {
-      method: 'PUT', body: JSON.stringify({ registrationId: 'fedcba9876543210fedcba9876543210',
-        boardId: 'ACDE', gameCode, playerName: 'Bob' }),
+      body: JSON.stringify({ boardId: 'ACDE', gameCode, playerName: 'Bob', registrationId: 'fedcba9876543210fedcba9876543210' }),
+      method: 'PUT',
     }), env);
     expect(rows.size).toBe(2);
     const denied = await worker.fetch(new Request('https://pingo.test/player'), env);
@@ -257,7 +257,8 @@ describe('Pingo player API', () => {
       { boardId: 'ACDE', gameCode, playerName: 'Bob' },
     ]);
     expect((await worker.fetch(new Request('https://pingo.test/player', {
-      method: 'PUT', body: JSON.stringify({ registrationId, boardId: 'ACDE', gameCode: 'invalid', playerName: 'Alice' }),
+      body: JSON.stringify({ boardId: 'ACDE', gameCode: 'invalid', playerName: 'Alice', registrationId }),
+      method: 'PUT',
     }), env)).status).toBe(400);
   });
 });

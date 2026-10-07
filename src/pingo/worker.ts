@@ -22,7 +22,7 @@ interface Env {
 type JsonObject = Record<string, unknown>;
 
 function json(value: JsonObject, status = 200): Response {
-  return Response.json(value, { status, headers: { 'Cache-Control': 'no-store' } });
+  return Response.json(value, { headers: { 'Cache-Control': 'no-store' }, status });
 }
 
 async function limitedJson(request: Request): Promise<JsonObject> {
@@ -33,7 +33,7 @@ async function limitedJson(request: Request): Promise<JsonObject> {
   const parts: Uint8Array[] = [];
   let length = 0;
   try {
-    while (true) {
+    for (;;) {
       const { done, value } = await reader.read();
       if (done) break;
       length += value.length;
@@ -90,7 +90,7 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
     typeof gameCode !== 'string' || verifiedGameStart(gameCode) === null ||
     verifiedGameStart(gameCode)! > Date.now() + 60_000 ||
     typeof registrationId !== 'string' || !/^[0-9a-f]{32}$/i.test(registrationId) ||
-    !playerName || playerName.length > 80 || /[\x00-\x1f\x7f]/.test(playerName)) {
+    !playerName || playerName.length > 80 || /\p{Cc}/u.test(playerName)) {
     return json({ error: 'Invalid player details.' }, 400);
   }
   const updatedAt = Date.now();
@@ -103,7 +103,7 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
 
 export function localDayFor(timestamp: number, timeZone: string): string {
   const parts = new Intl.DateTimeFormat('en-US', {
-    timeZone, year: 'numeric', month: '2-digit', day: '2-digit',
+    day: '2-digit', month: '2-digit', timeZone, year: 'numeric',
   }).formatToParts(new Date(timestamp));
   const part = (name: string) => parts.find(value => value.type === name)?.value;
   return `${part('year')}-${part('month')}-${part('day')}`;
@@ -125,7 +125,7 @@ async function scavengerRequest(request: Request, env: Env): Promise<Response> {
   if (typeof gameCode !== 'string' || verifiedGameStart(gameCode) === null ||
     verifiedGameStart(gameCode)! > Date.now() + 60_000 ||
     typeof deviceId !== 'string' || !/^[0-9a-f]{32}$/i.test(deviceId) ||
-    !nickname || nickname.length > 80 || /[\x00-\x1f\x7f]/.test(nickname) ||
+    !nickname || nickname.length > 80 || /\p{Cc}/u.test(nickname) ||
     typeof timeZone !== 'string' || timeZone.length > 64) {
     return json({ error: 'Invalid scavenger details.' }, 400);
   }
@@ -200,7 +200,7 @@ async function adminRequest(request: Request, env: Env): Promise<Response> {
     Math.max(DRAW_BATCH_SIZE, Math.ceil((count + 1) / DRAW_BATCH_SIZE) * DRAW_BATCH_SIZE));
   const ids = await drawIds(env.PINGO_SIGNING_SECRET!, startMs, pins.map(pin => pin.id), limit);
   const sig = await signPinCount(env.PINGO_SIGNING_SECRET!, body.game, count, at);
-  return json({ game: body.game, startMs, intervalMs, pin: count, at, sig, ids });
+  return json({ at, game: body.game, ids, intervalMs, pin: count, sig, startMs });
 }
 
 async function verifyRequest(request: Request, env: Env): Promise<Response> {
@@ -232,10 +232,9 @@ async function verifyRequest(request: Request, env: Env): Promise<Response> {
   const boardIds = boardPins(board, pins).map(pin => pin.id);
   const called = new Set(ids);
   return json({
-    game, board, count, intervalMs,
+    board, checkedAt: Date.now(), count, game, intervalMs,
     matchedIds: boardIds.filter(id => called.has(id)),
     winningLines: winningLines(boardIds, called),
-    checkedAt: Date.now(),
   });
 }
 
@@ -262,8 +261,8 @@ export default {
         if (url.pathname === '/api/pingo/verify') return await verifyRequest(request, env);
         return json({ error: 'Unknown endpoint.' }, 404);
       } catch (error) {
-        console.error(JSON.stringify({ event: 'pingo_api_error', path: url.pathname,
-          message: error instanceof Error ? error.message : 'Unknown error' }));
+        console.error(JSON.stringify({ event: 'pingo_api_error',
+          message: error instanceof Error ? error.message : 'Unknown error', path: url.pathname }));
         return json({ error: 'Pingo request failed.' }, 500);
       }
     }

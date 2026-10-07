@@ -30,7 +30,7 @@ export function photoIsValid(photo: Pick<HuntPhoto, 'capturedAt'>, startedAt: nu
 
 export function centeredSquare(width: number, height: number): CropSquare {
   const size = Math.min(width, height) * 0.65;
-  return { x: (width - size) / 2, y: (height - size) / 2, size };
+  return { size, x: (width - size) / 2, y: (height - size) / 2 };
 }
 
 export function moveSquare(square: CropSquare, dx: number, dy: number,
@@ -81,7 +81,7 @@ export async function loadBoardPhotos(boardCode: string): Promise<HuntPhoto[]> {
 
 export async function saveBoardPhoto(boardCode: string, pinId: number,
   capturedAt: number, blob: Blob): Promise<HuntPhoto> {
-  const photo: HuntPhoto = { key: `${boardCode}:${pinId}`, boardCode, pinId, capturedAt, blob };
+  const photo: HuntPhoto = { blob, boardCode, capturedAt, key: `${boardCode}:${pinId}`, pinId };
   const database = await openDatabase();
   try {
     await new Promise<void>((resolve, reject) => {
