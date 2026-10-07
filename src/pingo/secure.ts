@@ -72,14 +72,14 @@ function unhex(value: string): Uint8Array {
 async function deriveGamePassword(password: string, salt: Uint8Array): Promise<Uint8Array> {
   const key = await crypto.subtle.importKey('raw', encoder.encode(password), 'PBKDF2', false, ['deriveBits']);
   return new Uint8Array(await crypto.subtle.deriveBits({
-    name: 'PBKDF2', hash: 'SHA-256', salt: new Uint8Array(salt).buffer,
-    iterations: GAME_PASSWORD_ITERATIONS
+    hash: 'SHA-256', iterations: GAME_PASSWORD_ITERATIONS, name: 'PBKDF2',
+    salt: new Uint8Array(salt).buffer,
   }, key, 256));
 }
 
 export async function hashGamePassword(password: string): Promise<{ salt: string; hash: string }> {
   const salt = crypto.getRandomValues(new Uint8Array(16));
-  return { salt: hex(salt), hash: hex(await deriveGamePassword(password, salt)) };
+  return { hash: hex(await deriveGamePassword(password, salt)), salt: hex(salt) };
 }
 
 export async function gamePasswordHash(password: string, salt: string): Promise<string> {
@@ -99,8 +99,11 @@ export async function gamePasswordProofMatches(proof: string, verifier: string,
 
 export function verifiedGameDetails(code: string): { startMs: number; intervalMs: number; poolSize?: number } | null {
   if (isNewGameCode(code)) {
-    try { return gameDetailsFromCode(code); }
-    catch { return null; }
+    try {
+      return gameDetailsFromCode(code); 
+    } catch {
+      return null; 
+    }
   }
   if (![GAME_CODE_LENGTH, GAME_TIME_CHARS, PREVIOUS_TIMED_GAME_CODE_LENGTH].includes(code.length) ||
     [...code].some(letter => !CODE_ALPHABET.includes(letter))) return null;
@@ -139,7 +142,7 @@ export async function callerPinSignatureIsValid(
   const scopedKey = await callerSigningKey(secret, game);
   const [current, legacy] = await Promise.all([
     pinCountSignatureIsValid(scopedKey, game, count, at, signature),
-    pinCountSignatureIsValid(secret, game, count, at, signature)
+    pinCountSignatureIsValid(secret, game, count, at, signature),
   ]);
   return current || legacy;
 }

@@ -1,12 +1,16 @@
-import { webcrypto } from 'node:crypto';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
-import type { Pin } from '../types.ts';
 import { boardCodeForGame, boardPins, gameCodeWithSettings, gameDetailsFromCode, isBoardCodeForGame,
   settingsCode, settingsFromCode } from './game.ts';
 import { drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
+import type { Pin } from '../types.ts';
+import { webcrypto } from 'node:crypto';
 import worker from './worker.ts';
 
-beforeAll(() => { Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true }); });
+/* eslint sort-keys: off */
+
+beforeAll(() => {
+  Object.defineProperty(globalThis, 'crypto', { value: webcrypto, configurable: true }); 
+});
 
 const pins = Array.from({ length: 200 }, (_, id) =>
   ({ id, name: `Pin ${id}`, image_name: `pin-${id}.webp` })) as Pin[];
@@ -103,8 +107,8 @@ function database() {
           return { results: [...players.values()].filter(row => !values.length || row.gameCode === values[0]) };
         }
         throw new Error(`Unexpected SQL: ${query}`);
-      }
-    }) })
+      },
+    }) }),
   };
 }
 
@@ -112,7 +116,7 @@ describe('registered games and bounded pin pools', () => {
   it.each([10, 15, 20, 30] as const)('round trips %is and 25-pin increments in YYY', speed => {
     for (const pool of [25, 50, 150, 200]) {
       expect(settingsFromCode(settingsCode(speed, pool))).toEqual({
-        intervalMs: speed * 1_000, poolSize: pool
+        intervalMs: speed * 1_000, poolSize: pool,
       });
     }
     expect(() => settingsCode(speed, 151)).toThrow();
@@ -125,7 +129,7 @@ describe('registered games and bounded pin pools', () => {
       PINGO_SIGNING_SECRET: 'test-signing-secret',
       ASSETS: { fetch: async () => Response.json({ pins }) } };
     const request = (path: string, body: Record<string, unknown>) => worker.fetch(new Request(`https://pingo.test${path}`, {
-      method: 'POST', body: JSON.stringify(body)
+      method: 'POST', body: JSON.stringify(body),
     }), env);
     const { salt, hash } = await hashGamePassword('game-secret');
     const rejected = await request('/api/pingo/create', { password: 'wrong',
@@ -147,7 +151,7 @@ describe('registered games and bounded pin pools', () => {
 
     const listing = await worker.fetch(new Request('https://pingo.test/api/pingo/games'), env);
     expect((await listing.json() as { games: unknown[] }).games).toMatchObject([
-      { gameCode: game, intervalMs: 15_000, poolSize: 50 }
+      { gameCode: game, intervalMs: 15_000, poolSize: 50 },
     ]);
     const wrongAdmin = await request('/api/pingo/admin', { game, passwordProof: 'site-secret' });
     expect(wrongAdmin.status).toBe(401);
@@ -190,17 +194,17 @@ describe('registered games and bounded pin pools', () => {
     const registrationId = '0123456789abcdef0123456789abcdef';
     const player = await worker.fetch(new Request('https://pingo.test/player', {
       method: 'PUT', body: JSON.stringify({ boardId: board, gameCode: game,
-        registrationId, playerName: 'Alice' })
+        registrationId, playerName: 'Alice' }),
     }), env);
     expect(player.status).toBe(200);
     const playerList = await worker.fetch(new Request(`https://pingo.test/player?game=${game}`, {
-      headers: { Authorization: `Bearer ${hash}` }
+      headers: { Authorization: `Bearer ${hash}` },
     }), env);
     expect((await playerList.json() as { players: unknown[] }).players).toMatchObject([
-      { boardId: board, gameCode: game, playerName: 'Alice' }
+      { boardId: board, gameCode: game, playerName: 'Alice' },
     ]);
     const deniedPlayers = await worker.fetch(new Request(`https://pingo.test/player?game=${game}`, {
-      headers: { Authorization: 'Bearer wrong-password' }
+      headers: { Authorization: 'Bearer wrong-password' },
     }), env);
     expect(deniedPlayers.status).toBe(401);
   });
@@ -211,7 +215,7 @@ describe('registered games and bounded pin pools', () => {
       PINGO_SIGNING_SECRET: 'test-signing-secret',
       ASSETS: { fetch: async () => Response.json({ pins }) } };
     const request = (path: string, body: Record<string, unknown>) => worker.fetch(new Request(`https://pingo.test${path}`, {
-      method: 'POST', body: JSON.stringify(body)
+      method: 'POST', body: JSON.stringify(body),
     }), env);
     const now = vi.spyOn(Date, 'now');
     try {
@@ -244,7 +248,9 @@ describe('registered games and bounded pin pools', () => {
         passwordHash: db.games.get(game)?.passwordHash });
       const successorAdmin = await request('/api/pingo/admin', { game: nextGame, passwordProof: hash });
       expect(successorAdmin.status).toBe(200);
-    } finally { now.mockRestore(); }
+    } finally {
+      now.mockRestore(); 
+    }
   });
 
   it('gives a scavenger the same suffixed board on repeat', async () => {
@@ -259,12 +265,12 @@ describe('registered games and bounded pin pools', () => {
       now.mockReturnValue(start);
       const create = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
         method: 'POST', body: JSON.stringify({ password: 'site-secret', passwordSalt: salt, passwordHash: hash,
-          intervalSeconds: 30, poolSize: 150 })
+          intervalSeconds: 30, poolSize: 150 }),
       }), env);
       const { game } = await create.json() as { game: string };
       const join = () => worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
         method: 'POST', body: JSON.stringify({ gameCode: game,
-          deviceId: '0123456789abcdef0123456789abcdef', nickname: 'Alice', timeZone: 'Australia/Sydney' })
+          deviceId: '0123456789abcdef0123456789abcdef', nickname: 'Alice', timeZone: 'Australia/Sydney' }),
       }), env);
       const first = await join();
       const second = await join();
@@ -275,6 +281,8 @@ describe('registered games and bounded pin pools', () => {
       expect(isBoardCodeForGame(assigned.boardId, game)).toBe(true);
       expect(await second.json()).toMatchObject({ boardId: assigned.boardId, existing: true });
       expect(db.hunts.size).toBe(1);
-    } finally { now.mockRestore(); }
+    } finally {
+      now.mockRestore(); 
+    }
   });
 });

@@ -1,4 +1,3 @@
-import { makeCode } from '../guess/game.ts';
 import { BOARD_SIZE, DEFAULT_POOL_SIZE, DRAW_BATCH_SIZE, DRAW_INTERVAL_SECONDS,
   boardCodeForGame, boardPins, isBoardCodeForGame, isNewGameCode, scheduledCount,
   usablePinsFrom, winningLines } from './game.ts';
@@ -8,6 +7,7 @@ import {
   passwordMatches,
   signPinCount, verifiedGameDetails
 } from './secure.ts';
+import { makeCode } from '../guess/game.ts';
 
 interface Env {
   ASSETS: { fetch(request: Request | string): Promise<Response> };
@@ -88,14 +88,14 @@ async function registeredGame(env: Env, code: string): Promise<GameRecord | null
   return saved;
 }
 
-async function gameDetailsFor(env: Env, code: string): Promise<{ startMs: number; intervalMs: number; poolSize?: number } | null> {
+async function gameDetailsFor(env: Env, code: string): Promise<{ intervalMs: number; startMs: number; poolSize?: number } | null> {
   const decoded = verifiedGameDetails(code);
   if (!decoded || decoded.startMs > Date.now() + 60_000) return null;
   if (!isNewGameCode(code)) return decoded;
   const saved = await registeredGame(env, code);
   if (!saved || saved.startMs !== decoded.startMs || saved.intervalMs !== decoded.intervalMs ||
     saved.poolSize !== decoded.poolSize) return null;
-  return { startMs: saved.startMs, intervalMs: saved.intervalMs, poolSize: saved.poolSize };
+  return { intervalMs: saved.intervalMs, poolSize: saved.poolSize, startMs: saved.startMs };
 }
 
 async function boardExists(env: Env, game: string, board: string): Promise<boolean> {
@@ -123,8 +123,8 @@ async function playerRequest(request: Request, env: Env): Promise<Response> {
     const authorization = request.headers.get('Authorization') ?? '';
     const game = new URL(request.url).searchParams.get('game');
     const supplied = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
-    if (!supplied || !(game ? await adminPasswordMatches(env, game, supplied) :
-      (env.PINGO_ADMIN_PASSWORD && await passwordMatches(env.PINGO_ADMIN_PASSWORD, supplied)))) {
+    if (!supplied || !(game ? await adminPasswordMatches(env, game, supplied)
+      : (env.PINGO_ADMIN_PASSWORD && await passwordMatches(env.PINGO_ADMIN_PASSWORD, supplied)))) {
       return json({ error: 'Incorrect admin password.' }, 401);
     }
     const rows = await env.PINGO_PLAYERS.prepare(
@@ -182,12 +182,15 @@ async function boardRequest(request: Request, env: Env): Promise<Response> {
     if (!await gameDetailsFor(env, game) || !await boardExists(env, game, board)) {
       return json({ error: 'Board is not registered for this game.' }, 404);
     }
-    return json({ game, board });
+    return json({ board, game });
   }
   if (request.method !== 'POST') return json({ error: 'GET or POST required.' }, 405);
   let body: JsonObject;
-  try { body = await limitedJson(request); }
-  catch { return json({ error: 'Invalid request.' }, 400); }
+  try {
+    body = await limitedJson(request); 
+  } catch {
+    return json({ error: 'Invalid request.' }, 400); 
+  }
   const game = body.game;
   if (typeof game !== 'string' || !isNewGameCode(game)) return json({ error: 'A registered game is required.' }, 400);
   const details = await gameDetailsFor(env, game);
@@ -198,7 +201,7 @@ async function boardRequest(request: Request, env: Env): Promise<Response> {
     const inserted = await env.PINGO_PLAYERS.prepare(
       'INSERT OR IGNORE INTO game_boards (game_code, board_code, created_at_ms) VALUES (?, ?, ?)'
     ).bind(game, board, Date.now()).run() as { meta?: { changes?: number } };
-    if (inserted.meta?.changes === 1) return json({ game, board }, 201);
+    if (inserted.meta?.changes === 1) return json({ board, game }, 201);
   }
   throw new Error('No available board code was found.');
 }

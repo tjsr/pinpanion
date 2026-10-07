@@ -8,5 +8,5 @@ export async function testAdminResponse(game: string, pin: number, at: number, p
   const ids = await drawIdsFromBatchKeys(drawKeys, pinIds.slice(0, poolSize), Math.min(poolSize, 100));
   const signingKey = await callerSigningKey(secret, game);
   const sig = await signPinCount(secret, game, pin, at);
-  return { game, startMs, pin, poolSize, at, sig, ids, drawKeys, signingKey };
+  return { at, drawKeys, game, ids, pin, poolSize, sig, signingKey, startMs };
 }

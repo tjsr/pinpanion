@@ -5,10 +5,10 @@ const DAILY_WINDOW_MS = 24 * 60 * 60_000;
 const DAILY_REQUEST_LIMIT = 5_000;
 
 type GuardState = {
-  windowStart: number;
+  blockedUntil: number;
   count: number;
   nextAtByKey: Record<string, number>;
-  blockedUntil: number;
+  windowStart: number;
 };
 
 type GuardDenial = { allowed: false; reason: 'spacing' | 'service' | 'daily'; waitMs: number };
@@ -17,7 +17,7 @@ type GuardDecision = { allowed: true } | GuardDenial;
 let memoryState: GuardState | null = null;
 
 function freshState(now: number): GuardState {
-  return { windowStart: now, count: 0, nextAtByKey: {}, blockedUntil: 0 };
+  return { blockedUntil: 0, count: 0, nextAtByKey: {}, windowStart: now };
 }
 
 function readState(now: number): GuardState {
@@ -39,8 +39,9 @@ function readState(now: number): GuardState {
 
 function saveState(state: GuardState): void {
   memoryState = state;
-  try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
-  catch { /* In-memory limits still protect this tab when storage is unavailable. */ }
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); 
+  } catch { /* In-memory limits still protect this tab when storage is unavailable. */ }
 }
 
 function requestAvailability(key: string, now: number): GuardDecision {
