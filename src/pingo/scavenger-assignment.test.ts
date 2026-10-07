@@ -41,8 +41,8 @@ function memoryDatabase() {
           return { results: assignment ? [assignment] : [] };
         }
         throw new Error(`Unexpected query: ${query}`);
-      }
-    }) })
+      },
+    }) }),
   };
 }
 
@@ -65,7 +65,7 @@ describe('scavenger assignment', () => {
       ASSETS: { fetch: async () => Response.json({ pins: [] }) } };
     const assign = async (nickname: string, timeZone = 'Australia/Sydney', id = deviceId) => {
       const response = await worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
-        method: 'POST', body: JSON.stringify({ gameCode, deviceId: id, nickname, timeZone })
+        method: 'POST', body: JSON.stringify({ gameCode, deviceId: id, nickname, timeZone }),
       }), env);
       expect(response.status).toBe(200);
       return response.json() as Promise<{ boardId: string; nickname: string; localDay: string; existing: boolean }>;
@@ -85,7 +85,9 @@ describe('scavenger assignment', () => {
       const otherDevice = await assign('Bob', 'Australia/Sydney', 'abcdef0123456789abcdef0123456789');
       expect(otherDevice.boardId).not.toBe(nextDay.boardId);
       expect(database.assignments.size).toBe(3);
-    } finally { now.mockRestore(); }
+    } finally {
+      now.mockRestore(); 
+    }
   });
 
   it('requires a nickname and a valid time zone', async () => {
@@ -95,7 +97,7 @@ describe('scavenger assignment', () => {
       ASSETS: { fetch: async () => Response.json({ pins: [] }) } };
     const request = (nickname: string, timeZone: string) => worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
       method: 'POST', body: JSON.stringify({ gameCode,
-        deviceId: '0123456789abcdef0123456789abcdef', nickname, timeZone })
+        deviceId: '0123456789abcdef0123456789abcdef', nickname, timeZone }),
     }), env);
     expect((await request('', 'Australia/Sydney')).status).toBe(400);
     expect((await request('Alice', 'Not/AZone')).status).toBe(400);

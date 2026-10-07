@@ -38,7 +38,7 @@ export function moveSquare(square: CropSquare, dx: number, dy: number,
   return {
     ...square,
     x: Math.max(0, Math.min(width - square.size, square.x + dx)),
-    y: Math.max(0, Math.min(height - square.size, square.y + dy))
+    y: Math.max(0, Math.min(height - square.size, square.y + dy)),
   };
 }
 
@@ -74,7 +74,9 @@ export async function loadBoardPhotos(boardCode: string): Promise<HuntPhoto[]> {
       request.onsuccess = () => resolve(request.result as HuntPhoto[]);
       request.onerror = () => reject(request.error ?? new Error('Saved photos could not be read.'));
     });
-  } finally { database.close(); }
+  } finally {
+    database.close(); 
+  }
 }
 
 export async function saveBoardPhoto(boardCode: string, pinId: number,
@@ -90,5 +92,7 @@ export async function saveBoardPhoto(boardCode: string, pinId: number,
       transaction.onabort = () => reject(transaction.error ?? new Error('Photo could not be saved.'));
     });
     return photo;
-  } finally { database.close(); }
+  } finally {
+    database.close(); 
+  }
 }

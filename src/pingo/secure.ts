@@ -1,8 +1,8 @@
 import { CODE_ALPHABET } from '../guess/game.ts';
 import {
   DRAW_BATCH_OFFSET_MS, DRAW_BATCH_SIZE,
-  encodeBase28, GAME_CODE_LENGTH, GAME_TIME_CHARS,
-  GAME_TAG_CHARS, PREVIOUS_TIMED_GAME_CODE_LENGTH,
+  GAME_CODE_LENGTH, GAME_TAG_CHARS, GAME_TIME_CHARS,
+  PREVIOUS_TIMED_GAME_CODE_LENGTH, encodeBase28,
   gameDetailsFromCode, timedGamePayload, timestampPayload
 } from './game.ts';
 import type { DrawIntervalSeconds } from './game.ts';
@@ -55,8 +55,11 @@ export function createTimedGameCode(epochMs: number, intervalSeconds: DrawInterv
 export function verifiedGameDetails(code: string): { startMs: number; intervalMs: number } | null {
   if (![GAME_CODE_LENGTH, GAME_TIME_CHARS, PREVIOUS_TIMED_GAME_CODE_LENGTH].includes(code.length) ||
     [...code].some(letter => !CODE_ALPHABET.includes(letter))) return null;
-  try { return gameDetailsFromCode(code); }
-  catch { return null; }
+  try {
+    return gameDetailsFromCode(code); 
+  } catch {
+    return null; 
+  }
 }
 
 export function verifiedGameStart(code: string): number | null {

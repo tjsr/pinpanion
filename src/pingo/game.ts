@@ -130,7 +130,7 @@ export function gameDetailsFromCode(code: string, nowMs = Date.now()): { startMs
   if (startSeconds < 0n) throw new Error('Invalid game timestamp.');
   return {
     startMs: Number(startSeconds) * 1_000,
-    intervalMs
+    intervalMs,
   };
 }
 
