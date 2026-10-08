@@ -24,14 +24,15 @@ describe('Pingo scavenger camera flow', () => {
 
   it('captures a live frame, offers a square crop, and saves the confirmed photo', async () => {
     const stop = vi.fn();
+    const track = { stop, kind: 'video', readyState: 'live' };
     Object.defineProperty(navigator, 'mediaDevices', { configurable: true,
-      value: { getUserMedia: vi.fn(async () => ({ getTracks: () => [{ stop }] })) } });
+      value: { getUserMedia: vi.fn(async () => ({ getTracks: () => [track], getVideoTracks: () => [track] })) } });
     vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue();
     Object.defineProperty(HTMLVideoElement.prototype, 'videoWidth', { configurable: true, value: 640 });
     Object.defineProperty(HTMLVideoElement.prototype, 'videoHeight', { configurable: true, value: 480 });
     vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue({ drawImage: vi.fn() } as unknown as CanvasRenderingContext2D);
     vi.spyOn(HTMLCanvasElement.prototype, 'toBlob').mockImplementation(callback => {
-      callback(new Blob(['captured frame'], { type: 'image/jpeg' }));
+      callback(new Blob([new Uint8Array([0xff, 0xd8, 0xff, 0xd9])], { type: 'image/jpeg' }));
     });
     Object.defineProperty(URL, 'createObjectURL', { configurable: true, value: vi.fn(() => 'blob:test') });
     Object.defineProperty(URL, 'revokeObjectURL', { configurable: true, value: vi.fn() });

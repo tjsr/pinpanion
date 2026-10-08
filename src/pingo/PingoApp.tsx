@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AppBar, Box, Button, Container, Dialog, DialogActions, DialogContent,
-  DialogTitle, Paper, Stack, TextField, Toolbar, Typography
+  DialogTitle, Paper, Stack, TextField, Toolbar, Tooltip, Typography
 } from '@mui/material';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import type { Pin } from '../types.ts';
@@ -14,6 +14,7 @@ import { BOARD_WITH_SETTINGS_LENGTH, DEFAULT_POOL_SIZE, DRAW_INTERVAL_SECONDS,
 import { HuntCaptureDialog, HuntPhotoCard, HuntPhotoPreview } from './ScavengerHunt.tsx';
 import { boardStartedAt, loadBoardPhotos, photoIsValid, saveBoardPhoto } from './scavenger.ts';
 import type { HuntPhoto } from './scavenger.ts';
+import { formatPhotoTakenAt } from './photoMetadata.ts';
 import { drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
 import { adminRequestAvailability, adminRequestWaitMessage,
   recordPingoResponse, reserveAdminRequest, reservePingoPoll,
@@ -170,22 +171,25 @@ function BoardGrid({ board, feed, checked = new Set<number>(), winning = [], onT
     onHuntClick?: (pin: Pin) => void }) {
   const winningCells = new Set(winning.flat());
   return <Box className="pingo-board-scroll"><Box className="pingo-board" aria-label="Pingo board">
-    {board.map((pin, index) => <Box key={`${pin.id}-${index}`}
-      component={onToggle || onHuntClick ? 'button' : 'div'}
-      type={onToggle || onHuntClick ? 'button' : undefined}
-      className={`pingo-cell${onToggle || onHuntClick ? ' interactive' : ''}${checked.has(pin.id) ? ' checked' : ''}${winningCells.has(index) ? ' winner' : ''}`}
-      aria-label={onHuntClick ? `${pin.name}, ${huntPhotos?.has(pin.id) ? 'view photo' : 'take photo'}` :
-        `${pin.name}, ${checked.has(pin.id) ? (onToggle ? 'marked' : 'called') : (onToggle ? 'unmarked' : 'not called')}`}
-      aria-pressed={onToggle ? checked.has(pin.id) : undefined}
-      onClick={onHuntClick ? () => onHuntClick(pin) : onToggle ? () => onToggle(pin.id) : undefined}>
-      <span className="pingo-cell-number">{index + 1}</span>
-      {huntPhotos?.get(pin.id) ? <HuntPhotoCard pin={pin} photo={huntPhotos.get(pin.id)!} /> :
-        <PinCard pin={pin} feed={feed} />}
-      {checked.has(pin.id) && <svg className="pingo-check" viewBox="0 0 100 100"
-        preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path d="M9 10 L91 90 M91 10 L9 90" />
-      </svg>}
-    </Box>)}
+    {board.map((pin, index) => <Tooltip describeChild key={`${pin.id}-${index}`}
+      title={huntPhotos?.get(pin.id) ? formatPhotoTakenAt(huntPhotos.get(pin.id)!.capturedAt) : ''}>
+      <Box
+        component={onToggle || onHuntClick ? 'button' : 'div'}
+        type={onToggle || onHuntClick ? 'button' : undefined}
+        className={`pingo-cell${onToggle || onHuntClick ? ' interactive' : ''}${checked.has(pin.id) ? ' checked' : ''}${winningCells.has(index) ? ' winner' : ''}`}
+        aria-label={onHuntClick ? `${pin.name}, ${huntPhotos?.has(pin.id) ? 'view photo' : 'take photo'}` :
+          `${pin.name}, ${checked.has(pin.id) ? (onToggle ? 'marked' : 'called') : (onToggle ? 'unmarked' : 'not called')}`}
+        aria-pressed={onToggle ? checked.has(pin.id) : undefined}
+        onClick={onHuntClick ? () => onHuntClick(pin) : onToggle ? () => onToggle(pin.id) : undefined}>
+        <span className="pingo-cell-number">{index + 1}</span>
+        {huntPhotos?.get(pin.id) ? <HuntPhotoCard pin={pin} photo={huntPhotos.get(pin.id)!} /> :
+          <PinCard pin={pin} feed={feed} />}
+        {checked.has(pin.id) && <svg className="pingo-check" viewBox="0 0 100 100"
+          preserveAspectRatio="none" aria-hidden="true" focusable="false">
+          <path d="M9 10 L91 90 M91 10 L9 90" />
+        </svg>}
+      </Box>
+    </Tooltip>)}
   </Box></Box>;
 }
 
@@ -449,14 +453,14 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
         'Click a pin to mark it with a red X. Click it again to remove the X.'}</Typography>
       {!huntMode && startMs !== null && <GameStartTime startMs={startMs} game={gameCode} />}
     </Box>
-    {!huntMode && <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} alignItems={{ sm: 'center' }}>
+    {!huntMode && <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1} sx={{ alignItems: { sm: 'center' } }}>
         <Button variant="outlined" onClick={() => copy(window.location.href).then(() => setMessage('Board link copied.')).catch(() => setMessage('Copy failed.'))}>Copy board link</Button>
         <Button variant="outlined" onClick={() => setEnterHunt(true)}>Scavenger hunt Mode</Button>
         <Button variant="outlined" onClick={newBoard}>New board</Button>
         <Button variant="outlined" onClick={() => navigate('/go')}>Run a game</Button>
     </Stack>}
     {!huntMode && <Paper variant="outlined" sx={{ p: 2 }}>
-      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems={{ sm: 'flex-start' }}>
+      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: { sm: 'flex-start' } }}>
         <TextField label="Game code" value={gameEntry}
           onChange={event => { if (!isNewGameCode(initialGame ?? '')) { setGameEntry(event.target.value.toUpperCase()); setPlayerEdited(true); } }}
           slotProps={{ htmlInput: { maxLength: MAX_GAME_CODE_LENGTH,
@@ -465,7 +469,7 @@ export function BoardPage({ code, initialGame, assignedHunt = false, pins, feed,
           helperText={isNewGameCode(initialGame ?? '') ? 'This board belongs to this game.' : "Enter the caller's game code."} />
         <TextField label="Player name" value={playerName}
           onChange={event => { setPlayerName(event.target.value); setPlayerEdited(true); }}
-          inputProps={{ maxLength: 80 }} size="small" sx={{ width: { xs: '100%', sm: 320 } }} />
+          slotProps={{ htmlInput: { maxLength: 80 } }} size="small" sx={{ width: { xs: '100%', sm: 320 } }} />
       </Stack>
     </Paper>}
     {huntMode ? <BoardGrid board={board} feed={feed} huntPhotos={photos} onHuntClick={choosePin} /> :
@@ -577,7 +581,7 @@ export function ScavengerJoinPage({ game, navigate }:
   return <Stack spacing={2} sx={{ maxWidth: 520 }}>
     <Typography variant="h3" component="h1">Game {game} scavenger hunt</Typography>
     <Typography>Enter a nickname to get your scavenger hunt board.</Typography>
-    <TextField label="Nickname" value={nickname} inputProps={{ maxLength: 80 }}
+    <TextField label="Nickname" value={nickname} slotProps={{ htmlInput: { maxLength: 80 } }}
       onChange={event => setNickname(event.target.value)}
       onKeyDown={event => { if (event.key === 'Enter') void join(); }} />
     <Button variant="contained" color="primary" disabled={busy || !nickname.trim()}
@@ -659,7 +663,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
   const [gamePassword, setGamePassword] = useState('');
   const [activePassword, setActivePassword] = useState('');
   const autoUnlockAttempted = useRef(false);
-  const unlockRetryTimer = useRef<number | undefined>();
+  const unlockRetryTimer = useRef<number | undefined>(undefined);
   const rolloverAttempted = useRef(false);
   const advanceInFlight = useRef(false);
   const playersInFlight = useRef(false);
@@ -913,7 +917,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
       <GameStartTime startMs={data.startMs} game={data.game} heading /> :
       <Typography variant="h3" component="h1">Pingo {view === 'admin' ? 'admin' : 'caller'}{shownGame ? ` · Game ${shownGame}` : ''}</Typography>}
     {data && view === 'caller' && error && <Paper variant="outlined" sx={{ p: 1 }}>
-      <Stack direction="row" spacing={1} alignItems="center">
+      <Stack direction="row" spacing={1} sx={{ alignItems: 'center' }}>
         <Typography role="alert" color="error">{error} {concluded ? 'Automatic game start is paused.' : 'Automatic draws are paused.'}</Typography>
         {concluded && !adminRequestGate.allowed &&
           <Typography variant="body2">{adminRequestWaitMessage(adminRequestGate)}</Typography>}
@@ -936,7 +940,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
           isNewGameCode(game) ? 'Game admin password' : 'Admin password'} type="password" value={password}
           onChange={event => setPassword(event.target.value)} onKeyDown={event => { if (event.key === 'Enter') void unlock(); }} />
         {view === 'admin' && !game && <TextField label="Game code" value={gameEntry}
-          inputProps={{ maxLength: MAX_GAME_CODE_LENGTH }} onChange={event => setGameEntry(event.target.value.toUpperCase())} />}
+          slotProps={{ htmlInput: { maxLength: MAX_GAME_CODE_LENGTH } }} onChange={event => setGameEntry(event.target.value.toUpperCase())} />}
         {view === 'caller' && !game && <TextField select label="Time between pin draws" value={intervalSeconds}
           onChange={event => setIntervalSeconds(Number(event.target.value))}
           slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
@@ -945,7 +949,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
         </TextField>}
         {view === 'caller' && !game && <TextField select label="Pins in candidate pool" value={poolSize}
           onChange={event => setPoolSize(Number(event.target.value))}
-          SelectProps={{ native: true }} InputLabelProps={{ shrink: true }}
+          slotProps={{ select: { native: true }, inputLabel: { shrink: true } }}
           helperText="The board and caller use the first N pins in the catalog. This cannot change after creation.">
           {Array.from({ length: Math.floor(pins.length / 25) }, (_, index) => (index + 1) * 25)
             .map(size => <option key={size} value={size}>{size} pins</option>)}
@@ -993,7 +997,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
       <Paper className="pingo-check-panel" variant="outlined" sx={{ p: 2 }}>
         <Stack spacing={1}>
           <Typography variant="h6">Check a board</Typography>
-          <TextField label="Board code" value={boardEntry} inputProps={{ maxLength: BOARD_WITH_SETTINGS_LENGTH }}
+          <TextField label="Board code" value={boardEntry} slotProps={{ htmlInput: { maxLength: BOARD_WITH_SETTINGS_LENGTH } }}
             onChange={event => setBoardEntry(event.target.value.toUpperCase())} size="small" />
           <Button variant="outlined" component="a" href={verifyLink || undefined}
             target="_blank" rel="noopener noreferrer" disabled={!verifyLink}>Check board</Button>
@@ -1001,7 +1005,7 @@ export function AdminPage({ game, pins, feed, onGameStarted, onCallerSnapshot, n
         </Stack>
       </Paper>
       <Paper className="pingo-players-panel" variant="outlined" sx={{ p: 2 }}>
-        <Stack direction="row" justifyContent="space-between" alignItems="center">
+        <Stack direction="row" sx={{ justifyContent: 'space-between', alignItems: 'center' }}>
           <Typography variant="h6">Players ({players.length})</Typography>
           <Button size="small" onClick={() => {
             playersPollingPaused.current = false;

@@ -133,7 +133,7 @@ export function GuessGame() {
           </Box>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={1}>
-            <TextField label="Have a code?" value={entry} onChange={event => setEntry(event.target.value.toUpperCase())} onKeyDown={event => { if (event.key === 'Enter') joinCode(); }} inputProps={{ maxLength: 4 }} autoComplete="off" fullWidth />
+            <TextField label="Have a code?" value={entry} onChange={event => setEntry(event.target.value.toUpperCase())} onKeyDown={event => { if (event.key === 'Enter') joinCode(); }} slotProps={{ htmlInput: { maxLength: 4 } }} autoComplete="off" fullWidth />
             <Button variant="outlined" onClick={joinCode}>Join game</Button>
             <Button variant="outlined" onClick={() => setCodeAndRoute(makeCode())}>New code</Button>
           </Stack>
@@ -150,17 +150,17 @@ export function GuessGame() {
           <Typography role="status" aria-live="polite" color={loadError ? 'error' : 'text.secondary'} variant="body2">{loadError || message || (!code ? 'That game code is invalid. Enter a code or make a new one.' : '')}</Typography>
         </Stack>
       </Paper> : <Stack spacing={2}>
-        <Stack direction={{ xs: 'column', md: 'row' }} alignItems={{ md: 'center' }} spacing={2}>
+        <Stack direction={{ xs: 'column', md: 'row' }} spacing={2} sx={{ alignItems: { md: 'center' } }}>
           <Box sx={{ flex: 1, minWidth: 0 }}>
-            <Stack direction="row" justifyContent="space-between" alignItems="baseline" flexWrap="wrap" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap' }}>
               <Typography variant="h5" component="h1">Player {player} - Your 24 pins</Typography>
-              <Typography fontWeight="bold" aria-live="polite" sx={{ whiteSpace: 'nowrap' }}>{BOARD_SIZE - eliminated.size} remaining</Typography>
+              <Typography aria-live="polite" sx={{ fontWeight: 'bold', whiteSpace: 'nowrap' }}>{BOARD_SIZE - eliminated.size} remaining</Typography>
             </Stack>
             <Typography color="text.secondary">You have been assigned a pin which appears on the board below - your job is to determine through yes or no questions which of the below pins it is.  Take turns asking one yes or no question per turn. Make a guess when you think you know your opponent's character, but be careful: a wrong guess loses the game.</Typography>
           </Box>
 
           {secret && feed && <Paper variant="outlined" sx={{ p: .5, width: 'fit-content', maxWidth: '100%', flexShrink: 0, '& .pin-sm img.pinImage': { maxHeight: '90px' } }}>
-            <Stack direction={{ xs: 'column', sm: 'row' }} alignItems="center" spacing={2}>
+            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ alignItems: 'center' }}>
               <Box><Typography variant="h6" component="h2">Player {opponent}'s pin</Typography><Typography variant="body2" sx={{ maxWidth: 260 }}>This is the pin which the other player is trying to uncover out of their board options - they will ask you questions, and your answer should be yes or no based on this pin.</Typography></Box>
               <Box sx={{ textAlign: 'center', display: 'flex', justifyContent: 'center' }}><GamePin pin={secret} feed={feed} htmlId="guess-secret-pin" /></Box>
             </Stack>

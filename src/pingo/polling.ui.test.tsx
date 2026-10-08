@@ -24,7 +24,7 @@ describe('Pingo polling', () => {
     const intervals: Array<() => void> = [];
     vi.spyOn(window, 'setInterval').mockImplementation((callback) => {
       intervals.push(callback as () => void);
-      return intervals.length;
+      return intervals.length as unknown as ReturnType<typeof window.setInterval>;
     });
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
       if (input === '/pins.json') return Response.json({ pins });
