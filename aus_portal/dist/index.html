@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#050505">
+  <meta name="description" content="Games, collections and pin trading links for PAX Aus 2026.">
+  <title>PAX Aus 2026 · Games for pins</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="top">
+    <section class="intro" aria-labelledby="page-title">
+      <h1 id="page-title">Welcome to PAX Aus 2026</h1>
+      <p class="intro-tagline">Let's play some <em>games</em>... for pins!</p>
+    </section>
+
+    <section class="directory" aria-label="Pin destinations">
+      <div class="link-grid">
+        <a class="destination destination-featured destination-illustrated" href="https://lionet.au/">
+          <img class="tile-image tile-image-lionet" src="images/lionet-collection.png" width="2307" height="1647" alt="The five Lionet pin characters">
+          <span class="destination-top"><span class="number">01</span><span class="kind">COLLECTION</span></span>
+          <span class="destination-bottom"><span><strong>The Lionet Pin Collection</strong><span class="description">Explore the collection.</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <div class="destination destination-illustrated destination-bouquet">
+          <img class="tile-image tile-image-bouquet" src="images/bouquet-preview.png" width="396" height="554" alt="Bouquet of Piranha Plants pin artwork">
+          <span class="destination-top"><span class="number">02</span><span class="kind">FEATURE</span></span>
+          <span class="destination-bottom"><span><strong>Bouquet of Piranha Plants</strong><span class="description">A special stop in the collection.</span></span><button class="info-trigger" id="bouquet-info-trigger" type="button" aria-haspopup="dialog" aria-controls="bouquet-info" aria-label="Info about Bouquet of Piranha Plants">Info</button></span>
+        </div>
+
+        <a class="destination" href="https://pingo.pinpanion.com/">
+          <span class="destination-top"><span class="number">03</span><span class="kind">PLAY</span></span>
+          <span class="destination-bottom"><span><strong>Pingo!</strong><span class="description">It’s Bingo… but with pins!</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="destination" href="https://pingo.pinpanion.com/scavenger/HT2KTD/">
+          <span class="destination-top"><span class="number">04</span><span class="kind">PLAY</span></span>
+          <span class="destination-bottom"><span><strong>Pingo Scavenger Hunt</strong><span class="description">Find it. Photograph it. Fill your board.</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="destination" href="https://guess.pinpanion.com/">
+          <span class="destination-top"><span class="number">05</span><span class="kind">PLAY</span></span>
+          <span class="destination-bottom"><span><strong>Pin Who?</strong><span class="description">Your childhood favourite guessing game, with pins.</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <div class="destination destination-pending" aria-label="Pinpare, link coming soon">
+          <span class="destination-top"><span class="number">06</span><span class="kind">TRADE</span></span>
+          <span class="destination-bottom"><span><strong>Pinpare</strong><span class="description">Help crowdsource the trade value of pins.</span></span><span class="pending-label">LINK SOON</span></span>
+        </div>
+
+        <a class="destination" href="https://www.pinpanion.com/">
+          <span class="destination-top"><span class="number">07</span><span class="kind">CREATE</span></span>
+          <span class="destination-bottom"><span><strong>Pinpanion</strong><span class="description">Make shareable, printable lanyards and wishlists.</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <a class="destination" href="https://www.pinnypals.com/">
+          <span class="destination-top"><span class="number">08</span><span class="kind">COMMUNITY</span></span>
+          <span class="destination-bottom"><span><strong>Pinnypals</strong><span class="description">Create a profile and trade with collectors.</span></span><span class="outbound" aria-hidden="true">↗</span></span>
+        </a>
+
+        <div class="destination destination-pending" aria-label="My wishlist, link coming soon">
+          <span class="destination-top"><span class="number">09</span><span class="kind">PERSONAL</span></span>
+          <span class="destination-bottom"><span><strong>My wishlist</strong><span class="description">The pins I’m looking for.</span></span><span class="pending-label">LINK SOON</span></span>
+        </div>
+
+      </div>
+    </section>
+
+    <dialog class="info-dialog" id="bouquet-info" aria-labelledby="bouquet-info-title" aria-describedby="bouquet-info-text">
+      <h2 id="bouquet-info-title">Bouquet of Piranha Plants</h2>
+      <p id="bouquet-info-text">Earn the Bouquet of Piranha Plants pin by completing the Lionet collection, or by chance from being one of the first six to complete a <a href="https://pingo.pinpanion.com/scavenger/HT2KTD/">Pingo Scavenger Hunt</a>.  There will be one of each 6 pins available randomly given out for the first 6 people to present a completed game card</p>
+      <form method="dialog"><button class="dialog-close" type="submit">Close</button></form>
+    </dialog>
+
+    <section id="scan" class="scan-section" aria-labelledby="scan-title">
+      <div class="scan-content">
+        <p class="eyebrow">TAKE THIS WITH YOU</p>
+        <h2 id="scan-title">Scan &amp; explore</h2>
+        <a class="qr-link" href="https://aus.pinpanion.com/" aria-label="Open aus.pinpanion.com">
+          <img src="portal-qr.svg" width="370" height="370" alt="QR code linking to aus.pinpanion.com">
+        </a>
+        <p class="scan-url">aus.pinpanion.com</p>
+      </div>
+    </section>
+  </main>
+  <script>
+    const bouquetInfoTrigger = document.getElementById('bouquet-info-trigger');
+    const bouquetInfoDialog = document.getElementById('bouquet-info');
+    bouquetInfoTrigger.addEventListener('click', () => bouquetInfoDialog.showModal());
+    bouquetInfoDialog.addEventListener('click', (event) => {
+      if (event.target === bouquetInfoDialog) bouquetInfoDialog.close();
+    });
+  </script>
+</body>
+</html>
