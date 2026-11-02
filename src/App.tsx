@@ -6,7 +6,7 @@ import {type ApplicationSettings, loadSettings, saveSettings } from './settingsS
 import { EMPTY_FILTER, newSelectionList } from './fixture.ts';
 import type { PAX, PAXEvent, Pin, PinCategory, PinGroup, PinListFilter, PinSelectionList, PinSet } from './types.ts';
 import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './components/PinSearchFilter.tsx';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils.ts';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage.ts';
 
@@ -37,14 +37,6 @@ const App = (): JSX.Element => {
   const [showInSets, setShowInSets] = useState<boolean>(false);
 
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [hash, setHash] = React.useState(() => window.location.hash);
-
-  const hashChanged = React.useCallback(() => {
-    setHash(window.location.hash);
-    console.log(`Read hash value: ${window.location.hash}`);
-  }, []);
-
   const hasListOnUrlHash = (): boolean => {
     return window.location.hash !== undefined && window.location.hash.startsWith('#');
   };
@@ -57,13 +49,6 @@ const App = (): JSX.Element => {
       selectionListUpdated(pinSelection);
     }
   };
-
-  React.useEffect(() => {
-    window.addEventListener('hashchange', hashChanged);
-    return () => {
-      window.removeEventListener('hashchange', hashChanged);
-    };
-  }, []);
 
   const shouldDefaultShowSelection = (): boolean => {
     return window.location.hash != '';
@@ -157,6 +142,15 @@ const App = (): JSX.Element => {
     sanitizePinList(updatedList, applicationSettings);
     setActivePinList(updatedList);
   };
+
+  useEffect(() => {
+    // A second scanned/shared link can navigate within this already mounted app.
+    const hashChanged = (): void => {
+      processCurrentHash();
+    };
+    window.addEventListener('hashchange', hashChanged);
+    return () => window.removeEventListener('hashchange', hashChanged);
+  }, [applicationSettings]);
 
   const getPinListHeading = (): string => {
     if (selectionFilterEnabled) {
