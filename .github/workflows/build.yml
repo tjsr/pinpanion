@@ -45,6 +45,9 @@ jobs:
         cp -Rf cached-images/* public/imgs || true
     - run: npm run build:vite
     - run: npm run test
+      env:
+        # Let jsdom provide browser storage instead of Node's native globals.
+        NODE_OPTIONS: --no-experimental-webstorage
 
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
