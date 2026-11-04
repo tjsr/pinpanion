@@ -8,7 +8,9 @@ export default defineConfig({
   publicDir: false,
   plugins: [react()],
   build: {
-    outDir: path.resolve('build/pingo'),
+    // `outDir` is resolved relative to the Pingo root. Keep it relative so
+    // Cloudflare never receives a machine-specific Windows path.
+    outDir: '../build/pingo',
     emptyOutDir: true,
   },
 });
