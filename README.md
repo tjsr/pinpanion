@@ -8,7 +8,7 @@ More broadly though it's intended to help facilitate social interactions.  Futur
 
 ## Running the app
 
-First, `npm install`. You will need Node.js 22.18 or later and npm 11.5 or later.
+First, `npm install`. You will need Node.js 24 or later and npm 11.5 or later.
 
 You'll need pin data and image assets to run the app. `npm run build` retrieves the latest data from Pinnypals and stores the generated assets locally before building the site.
 
