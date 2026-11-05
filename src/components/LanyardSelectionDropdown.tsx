@@ -27,10 +27,9 @@ const hasLanyardData = (lanyard: PinSelectionList): boolean => {
 export const LanyardSelectionDropdown = (props: LanyardSelectionDropdownProps): JSX.Element => {
   const lanyards: PinSelectionList[] =
     props.storedLanyardList === undefined ? getStoredLanyards() : props.storedLanyardList;
-  const hasSelected: boolean =
-    lanyards.filter((psl: PinSelectionList) => {
-      psl.id === props.activeLanyard.id;
-    }).length > 0;
+  const hasSelected = lanyards.some(
+    (lanyard) => lanyard.id === props.activeLanyard.id && hasLanyardData(lanyard)
+  );
 
   return (
     <FormControl sx={{ m: 1, minWidth: SEARCH_CONTROL_WIDTH }}>
