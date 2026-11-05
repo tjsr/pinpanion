@@ -173,4 +173,62 @@ describe('issue #3: shared QR/hash lanyards', () => {
     await waitFor(() => expectEditor(shared));
     expect(getStoredLanyards()).toHaveLength(2);
   });
+
+  it('keeps the newest same-ID shared lanyard when scans move backwards through revisions', async () => {
+    mountApp();
+    await openLanyards();
+    const firstRevision = makeSharedLanyard({
+      availableIds: [5],
+      name: 'Revision one',
+      revision: 1,
+    });
+    const secondRevision = makeSharedLanyard({
+      availableIds: [13],
+      name: 'Revision two',
+      revision: 2,
+    });
+
+    await act(async () => {
+      visitSharedLink(firstRevision);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    await waitFor(() => expectEditor(firstRevision));
+    await act(async () => {
+      visitSharedLink(secondRevision);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+    await waitFor(() => expectEditor(secondRevision));
+    await waitFor(() => expect(getStoredLanyards()).toContainEqual(secondRevision));
+    await act(async () => {
+      visitSharedLink(firstRevision);
+      window.dispatchEvent(new HashChangeEvent('hashchange'));
+    });
+
+    await waitFor(() => expectEditor(secondRevision));
+    expect(screen.getByRole('textbox', { name: 'Available' })).toBeDisabled();
+    expect(getStoredLanyards()).toContainEqual(secondRevision);
+  });
+
+  it('uses a newer owned lanyard from storage when an older same-ID link is opened initially', async () => {
+    const newest = makeSharedLanyard({
+      availableIds: [13],
+      name: 'My current lanyard',
+      ownerId: localOwnerId,
+      revision: 5,
+    });
+    const staleLink = makeSharedLanyard({
+      availableIds: [5],
+      name: 'My old lanyard',
+      ownerId: localOwnerId,
+      revision: 4,
+    });
+    saveListToLocal(newest);
+    visitSharedLink(staleLink);
+
+    mountApp();
+    await openLanyards();
+    expectEditor(newest);
+    expect(screen.getByRole('textbox', { name: 'Available' })).toBeEnabled();
+    expect(getStoredLanyards()).toContainEqual(newest);
+  });
 });

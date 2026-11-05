@@ -45,8 +45,11 @@ const App = (): JSX.Element => {
     if (hasListOnUrlHash()) {
       const pinSelection: PinSelectionList = decodePinSelectionHash(
         window.location.hash);
-      // check that we're not the owner of this list
-      selectionListUpdated(pinSelection);
+      // A previous scan can have saved a newer revision of this same lanyard.
+      // Keep it active rather than asking the persistence layer to downgrade it.
+      const storedLanyard: PinSelectionList | undefined = getStoredLanyard(pinSelection.id, applicationSettings);
+      selectionListUpdated(
+        storedLanyard && storedLanyard.revision > pinSelection.revision ? storedLanyard : pinSelection);
     }
   };
 
