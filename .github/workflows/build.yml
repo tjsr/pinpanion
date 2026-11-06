@@ -3,13 +3,17 @@ run-name: ${{ github.actor }} running Pinpanion build.
 on: [push]
 jobs:
   build:
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [24, 26]
     runs-on: ubuntu-latest
 
     steps:
     - name: Use Node.js
       uses: actions/setup-node@main
       with:
-        node-version: 24.19.0
+        node-version: ${{ matrix.node-version }}
     
     - name: Check out repository code
       uses: actions/checkout@main
@@ -41,6 +45,9 @@ jobs:
         cp -Rf cached-images/* public/imgs || true
     - run: npm run build:vite
     - run: npm run test
+      env:
+        # Let jsdom provide browser storage instead of Node's native globals.
+        NODE_OPTIONS: --no-experimental-webstorage
 
     - name: Run lint at end on all other branches
       if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/prod'
