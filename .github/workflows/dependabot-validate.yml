@@ -12,8 +12,15 @@ jobs:
       - uses: actions/checkout@v4
       - uses: marocchino/validate-dependabot@v3
         id: validate
-      - uses: marocchino/sticky-pull-request-comment@v2
+      - name: Write validation summary
         if: always()
+        env:
+          VALIDATION_MARKDOWN: ${{ steps.validate.outputs.markdown }}
+        run: printf '%s\n' "$VALIDATION_MARKDOWN" >> "$GITHUB_STEP_SUMMARY"
+      - uses: marocchino/sticky-pull-request-comment@v3
+        # Dependabot and fork pull requests have read-only tokens.
+        # Keep validation blocking, and use the job summary instead of a comment.
+        if: always() && github.event.pull_request.user.login != 'dependabot[bot]' && github.event.pull_request.head.repo.full_name == github.repository
         with:
           header: validate-dependabot
           message: ${{ steps.validate.outputs.markdown }}
