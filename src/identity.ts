@@ -1,4 +1,4 @@
-import { generateListId } from './fixture';
+import { generateListId } from './fixture.ts';
 
 export const getOrCreateIdentity = (): string => {
   let id: string | null = localStorage.getItem('userId');
