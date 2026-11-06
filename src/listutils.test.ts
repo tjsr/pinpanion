@@ -1,4 +1,4 @@
-import { addIdToList, removeIdFromList, removeOrAddId } from './listutils';
+import { addIdToList, removeIdFromList, removeOrAddId } from './listutils.ts';
 
 describe('addIdToList', () => {
   test('Should return a list containing only the newly added element from a blank list', () => {
