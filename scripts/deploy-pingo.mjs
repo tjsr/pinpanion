@@ -1,4 +1,6 @@
 import { spawnSync } from 'node:child_process';
+import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -6,10 +8,22 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const environment = process.argv[2];
 if (environment !== 'dev' && environment !== 'prod') throw new Error('Expected dev or prod.');
 const project = environment === 'dev' ? 'pingo-dev' : 'pingo';
-const output = '../../build/pingo';
-const result = spawnSync(process.execPath, [
-  join(root, 'node_modules', 'wrangler', 'bin', 'wrangler.js'),
-  'pages', 'deploy', output, '--project-name', project, '--branch', 'main'
-], { cwd: join(root, 'pingo', environment), stdio: 'inherit', env: process.env });
-if (result.error) throw result.error;
-process.exitCode = result.status ?? 1;
+const databaseIdVariable = environment === 'dev' ? 'PINGO_DEV_D1_DATABASE_ID' : 'PINGO_PROD_D1_DATABASE_ID';
+const databaseId = process.env[databaseIdVariable];
+if (!databaseId) throw new Error(`Set ${databaseIdVariable} before deploying Pingo.`);
+const config = JSON.parse(readFileSync(join(root, 'pingo', environment, 'wrangler.jsonc'), 'utf8'));
+const output = join(root, 'build', 'pingo');
+const temporary = mkdtempSync(join(tmpdir(), 'pingo-pages-'));
+try {
+  config.pages_build_output_dir = output;
+  config.d1_databases[0].database_id = databaseId;
+  writeFileSync(join(temporary, 'wrangler.jsonc'), JSON.stringify(config, null, 2));
+  const result = spawnSync(process.execPath, [
+    join(root, 'node_modules', 'wrangler', 'bin', 'wrangler.js'),
+    'pages', 'deploy', output, '--project-name', project, '--branch', 'main'
+  ], { cwd: temporary, stdio: 'inherit', env: process.env });
+  if (result.error) throw result.error;
+  process.exitCode = result.status ?? 1;
+} finally {
+  rmSync(temporary, { recursive: true, force: true });
+}
