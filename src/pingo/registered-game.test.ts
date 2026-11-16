@@ -1,7 +1,7 @@
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 import { boardCodeForGame, boardPins, gameCodeWithSettings, gameDetailsFromCode, isBoardCodeForGame,
   settingsCode, settingsFromCode } from './game.ts';
-import { drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
+import { createGameCode, drawIdsFromBatchKeys, gamePasswordHash, hashGamePassword, signPinCount } from './secure.ts';
 import type { Pin } from '../types.ts';
 import { webcrypto } from 'node:crypto';
 import worker from './worker.ts';
@@ -22,15 +22,22 @@ function database() {
   const devices = new Map<string, string>();
   const hunts = new Map<string, Record<string, unknown>>();
   const players = new Map<string, Record<string, unknown>>();
+  const gameInfo = new Map<string, { infoUrl: string; tooltipText: string }>();
   return {
-    games, successors, boards, hunts,
+    games, successors, boards, hunts, gameInfo,
     prepare: (query: string) => ({ bind: (...values: unknown[]) => ({
       run: async () => {
+        if (query.startsWith('INSERT INTO game_info')) {
+          const [game, infoUrl, tooltipText] = values.map(String);
+          gameInfo.set(game, { infoUrl, tooltipText });
+          return { meta: { changes: 1 } };
+        }
         if (query.startsWith('INSERT OR IGNORE INTO games')) {
-          const [gameCode, startMs, intervalMs, poolSize, passwordSalt, passwordHash, createdAt] = values;
+          const [gameCode, startMs, intervalMs, poolSize, passwordSalt, passwordHash,
+            scavengerHuntOnly, createdAt] = values;
           if (games.has(String(gameCode))) return { meta: { changes: 0 } };
           games.set(String(gameCode), { gameCode, startMs, intervalMs, poolSize,
-            passwordSalt, passwordHash, createdAt });
+            passwordSalt, passwordHash, scavengerHuntOnly, createdAt });
           return { meta: { changes: 1 } };
         }
         if (query.startsWith('UPDATE games SET password_hash')) {
@@ -79,13 +86,18 @@ function database() {
         throw new Error(`Unexpected SQL: ${query}`);
       },
       all: async () => {
+        if (query.includes('FROM game_info')) {
+          const row = gameInfo.get(String(values[0])) ?? gameInfo.get(String(values[1]));
+          return { results: row ? [row] : [] };
+        }
         if (query.includes('FROM game_successors')) {
           const successorGameCode = successors.get(String(values[0]));
           return { results: successorGameCode ? [{ successorGameCode }] : [] };
         }
         if (query.includes('FROM games WHERE')) {
-          const found = games.get(String(values[0]));
-          return { results: found ? [found] : [] };
+          const prefix = String(values[0]).replace(/-%$/, '');
+          return { results: [...games.values()].filter(row =>
+            String(row.gameCode).startsWith(`${prefix}-`)).slice(0, 2) };
         }
         if (query.includes('FROM games ORDER BY')) {
           return { results: [...games.values()] };
@@ -113,6 +125,39 @@ function database() {
 }
 
 describe('registered games and bounded pin pools', () => {
+  it('saves public game information for registered and legacy codes only with admin credentials', async () => {
+    const db = database();
+    const env = { PINGO_PLAYERS: db, PINGO_ADMIN_PASSWORD: 'site-secret',
+      PINGO_SIGNING_SECRET: 'test-signing-secret',
+      ASSETS: { fetch: async () => Response.json({ pins }) } };
+    const post = (body: Record<string, unknown>) => worker.fetch(new Request('https://pingo.test/api/pingo/game-info', {
+      method: 'POST', body: JSON.stringify(body),
+    }), env);
+    const get = (game: string) => worker.fetch(new Request(
+      `https://pingo.test/api/pingo/game-info?${new URLSearchParams({ game })}`), env);
+    const { salt, hash } = await hashGamePassword('game-secret');
+    const creation = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
+      method: 'POST', body: JSON.stringify({ password: 'site-secret', passwordSalt: salt,
+        passwordHash: hash, intervalSeconds: 30, poolSize: 25 }),
+    }), env);
+    const { game } = await creation.json() as { game: string };
+    expect(await (await get(game)).json()).toEqual({ infoUrl: '', tooltipText: '' });
+    expect((await post({ game, passwordProof: 'wrong', infoUrl: 'https://example.com', tooltipText: 'Meet at noon.' })).status).toBe(401);
+    expect((await post({ game, passwordProof: hash, infoUrl: 'javascript:alert(1)', tooltipText: '' })).status).toBe(400);
+    expect((await post({ game, passwordProof: hash, infoUrl: 'https://example.com/game', tooltipText: 'Meet at noon.' })).status).toBe(200);
+    expect(await (await get(game)).json()).toEqual({ infoUrl: 'https://example.com/game', tooltipText: 'Meet at noon.' });
+    const prefix = game.split('-')[0];
+    expect(await (await get(prefix)).json()).toEqual({ infoUrl: 'https://example.com/game', tooltipText: 'Meet at noon.' });
+    expect((await post({ game: prefix, passwordProof: hash,
+      infoUrl: 'https://example.com/hunt', tooltipText: 'Show your completed board.' })).status).toBe(200);
+    expect(await (await get(game)).json()).toEqual({ infoUrl: 'https://example.com/hunt',
+      tooltipText: 'Show your completed board.' });
+    expect((await post({ game, passwordProof: hash, infoUrl: '', tooltipText: '' })).status).toBe(200);
+    expect(await (await get(game)).json()).toEqual({ infoUrl: '', tooltipText: '' });
+    const legacy = createGameCode(Date.now() - 60_000);
+    expect((await post({ game: legacy, password: 'site-secret', infoUrl: 'https://example.com/legacy', tooltipText: 'Legacy tip' })).status).toBe(200);
+    expect(await (await get(legacy)).json()).toEqual({ infoUrl: 'https://example.com/legacy', tooltipText: 'Legacy tip' });
+  });
   it.each([10, 15, 20, 30] as const)('round trips %is and 25-pin increments in YYY', speed => {
     for (const pool of [25, 50, 150, 200]) {
       expect(settingsFromCode(settingsCode(speed, pool))).toEqual({
@@ -139,6 +184,16 @@ describe('registered games and bounded pin pools', () => {
       passwordSalt: salt, passwordHash: hash, intervalSeconds: 15, poolSize: 50 });
     expect(created.status).toBe(201);
     const { game } = await created.json() as { game: string };
+    const manageLogin = (sitePassword: string, passwordProof: string) => request('/api/pingo/manage-login',
+      { game, sitePassword, passwordProof });
+    expect((await manageLogin('wrong', hash)).status).toBe(401);
+    expect((await manageLogin('site-secret', 'wrong')).status).toBe(401);
+    expect(await (await manageLogin('site-secret', hash)).json()).toEqual({ game });
+    const legacyGame = createGameCode(Date.now() - 60_000);
+    expect((await request('/api/pingo/manage-login', { game: legacyGame,
+      sitePassword: 'site-secret', gamePassword: 'wrong' })).status).toBe(401);
+    expect(await (await request('/api/pingo/manage-login', { game: legacyGame,
+      sitePassword: 'site-secret', gamePassword: 'site-secret' })).json()).toEqual({ game: legacyGame });
     expect(game).toMatch(/^[234679ACDEFGHJKLMNPQRTUVWXYZ]{6}-[234679ACDEFGHJKLMNPQRTUVWXYZ]{3}$/);
     expect(gameDetailsFromCode(game)).toMatchObject({ intervalMs: 15_000, poolSize: 50 });
     expect(db.games.get(game)?.passwordHash).toMatch(/^v2:[0-9a-f]{64}$/);
@@ -151,7 +206,7 @@ describe('registered games and bounded pin pools', () => {
 
     const listing = await worker.fetch(new Request('https://pingo.test/api/pingo/games'), env);
     expect((await listing.json() as { games: unknown[] }).games).toMatchObject([
-      { gameCode: game, intervalMs: 15_000, poolSize: 50 },
+      { gameCode: game, intervalMs: 15_000, poolSize: 50, scavengerHuntOnly: false },
     ]);
     const wrongAdmin = await request('/api/pingo/admin', { game, passwordProof: 'site-secret' });
     expect(wrongAdmin.status).toBe(401);
@@ -245,7 +300,7 @@ describe('registered games and bounded pin pools', () => {
       expect(db.games.size).toBe(2);
       expect(db.successors.get(game)).toBe(nextGame);
       expect(db.games.get(nextGame)).toMatchObject({ passwordSalt: salt,
-        passwordHash: db.games.get(game)?.passwordHash });
+        passwordHash: db.games.get(game)?.passwordHash, scavengerHuntOnly: 0 });
       const successorAdmin = await request('/api/pingo/admin', { game: nextGame, passwordProof: hash });
       expect(successorAdmin.status).toBe(200);
     } finally {
@@ -265,20 +320,64 @@ describe('registered games and bounded pin pools', () => {
       now.mockReturnValue(start);
       const create = await worker.fetch(new Request('https://pingo.test/api/pingo/create', {
         method: 'POST', body: JSON.stringify({ password: 'site-secret', passwordSalt: salt, passwordHash: hash,
-          intervalSeconds: 30, poolSize: 150 }),
+          intervalSeconds: 30, poolSize: 150, scavengerHuntOnly: true }),
       }), env);
       const { game } = await create.json() as { game: string };
+      const prefix = game.split('-')[0];
+      const alternateOptions = `${prefix}-${settingsCode(10, 25)}`;
+      expect(db.games.get(game)?.scavengerHuntOnly).toBe(1);
+      const huntAdmin = await worker.fetch(new Request('https://pingo.test/api/pingo/admin', {
+        method: 'POST', body: JSON.stringify({ game: prefix, passwordProof: hash, pin: 25 }),
+      }), env);
+      expect(huntAdmin.status).toBe(200);
+      expect(await huntAdmin.json()).toMatchObject({ game, scavengerHuntOnly: true,
+        pin: 0, ids: [], drawKeys: [], signingKey: '' });
+      const forbiddenRollover = await worker.fetch(new Request('https://pingo.test/api/pingo/rollover', {
+        method: 'POST', body: JSON.stringify({ game, passwordProof: hash, pin: 25,
+          at: start, sig: 'unused' }),
+      }), env);
+      expect(forbiddenRollover.status).toBe(403);
+      const mode = await worker.fetch(new Request(`https://pingo.test/api/pingo/game-mode?game=${game}`), env);
+      expect(await mode.json()).toEqual({ game, scavengerHuntOnly: true });
+      const shortMode = await worker.fetch(new Request(
+        `https://pingo.test/api/pingo/game-mode?game=${prefix}`), env);
+      expect(await shortMode.json()).toEqual({ game, scavengerHuntOnly: true });
+      const alternateMode = await worker.fetch(new Request(
+        `https://pingo.test/api/pingo/game-mode?game=${alternateOptions}`), env);
+      expect(await alternateMode.json()).toEqual({ game, scavengerHuntOnly: true });
+      const prefixLogin = await worker.fetch(new Request('https://pingo.test/api/pingo/manage-login', {
+        method: 'POST', body: JSON.stringify({ game: prefix, sitePassword: 'site-secret',
+          passwordProof: hash }),
+      }), env);
+      expect(await prefixLogin.json()).toEqual({ game });
+      const listing = await worker.fetch(new Request('https://pingo.test/api/pingo/games'), env);
+      expect((await listing.json() as { games: unknown[] }).games).toMatchObject([
+        { gameCode: game, scavengerHuntOnly: true },
+      ]);
+      const deniedBoard = await worker.fetch(new Request('https://pingo.test/api/pingo/board', {
+        method: 'POST', body: JSON.stringify({ game }),
+      }), env);
+      expect(deniedBoard.status).toBe(403);
+      expect(db.boards.size).toBe(0);
       const join = () => worker.fetch(new Request('https://pingo.test/api/pingo/scavenger', {
-        method: 'POST', body: JSON.stringify({ gameCode: game,
+        method: 'POST', body: JSON.stringify({ gameCode: prefix,
           deviceId: '0123456789abcdef0123456789abcdef', nickname: 'Alice', timeZone: 'Australia/Sydney' }),
       }), env);
       const first = await join();
       const second = await join();
       expect(first.status).toBe(200);
       expect(second.status).toBe(200);
-      const assigned = await first.json() as { boardId: string; existing: boolean };
+      const assigned = await first.json() as { boardId: string; existing: boolean; gameCode: string };
       expect(assigned.existing).toBe(false);
       expect(isBoardCodeForGame(assigned.boardId, game)).toBe(true);
+      expect(assigned.gameCode).toBe(game);
+      const savedBoard = await worker.fetch(new Request(
+        `https://pingo.test/api/pingo/board?game=${game}&board=${assigned.boardId}`), env);
+      expect(await savedBoard.json()).toMatchObject({ board: assigned.boardId,
+        game, scavengerHuntOnly: true });
+      const verify = await worker.fetch(new Request(
+        `https://pingo.test/api/pingo/verify?game=${game}&board=${assigned.boardId}`), env);
+      expect(verify.status).toBe(403);
       expect(await second.json()).toMatchObject({ boardId: assigned.boardId, existing: true });
       expect(db.hunts.size).toBe(1);
     } finally {

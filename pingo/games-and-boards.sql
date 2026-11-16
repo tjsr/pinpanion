@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS games (
   pool_size INTEGER NOT NULL,
   password_salt TEXT NOT NULL,
   password_hash TEXT NOT NULL,
+  scavenger_hunt_only INTEGER NOT NULL DEFAULT 0 CHECK (scavenger_hunt_only IN (0, 1)),
   created_at_ms INTEGER NOT NULL
 );
 

@@ -20,15 +20,16 @@ afterEach(() => {
   window.history.replaceState(null, '', '/');
 });
 
-function mockRequests(createdGame: string) {
+function mockRequests(createdGame: string, scavengerHuntOnly = false) {
   return vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
     if (input === '/pins.json') return Response.json({ pins });
-    if (input === '/player') return Response.json({ players: [] });
-    if (input === '/api/pingo/create') return Response.json({ game: createdGame });
+    if (String(input).startsWith('/player')) return Response.json({ players: [] });
+    if (input === '/api/pingo/create') return Response.json({ game: createdGame, scavengerHuntOnly });
     if (input === '/api/pingo/admin') {
       const body = JSON.parse(String(init?.body)) as { game: string };
-      return Response.json(await testAdminResponse(body.game, 1, Date.now(),
-        isNewGameCode(body.game) ? 25 : 30, pins.map(pin => pin.id)));
+      return Response.json({ ...await testAdminResponse(body.game, 1, Date.now(),
+        isNewGameCode(body.game) ? 25 : 30, pins.map(pin => pin.id)), scavengerHuntOnly,
+      ...(scavengerHuntOnly ? { pin: 0, ids: [], drawKeys: [], signingKey: '', sig: '' } : {}) });
     }
     throw new Error(`Unexpected request: ${String(input)}`);
   });
@@ -37,29 +38,54 @@ function mockRequests(createdGame: string) {
 describe('started Pingo games', () => {
   it('saves a newly created game and shows the switcher', async () => {
     const game = createRegisteredGameCode(Date.now(), 15, 25);
-    const fetchMock = mockRequests(game);
+    const fetchMock = mockRequests(game, true);
     window.history.replaceState(null, '', '/go');
     render(<PingoApp />);
     expect(screen.queryByRole('combobox', { name: 'Switch to game' })).not.toBeInTheDocument();
     fireEvent.change(await screen.findByLabelText('Site admin password'), { target: { value: 'pinny' } });
     fireEvent.change(screen.getByLabelText('Game admin password'), { target: { value: 'game-secret' } });
     fireEvent.change(screen.getByRole('combobox', { name: 'Time between pin draws' }), { target: { value: '15' } });
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Scavenger Hunt Only' }));
     fireEvent.click(screen.getByRole('button', { name: 'Create game' }));
-    await screen.findByText('Current pin (1 of 25)');
-    expect(screen.getByRole('heading', { name: new RegExp(`^Game ${game} started at`) })).toBeInTheDocument();
-    expect(await screen.findByRole('link', { name: '(admin)' })).toHaveAttribute('href', expect.stringContaining(`/${game}/admin?`));
-    expect(document.querySelector('.pingo-caller-shell')).toBeInTheDocument();
-    expect(document.querySelector('.pingo-caller-footer')?.textContent).toContain('Pin images and information provided by Pinpanion and Pinnypals.');
+    await screen.findByRole('heading', { name: 'Scavenger Hunt Only' });
+    expect(window.location.pathname).toBe(`/${game}/admin`);
+    expect(screen.queryByText('Current pin (1 of 25)')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Next pin now' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'Call list' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Back to Caller page' })).not.toBeInTheDocument();
+    expect(document.querySelector('.pingo-caller-shell')).not.toBeInTheDocument();
     expect(JSON.parse(window.localStorage.getItem('pingo:admin:startedGames')!)).toEqual([game]);
     expect(screen.getByRole('combobox', { name: 'Switch to game' })).toHaveValue('');
     expect(screen.getByRole('option', { name: `Game ${game}` })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: `http://localhost:3000/scavenger/${game.split('-')[0]}` }))
+      .toHaveAttribute('href', `http://localhost:3000/scavenger/${game.split('-')[0]}`);
     expect(fetchMock.mock.calls.find(([url]) => url === '/api/pingo/create')?.[1]).toMatchObject({
       body: expect.stringContaining('"intervalSeconds":15')
     });
     expect(fetchMock.mock.calls.find(([url]) => url === '/api/pingo/create')?.[1]).toMatchObject({
       body: expect.stringContaining('"poolSize":25')
     });
+    expect(fetchMock.mock.calls.find(([url]) => url === '/api/pingo/create')?.[1]).toMatchObject({
+      body: expect.stringContaining('"scavengerHuntOnly":true')
+    });
     expect(screen.queryByRole('combobox', { name: 'Time between pin draws' })).not.toBeInTheDocument();
+  });
+
+  it('redirects a direct hunt-only caller URL to its admin page', async () => {
+    const game = createRegisteredGameCode(Date.now() - 60_000, 30, 25);
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
+      if (input === '/pins.json') return Response.json({ pins });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: true });
+      }
+      throw new Error(`Unexpected request: ${String(input)}`);
+    });
+    window.history.replaceState(null, '', `/${game}/go`);
+    render(<PingoApp />);
+    await screen.findByRole('heading', { name: `Pingo admin · Game ${game}` });
+    expect(window.location.pathname).toBe(`/${game}/admin`);
+    expect(screen.queryByRole('button', { name: 'Open caller' })).not.toBeInTheDocument();
+    expect(fetchMock.mock.calls.filter(([url]) => url === '/api/pingo/admin')).toHaveLength(0);
   });
 
   it('switches to a previously started game without creating another', async () => {
@@ -82,6 +108,9 @@ describe('started Pingo games', () => {
     const { salt, hash } = await hashGamePassword('game-secret');
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
       if (input === '/pins.json') return Response.json({ pins });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: false });
+      }
       if (String(input).startsWith('/api/pingo/salt?')) return Response.json({ salt });
       if (input === '/api/pingo/admin') return Response.json(
         await testAdminResponse(game, 1, Date.now(), 25, pins.map(pin => pin.id)));
@@ -118,6 +147,9 @@ describe('started Pingo games', () => {
     vi.spyOn(Date, 'now').mockImplementation(() => nowMs);
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
       if (input === '/pins.json') return Response.json({ pins });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: false });
+      }
       if (String(input).startsWith('/api/pingo/salt?')) return Response.json({ salt });
       if (input === '/api/pingo/admin') return Response.json(await testAdminResponse(
         game, 1, Date.now() - 91_000, 25, pins.map(pin => pin.id)));
@@ -142,6 +174,9 @@ describe('started Pingo games', () => {
     window.sessionStorage.setItem(`pingo:admin:password:${game}`, 'game-secret');
     const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
       if (input === '/pins.json') return Response.json({ pins });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: false });
+      }
       if (String(input).startsWith('/api/pingo/salt?')) return Response.json({ salt });
       if (input === '/api/pingo/rollover') return Response.json({ game: nextGame, intervalMs: 10_000, poolSize: 25 });
       if (input === '/api/pingo/admin') {

@@ -33,6 +33,23 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe('direct scavenger join', () => {
+  it('uses saved game options when the join link contains only the game prefix', async () => {
+    const user = userEvent.setup();
+    const game = createRegisteredGameCode(Date.now() - 60_000, 30, 25);
+    const prefix = game.split('-')[0];
+    const board = boardCodeForGame('ACDE', game);
+    const navigate = vi.fn();
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => input.startsWith('/api/pingo/game-info?') ?
+      Response.json({ infoUrl: '', tooltipText: '' }) :
+      Response.json({ gameCode: game, boardId: board, nickname: 'Alice',
+        createdAt: 123_000, existing: false })));
+    render(<ScavengerJoinPage game={prefix} navigate={navigate} />);
+    await user.type(screen.getByRole('textbox', { name: 'Nickname' }), 'Alice');
+    await user.click(screen.getByRole('button', { name: 'Get scavenger board' }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(`/${board}?game=${game}&hunt=1`));
+    expect(window.localStorage.getItem(`pingo:board:${board}:game`)).toBe(game);
+  });
+
   it('routes a game code to nickname entry and opens a newly assigned hunt board', async () => {
     const user = userEvent.setup();
     const game = createRegisteredGameCode(Date.now() - 60_000, 30, 25);
@@ -40,11 +57,19 @@ describe('direct scavenger join', () => {
     window.history.replaceState(null, '', `/scavenger/${game}`);
     expect(routeFromLocation()).toEqual({ kind: 'scavenger', game });
     const navigate = vi.fn();
-    const fetchMock = vi.fn(async (_url: string, _options: RequestInit) => Response.json({
-      gameCode: game, boardId: board, nickname: 'Alice', createdAt: 123_000, existing: false
-    }));
+    const fetchMock = vi.fn(async (url: string, _options?: RequestInit) =>
+      url.startsWith('/api/pingo/game-info') ?
+        Response.json({ infoUrl: 'https://example.com/game', tooltipText: 'Bring your pins.' }) :
+        Response.json({ gameCode: game, boardId: board, nickname: 'Alice',
+          createdAt: 123_000, existing: false }));
     vi.stubGlobal('fetch', fetchMock);
     render(<ScavengerJoinPage game={game} navigate={navigate} />);
+    expect(screen.getByText("To play Pingo scavenger hunt, find these pins in the wild - in your own collection or on other people's lanyards or trade boards and tables. Take photos of the pins specified to fill the board. When you've completed the board, follow the instructions applicable to that game.")).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: 'https://example.com/game' }))
+      .toHaveAttribute('href', 'https://example.com/game');
+    expect(screen.getByText('Bring your pins.')).toBeInTheDocument();
+    await user.hover(screen.getByRole('button', { name: 'Game information tip' }));
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Bring your pins.');
     expect(screen.getByRole('button', { name: 'Get scavenger board' })).toBeDisabled();
     await user.type(screen.getByRole('textbox', { name: 'Nickname' }), 'Alice');
     await user.click(screen.getByRole('button', { name: 'Get scavenger board' }));
@@ -52,7 +77,8 @@ describe('direct scavenger join', () => {
     expect(window.localStorage.getItem(`pingo:board:${board}:createdAt`)).toBe('123000');
     expect(window.localStorage.getItem(`pingo:board:${board}:huntMode`)).toBe('true');
     expect(window.localStorage.getItem('pingo:scavenger:deviceId')).toMatch(/^[0-9a-f]{32}$/);
-    expect(JSON.parse(String(fetchMock.mock.calls[0][1].body)).nickname).toBe('Alice');
+    const assignmentCall = fetchMock.mock.calls.find(([url]) => url === '/api/pingo/scavenger');
+    expect(JSON.parse(String(assignmentCall?.[1]?.body)).nickname).toBe('Alice');
     window.history.replaceState(null, '', `/${board}?game=${game}&hunt=1`);
     expect(routeFromLocation()).toMatchObject({ kind: 'board', board, assignedHunt: true });
   });
@@ -84,9 +110,46 @@ describe('direct scavenger join', () => {
     await user.click(screen.getByRole('button', { name: 'New board' }));
     expect(navigate).toHaveBeenCalledWith(`/scavenger/${game}`);
   });
+
+  it('shows separate QR dialogs for this board and for joining the scavenger game', async () => {
+    const user = userEvent.setup();
+    const game = createGameCode(Date.now() - 60_000);
+    render(<BoardPage code="ACDE" initialGame={game} assignedHunt pins={pins}
+      feed={feed} navigate={vi.fn()} onHuntModeChange={vi.fn()} />);
+    await user.click(screen.getByRole('button', { name: 'Board check link' }));
+    const boardDialog = screen.getByRole('dialog', { name: 'Board check link' });
+    expect(within(boardDialog).getByRole('img', { name: 'QR code for board ACDE' })).toBeInTheDocument();
+    expect(within(boardDialog).getByRole('link')).toHaveAttribute('href',
+      `${window.location.origin}/ACDE?game=${game}&hunt=1`);
+    expect(within(boardDialog).getByText('Photos remain on the device where they were taken.')).toBeInTheDocument();
+    await user.click(within(boardDialog).getByRole('button', { name: 'Close' }));
+    await user.click(await screen.findByRole('button', { name: 'Share to join game' }));
+    const joinDialog = screen.getByRole('dialog', { name: 'Share to join game' });
+    expect(within(joinDialog).getByRole('img', { name: `QR code to join game ${game}` })).toBeInTheDocument();
+    expect(within(joinDialog).getByRole('link')).toHaveAttribute('href',
+      `${window.location.origin}/scavenger/${game}`);
+  });
 });
 
 describe('Pingo scavenger hunt board', () => {
+  it('loads a registered hunt-only board in scavenger mode even without a hunt URL flag', async () => {
+    const game = createRegisteredGameCode(Date.now() - 60_000, 30, 25);
+    const board = boardCodeForGame('ACDE', game);
+    vi.stubGlobal('fetch', vi.fn(async (input: string) => input.startsWith('/api/pingo/game-info?') ?
+      Response.json({ infoUrl: 'https://example.com/game', tooltipText: 'Present your completed board.' }) :
+      Response.json({ board, game, scavengerHuntOnly: true })));
+    render(<BoardPage code={board} initialGame={game} pins={pins} feed={feed}
+      navigate={vi.fn()} onHuntModeChange={vi.fn()} />);
+    expect(await screen.findByRole('heading', {
+      name: `Pingo Board ${board} - Scavenger Hunt!`
+    })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Scavenger hunt Mode' })).not.toBeInTheDocument();
+    expect(await screen.findByText('Present your completed board.')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'https://example.com/game' }))
+      .toHaveAttribute('href', 'https://example.com/game');
+    expect(window.localStorage.getItem(`pingo:board:${board}:huntMode`)).toBe('true');
+  });
+
   it('requires confirmation and replaces the player controls after OK', async () => {
     const user = userEvent.setup();
     render(<BoardPage code="ACDE" pins={pins} feed={feed} navigate={vi.fn()}

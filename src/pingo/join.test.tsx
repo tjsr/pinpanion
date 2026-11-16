@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { PinCollectionData } from '../pinnypals/pinnypals3convertor.ts';
 import type { Pin } from '../types.ts';
 import { boardCodeForGame } from './game.ts';
-import { createRegisteredGameCode } from './secure.ts';
+import { createGameCode, createRegisteredGameCode } from './secure.ts';
 import { BoardPage, HomePage, JoinPage, routeFromLocation } from './PingoApp.tsx';
 
 vi.mock('../components/PinInfo.tsx', () => ({
@@ -39,6 +39,9 @@ describe('Pingo game join link', () => {
       if (input === '/api/pingo/games') return Response.json({ games: [
         { gameCode: game, startMs: Date.now() - 1_000, intervalMs: 15_000, poolSize: 150 }
       ] });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: false });
+      }
       if (input === '/api/pingo/board') return Response.json({ game, board }, { status: 201 });
       throw new Error(`Unexpected request: ${String(input)}`);
     });
@@ -52,6 +55,60 @@ describe('Pingo game join link', () => {
     expect(fetchMock.mock.calls.find(([url]) => url === '/api/pingo/board')?.[1]).toMatchObject({
       method: 'POST', body: JSON.stringify({ game })
     });
+  });
+
+  it('routes hunt-only games directly to scavenger assignment', async () => {
+    const game = createRegisteredGameCode(Date.now() - 1_000, 30, 25);
+    const prefix = game.split('-')[0];
+    const navigate = vi.fn();
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockImplementation(async input => {
+      if (input === '/api/pingo/games') return Response.json({ games: [
+        { gameCode: game, startMs: Date.now() - 1_000, intervalMs: 30_000,
+          poolSize: 25, scavengerHuntOnly: true }
+      ] });
+      if (String(input).startsWith('/api/pingo/game-mode?')) {
+        return Response.json({ game, scavengerHuntOnly: true });
+      }
+      throw new Error(`Unexpected request: ${String(input)}`);
+    });
+    const home = render(<HomePage navigate={navigate} />);
+    expect(await screen.findByText('Scavenger Hunt Only')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Join game' })).not.toBeInTheDocument();
+    home.unmount();
+    render(<JoinPage game={prefix} navigate={navigate} />);
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith(`/scavenger/${game}`));
+    expect(fetchMock.mock.calls.some(([input]) => input === '/api/pingo/board')).toBe(false);
+  });
+
+  it('creates a fresh board locally when a legacy game join QR is opened', async () => {
+    const game = createGameCode(Date.now() - 1_000);
+    const navigate = vi.fn();
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      Response.json({ game, scavengerHuntOnly: false }));
+    render(<JoinPage game={game} navigate={navigate} />);
+    await waitFor(() => expect(navigate).toHaveBeenCalledTimes(1));
+    const path = navigate.mock.calls[0][0] as string;
+    expect(path).toMatch(new RegExp(`^/[A-Z2-9]+\\?game=${game}$`));
+    window.history.replaceState(null, '', path);
+    expect(routeFromLocation()).toMatchObject({ kind: 'board', game });
+    expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining('/api/pingo/game-mode?'),
+      expect.any(Object));
+  });
+
+  it('shares a regular board and its game with distinct QR links', async () => {
+    const game = createGameCode(Date.now() - 1_000);
+    render(<BoardPage code="ACDE" initialGame={game} pins={Array.from({ length: 30 }, (_, id) =>
+      ({ id, name: `Pin ${id}`, image_name: `pin-${id}.webp` })) as Pin[]}
+    feed={{} as PinCollectionData} navigate={vi.fn()} onHuntModeChange={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Board check link' }));
+    const boardDialog = screen.getByRole('dialog', { name: 'Board check link' });
+    expect(within(boardDialog).getByRole('link')).toHaveAttribute('href',
+      `${window.location.origin}/ACDE?game=${game}`);
+    fireEvent.click(within(boardDialog).getByRole('button', { name: 'Close' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Share to join game' }));
+    const joinDialog = screen.getByRole('dialog', { name: 'Share to join game' });
+    expect(within(joinDialog).getByRole('link')).toHaveAttribute('href',
+      `${window.location.origin}/join/${game}`);
   });
 
   it('shows only the registered game pool on an issued board', async () => {
