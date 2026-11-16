@@ -9,6 +9,7 @@ import { PinSearchFilterDisplay, isPinFiltered, isPinSetFiltered } from './compo
 import { useEffect, useState } from 'react';
 import { countFilters, isEmptyList, isPinOnLanyard, isPinSetOnLanyard, sanitizePinList } from './utils.ts';
 import { getActiveLanyard, getStoredLanyard, saveListToLocal, setActiveLanyardId } from './lanyardStorage.ts';
+import { getLanyardFromCloud, saveLanyardToCloud } from './lanyardCloudStorage.ts';
 
 import { AppSettingsPanel } from './components/AppSettingsPanel.tsx';
 import { FilterQRCode } from './components/FilterQRCode.tsx';
@@ -68,7 +69,14 @@ const App = (): JSX.Element => {
   useEffect(() => {
     if (activePinList && !isEmptyList(activePinList)) {
       setActiveLanyardId(activePinList.id);
-      saveListToLocal(activePinList);
+      try {
+        saveListToLocal(activePinList);
+      } catch (error) {
+        console.warn('Could not save lanyard locally.', error);
+      }
+      void saveLanyardToCloud(activePinList).catch((error: unknown) => {
+        console.warn('Could not save lanyard to cloud storage.', error);
+      });
     } else {
       setSelectionFilterEnabled(false);
     }
@@ -116,12 +124,33 @@ const App = (): JSX.Element => {
       });
     };
 
-    if (hasListOnUrlHash()) {
-      processCurrentHash();
+    const loadSharedLanyard = async () => {
+      const sharedId = new URLSearchParams(window.location.search).get('id');
+      if (sharedId) {
+        try {
+          const cloudLanyard = await getLanyardFromCloud(sharedId);
+          if (cloudLanyard) {
+            selectionListUpdated(cloudLanyard);
+            return;
+          }
+        } catch (error) {
+          console.warn('Could not load shared lanyard from cloud storage; trying the offline link data.', error);
+        }
+      }
+
+      if (hasListOnUrlHash()) {
+        processCurrentHash();
+      } else {
+        await loadDefaultLanyard();
+      }
+    };
+
+    fetchPins();
+    if (new URLSearchParams(window.location.search).has('id')) {
+      void loadSharedLanyard();
     } else {
       loadDefaultLanyard();
     }
-    fetchPins();
   }, []);
 
   const updateFilterSelectionFromLanyard = (lanyard: PinSelectionList): void => {

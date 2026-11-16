@@ -3,6 +3,8 @@
 // Runtime types generated with workerd@1.20250902.0 2025-09-06 
 declare namespace Cloudflare {
 	interface Env {
+		LANYARDS: D1Database;
+		ASSETS: Fetcher;
 	}
 }
 interface Env extends Cloudflare.Env {}

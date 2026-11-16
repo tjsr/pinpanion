@@ -17,16 +17,17 @@ export const findShareGaps = (values: number[], minSize = 28): [number, number][
 
 export const createShareUrl = (psl: PinSelectionList, offlineMode?: boolean): string => {
   const collectionShareParams: string = encodePinSelectionHash(psl, offlineMode);
+  const sharePath = `?id=${encodeURIComponent(psl.id)}#${collectionShareParams}`;
 
   if (window.location.hostname === 'localhost') {
     // We need to use 127 as android QR code scanners block 'localhost' as a string in the host.
     if (window.location.protocol === 'https:' && window.location.port !== '443') {
-      return `https://${devIp}:${window.location.port}/#${collectionShareParams}`;
+      return `https://${devIp}:${window.location.port}/${sharePath}`;
     }
     if (window.location.protocol === 'http:' && window.location.port !== '80') {
-      return `http://${devIp}:${window.location.port}/#${collectionShareParams}`;
+      return `http://${devIp}:${window.location.port}/${sharePath}`;
     }
-    return `${window.location.protocol}//${devIp}/#${collectionShareParams}`;
+    return `${window.location.protocol}//${devIp}/${sharePath}`;
   }
-  return `${window.location.protocol}//${window.location.host}/#${collectionShareParams}`;
+  return `${window.location.protocol}//${window.location.host}/${sharePath}`;
 };

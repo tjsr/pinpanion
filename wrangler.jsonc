@@ -12,13 +12,24 @@
 		"directory": "./public/",
 		"not_found_handling": "single-page-application"
 	},
+	"d1_databases": [
+		{
+			"binding": "LANYARDS",
+			"database_name": "pinpanion-lanyards-dev",
+			"database_id": "00000000-0000-0000-0000-000000000000",
+			"migrations_dir": "worker/migrations"
+		}
+	],
 	"vars": {
 		"ENVIRONMENT": "dev",
 	},
 	"workers_dev": true,
 	"route": "dev.pinpanion.com",
 	"observability": {
-		"enabled": true
+		"enabled": true,
+		"traces": {
+			"enabled": true
+		}
 	},
 	"env": {
 		"dev": {
@@ -26,13 +37,29 @@
 			"workers_dev": true,
 			"vars": {
 				"ENVIRONMENT": "dev"
-			}
+			},
+			"d1_databases": [
+				{
+					"binding": "LANYARDS",
+					"database_name": "pinpanion-lanyards-dev",
+					"database_id": "00000000-0000-0000-0000-000000000000",
+					"migrations_dir": "worker/migrations"
+				}
+			]
 		},
 		"prod": {
 			"route": "www.pinpanion.com",
 			"vars": {
 				"ENVIRONMENT": "prod"
-			}
+			},
+			"d1_databases": [
+				{
+					"binding": "LANYARDS",
+					"database_name": "pinpanion-lanyards",
+					"database_id": "00000000-0000-0000-0000-000000000000",
+					"migrations_dir": "worker/migrations"
+				}
+			]
 		}
 	}
 
