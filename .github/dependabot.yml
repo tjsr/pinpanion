@@ -1,6 +1,7 @@
 version: 2
 updates:
   - package-ecosystem: "npm"
+    rebase-strategy: auto
     directory: "/"
     schedule:
       interval: "daily"
@@ -11,9 +12,13 @@ updates:
       linter:
         applies-to: version-updates
         patterns:
-        - "@typescript-eslint/*"
-        - "eslint-*"
-        - "@tjsr/eslint-config"
+          - "@tjsr/eslint-config"
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "@typescript-eslint/*"
+          - "typescript-eslint"
+          - "@stylistic/*"
       mui:
         applies-to: version-updates
         patterns:
@@ -27,6 +32,7 @@ updates:
         - "react-dom"
 
   - package-ecosystem: "github-actions"
+    rebase-strategy: auto
     directory: "/"
     schedule:
       interval: "weekly"
