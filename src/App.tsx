@@ -148,8 +148,10 @@ const App = (): JSX.Element => {
     fetchPins();
     if (new URLSearchParams(window.location.search).has('id')) {
       void loadSharedLanyard();
+    } else if (hasListOnUrlHash()) {
+      processCurrentHash();
     } else {
-      loadDefaultLanyard();
+      void loadDefaultLanyard();
     }
   }, []);
 
