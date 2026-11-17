@@ -39,7 +39,7 @@ jobs:
 
       - name: Cache pin images
         id: cache-images
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: cached-images
           key: ${{ runner.os }}-images
